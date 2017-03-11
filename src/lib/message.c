@@ -1,11 +1,44 @@
+/*
+
+Message Structure Overview
+==========================
+
+deepstream messages are transmitted using a proprietary, minimal,
+string-based protocol. Every message follows the same structure:
+
+<topic>|<action>|<data[0]>|...|<data[n]>+
+
+| and + are used above as placeholders, but messages are actually
+separated by ASCII control characters ("unit separator" 31) and
+"record separator" 30).
+
+Every message has a topic (e.g., RECORD, EVENT, AUTH) and an action
+(e.g., CREATE, DELETE, SUBSCRIBE).
+
+TOPICS
+
+| name       | value    | server | client |
+|------------+----------+--------+--------|
+| CONNECTION | C        | YES    | YES    |
+| AUTH       | A        | YES    | YES    |
+| ERROR      | X        | YES    | YES    |
+| EVENT      | E        | YES    | YES    |
+| RECORD     | R        | YES    | YES    |
+| RPC        | P        | YES    | YES    |
+| PRIVATE    | PRIVATE/ | YES    | YES    |
+
+ACTIONS
+
+Messages always start with TOPIC, then ACTION, but can contain zero or
+more data fields.
+
+*/
+
 #include <string.h>
 #include <stdlib.h>
 
 #include <dsio/dsio.h>
 #include "message.h"
-
-#define DSIO_MESSAGE_UNIT_SEPARATOR	0x1f
-#define DSIO_MESSAGE_RECORD_SEPARATOR	0x1e
 
 struct topic {
 	const char *ident;
@@ -96,7 +129,7 @@ static int action_bsearch_comparator(const void *a, const void *b)
 
 static int parse_topic(struct scanner *s)
 {
-	const char *found = strchr(s->curr, DSIO_MESSAGE_UNIT_SEPARATOR);
+	char *found = strchr(s->curr, DSIO_MESSAGE_UNIT_SEPARATOR);
 
 	if (found == NULL) {
 		return DSIO_ERROR;
@@ -104,7 +137,8 @@ static int parse_topic(struct scanner *s)
 
 	s->message->topic.ident = s->curr;
 	s->message->topic.len = found - s->curr;
-
+	*found = '\0';
+	
 	if (!is_valid_topic_p(s->message->topic.ident, s->message->topic.len)) {
 		return DSIO_ERROR;
 	}
@@ -116,7 +150,7 @@ static int parse_topic(struct scanner *s)
 
 static int parse_action(struct scanner *s)
 {
-	const char *found = strchr(s->curr, DSIO_MESSAGE_UNIT_SEPARATOR);
+	char *found = strchr(s->curr, DSIO_MESSAGE_UNIT_SEPARATOR);
 
 	if (found == NULL) {
 		return DSIO_ERROR;
@@ -124,6 +158,7 @@ static int parse_action(struct scanner *s)
 
 	s->message->action.ident = s->curr;
 	s->message->action.len = found - s->curr;
+	*found = '\0';
 
 	if (!is_valid_action_p(s->message->action.ident, s->message->action.len)) {
 		return DSIO_ERROR;
@@ -144,6 +179,11 @@ int dsio_message_parse(const struct dsio_allocator *a, const char *input, struct
 	int rc;
 	struct scanner s;
 
+	memset(msg, 0, sizeof *msg);
+	
+	if (input == NULL || *input == '\0')
+		return DSIO_ERROR;
+	
 	memset(&s, 0, sizeof s);
 	s.allocator = a;
 	s.curr = s.input = input;
