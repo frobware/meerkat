@@ -24,7 +24,7 @@ int strbuf_fmt(struct strbuf *strbuf, const char *fmt, ...) __attribute__((forma
 
 extern void strbuf_init(struct strbuf *strbuf, const struct dsio_allocator *allocator);
 extern void strbuf_release(struct strbuf *strbuf);
-extern char *strbuf_steal(struct strbuf *strbuf);
+extern char *strbuf_(struct strbuf *strbuf);
 extern void strbuf_reset(struct strbuf *strbuf);
 extern int strbuf_fmt(struct strbuf *strbuf, const char *fmt, ...);
 extern int strbuf_vfmt(struct strbuf *strbuf, const char *fmt, va_list ap);
