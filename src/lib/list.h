@@ -15,7 +15,7 @@
 #define dsio_list_foreach_rev(ptr, head) \
 	for (ptr = (head)->prev; ptr != head; ptr = ptr->prev)
 
-#define dsio_list_foreach_safe(ptr, head, tmp)	\
+#define dsio_list_foreach_safe(ptr, head, tmp)		\
 	for (ptr = (head)->next, tmp = ptr->next;	\
 	     ptr != head;				\
 	     ptr = tmp, tmp = tmp->next)
@@ -48,7 +48,7 @@ static inline void dsio_list_remove(struct dsio_list_head *item)
 }
 
 static inline void dsio_list_add_first(struct dsio_list_head *item,
-					 struct dsio_list_head *list)
+				       struct dsio_list_head *list)
 {
 	item->next = list->next;
 	item->prev = list;
@@ -57,7 +57,7 @@ static inline void dsio_list_add_first(struct dsio_list_head *item,
 }
 
 static inline void dsio_list_add_last(struct dsio_list_head *item,
-					struct dscore_list_head *list)
+				      struct dscore_list_head *list)
 {
 	item->next = list;
 	item->prev = list->prev;
