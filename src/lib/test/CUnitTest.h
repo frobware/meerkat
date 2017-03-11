@@ -246,14 +246,8 @@ const char * CUT_curr_suite = CUT_NO_SUITE;
              a <code>main()</code> function to run the specified tests/suite.
              Bad things will happen if this is called more than once!
  */
-#ifdef __VXWORKS__
-#define CUT_BEGIN_TEST_HARNESS(HARNESS_NAME) \
-_CUT_INIT \
-int HARNESS_NAME(void) { \
-	cafe_cunit_test_init();
-#else
 #define CUT_BEGIN_TEST_HARNESS(HARNESS_NAME) _CUT_INIT int main(void) {
-#endif /* __VXWORKS__ */
+
 /*!
  @define     CUT_END_TEST_HARNESS
  @abstract   End test harness definition.

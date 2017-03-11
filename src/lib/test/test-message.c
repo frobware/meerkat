@@ -90,6 +90,23 @@ static int test_topic_good_topic_and_good_action(void)
 	return 0;
 }
 
+static int test_all_topics_and_actions(void)
+{
+	struct topic *topic;
+	
+	for (topic = topics; topic->ident; topic++) {
+		if (strcmp(topic->ident, "private") == 0)
+			continue;
+		struct action *action;
+		for (action = actions; action->ident; action++) {
+			fprintf(stdout, "%s %s\n", topic->ident, action->ident);
+		}
+	}
+
+	return 0;
+}
+
+
 CUT_BEGIN_TEST_HARNESS(message_suite)
 CUT_RUN_TEST(test_topic_null_ident);
 CUT_RUN_TEST(test_topic_empty_ident);
@@ -98,4 +115,5 @@ CUT_RUN_TEST(test_topic_good_ident_but_missing_unit_separator);
 CUT_RUN_TEST(test_topic_good_ident_but_no_action);
 CUT_RUN_TEST(test_topic_good_action_but_no_unit_separator);
 CUT_RUN_TEST(test_topic_good_topic_and_good_action);
+CUT_RUN_TEST(test_all_topics_and_actions);
 CUT_END_TEST_HARNESS
