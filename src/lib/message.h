@@ -39,20 +39,53 @@ more data fields.
 */
 
 struct message_topic {
-	char *name;
-	char *ident;
+	const char *ident;
+	const char *name;
+};
+
+struct message_action {
+	const char *ident;
+	const char *name;
 };
 
 static struct message_topic message_topics[] = {
-	{ "connection", "C" },
-	{ "auth",	"A" },
-	{ "error",	"X" },
-	{ "error",	"E" },
-	{ "record",	"R" },
-	{ "rpc",	"P" },
-	{ "private",	"private/" },
+	{"C",		"CONNECTION"},
+	{"A",		"AUTH"},
+	{"X",		"ERROR"},
+	{"E",		"ERROR"},
+	{"R",		"RECORD"},
+	{"P",		"RPC"},
+	{"private",	"PRIVATE/"},
 };
 
+static struct message_action message_actions[] = {
+        {"A",	"ACK"},
+        {"CH",	"CHALLENGE"},
+        {"CHR",	"CHALLENGE_RESPONSE"},
+        {"C",	"CREATE"},
+        {"CR",	"CREATEORREAD"},
+        {"D",	"DELETE"},
+        {"E",	"ERROR"},
+        {"EVT",	"EVENT"},
+        {"H",	"HAS"},
+        {"L",	"LISTEN"},
+        {"LA",	"LISTEN_ACCEPT"},
+        {"LR",	"LISTEN_REJECT"},
+        {"P",	"PATCH"},
+        {"PU",	"PROVIDER_UPDATE"},
+        {"Q",	"QUERY"},
+        {"R",	"READ"},
+        {"RED",	"REDIRECT"},
+        {"REJ",	"REJECTION"},
+        {"REQ",	"REQUEST"},
+        {"RES",	"RESPONSE"},
+        {"SN",	"SNAPSHOT"},
+        {"S",	"SUBSCRIBE"},
+        {"SH",	"SUBSCRIPTION_HAS_PROVIDER"},
+        {"UL",	"UNLISTEN"},
+        {"US",	"UNSUBSCRIBE"},
+        {"U",	"UPDATE"},
+};
 typedef enum dsio_connection_state {
 	CONNECTION_STATE_CLOSED,
 	CONNECTION_STATE_AWAITING_CONNECTION,
@@ -88,3 +121,6 @@ struct dsio_message {
 	struct dsio_payload *payload;
 	size_t npayload;
 };
+
+extern int dsio_message_parse(const struct dsio_allocator *a, const char *input,
+			      struct dsio_message *msg);
