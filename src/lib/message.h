@@ -67,9 +67,24 @@ typedef enum dsio_connection_state {
 #define DSIO_MESSAGE_UNIT_SEPARATOR	0x1f
 #define DSIO_MESSAGE_RECORD_SEPARATOR	0x1e
 
+struct dsio_topic {
+	const char *ident;
+	size_t len;
+};
+
+struct dsio_action {
+	const char *ident;
+	size_t len;
+};
+
+struct dsio_data {
+	const char *data;
+	size_t len;
+};
+
 struct dsio_message {
-	const char *topic;
-	const char *action;
-	const char **data;
-	size_t ndata;
+	struct dsio_topic topic;
+	struct dsio_action action;
+	struct dsio_payload *payload;
+	size_t npayload;
 };

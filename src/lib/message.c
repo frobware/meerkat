@@ -4,16 +4,10 @@
 
 #define SCANNER_ERR 1
 
-enum scanner_state {
-	SCANNER_TOPIC,
-	SCANNER_ACTION,
-	SCANNER_DATA
-};
-
 struct scanner {
 	const char *input;
-	const char *next;
-	enum scanner_state state;
+	const char *curr;
+	struct dsio_message *message;
 	const struct dsio_allocator *allocator;
 };
 
@@ -28,23 +22,64 @@ static int is_valid_topic_p(const char *ident, size_t len)
 	return 0;
 }
 
-static void scanner_init(struct scanner *s, const struct dsio_allocator *a, const char *input)
+static int parse_topic(struct scanner *s)
 {
-	memset(s, 0, sizeof *s);
-	s->allocator = a;
-	s->state = SCANNER_TOPIC;
-	s->next = s->input = input;
+	const char *found = strchr(s->curr, DSIO_MESSAGE_UNIT_SEPARATOR);
+
+	if (found == NULL) {
+		return DSIO_ERROR;
+	}
+
+	s->message->topic.ident = s->curr;
+	s->message->topic.len = found - s->curr;
+
+	if (!is_valid_topic_p(s->message->topic.ident, s->message->topic.len)) {
+		return DSIO_ERROR;
+	}
+
+	s->curr = ++found;
+
+	return DSIO_OK;
 }
 
-static int scanner_next(struct scanner *s, const struct dsio_allocator *a, const char *input)
+static int parse_action(struct scanner *s)
 {
-	return 0;
+	const char *found = strchr(s->curr, DSIO_MESSAGE_UNIT_SEPARATOR);
+
+	if (found == NULL) {
+		return DSIO_ERROR;
+	}
+
+	s->message->action.ident = s->curr;
+	s->message->action.len = found - s->curr;
+	s->curr = ++found;
+
+	return DSIO_OK;
 }
 
-int message_parse(const struct dsio_allocator *a, const char *input)
+static int parse_payload(struct scanner *s)
 {
+	return DSIO_OK;
+}
+
+int message_parse(const struct dsio_allocator *a, const char *input, struct dsio_message *msg)
+{
+	int rc;
 	struct scanner s;
-	scanner_init(&s, a, input);
-	
+
+	memset(&s, 0, sizeof s);
+	s.allocator = a;
+	s.curr = s.input = input;
+	s.message = msg;
+
+	if ((rc = parse_topic(&s)) != DSIO_OK)
+		return rc;
+
+	if ((rc = parse_action(&s)) != DSIO_OK)
+		return rc;
+
+	if ((rc = parse_payload(&s)) != DSIO_OK)
+		return rc;
+
 	return DSIO_OK;
 }
