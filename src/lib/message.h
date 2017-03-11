@@ -59,7 +59,7 @@ struct dsio_action {
 	size_t len;
 };
 
-struct dsio_data {
+struct dsio_payload {
 	const char *data;
 	size_t len;
 };
@@ -67,8 +67,8 @@ struct dsio_data {
 struct dsio_message {
 	struct dsio_topic topic;
 	struct dsio_action action;
-	struct dsio_data *data;
-	size_t ndata;
+	struct dsio_payload *payload;
+	size_t npayload;
 };
 
 extern int dsio_message_parse(const struct dsio_allocator *a, const char *input,
