@@ -17,7 +17,7 @@
 #include <string.h>
 #include <assert.h>
 #include <dsio/dsio.h>
-#include "../utils.h"
+#include "../mprintf.h"
 #include "allocator.c"
 #include "CUnitTest.h"
 

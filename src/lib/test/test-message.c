@@ -2,7 +2,7 @@
 #include <string.h>
 #include <dsio/dsio.h>
 #include "../message.h"
-#include "../utils.h"
+#include "../mprintf.h"
 
 #include "CUnitTest.h"
 

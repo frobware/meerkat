@@ -16,10 +16,10 @@
 #include <stdio.h>
 #include <string.h>
 #include <dsio/dsio.h>
-#include "../utils.h"
 #include <dsio/allocator.h>
 #include <assert.h>
 #include "allocator.c"
+#include "../mprintf.h"
 #include "CUnitTest.h"
 
 static struct test_allocator *ta = &_test_allocator;
