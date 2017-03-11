@@ -4,17 +4,17 @@
 #include <dsio/dsio.h>
 #include "message.h"
 
-struct message_topic {
+struct topic {
 	const char *ident;
 	const char *descr;
 };
 
-struct message_action {
+struct action {
 	const char *ident;
 	const char *descr;
 };
 
-static struct message_topic message_topics[] = {
+static struct topic topics[] = {
 	{"C",		"CONNECTION"},
 	{"A",		"AUTH"},
 	{"X",		"ERROR"},
@@ -26,7 +26,7 @@ static struct message_topic message_topics[] = {
 
 /* This table _MUST_ remain sorted on ident. It is used by bsearch. */
 
-static struct message_action message_actions[] = {
+static struct action actions[] = {
         {"A",	"ACK"},
         {"C",	"CREATE"},
         {"CH",	"CHALLENGE"},
@@ -64,31 +64,31 @@ struct scanner {
 
 static int is_valid_topic_p(const char *ident, size_t len)
 {
-	for (size_t i = 0; i < DSIO_NELEMENTS(message_topics); i++) {
-		if (strncmp(ident, message_topics[i].ident, len) == 0) {
+	for (size_t i = 0; i < DSIO_NELEMENTS(topics); i++) {
+		if (strncmp(ident, topics[i].ident, len) == 0) {
 			return 1;
 		}
 	}
 
 	return 0;
-}
-
-static int message_action_bsearch_comparator(const void *a, const void *b)
-{
-	const struct dsio_message *x = a;
-	const struct message_action *y = b;
-	return strncmp(x->action.ident, y->ident, x->action.len); 
 }
 
 static int is_valid_action_p(const char *ident, size_t len)
 {
-	for (size_t i = 0; i < DSIO_NELEMENTS(message_actions); i++) {
-		if (strncmp(ident, message_actions[i].ident, len) == 0) {
+	for (size_t i = 0; i < DSIO_NELEMENTS(actions); i++) {
+		if (strncmp(ident, actions[i].ident, len) == 0) {
 			return 1;
 		}
 	}
 
 	return 0;
+}
+
+static int action_bsearch_comparator(const void *a, const void *b)
+{
+	const struct dsio_message *x = a;
+	const struct action *y = b;
+	return strncmp(x->action.ident, y->ident, x->action.len); 
 }
 
 static int parse_topic(struct scanner *s)
