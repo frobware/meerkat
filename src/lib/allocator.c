@@ -20,10 +20,11 @@ static void *dsio_alloc(const struct dsio_allocator *a, size_t n)
 
 static void *dsio_realloc(const struct dsio_allocator *a, void *ptr, size_t n)
 {
-	if (ptr == NULL)
+	if (ptr == NULL) {
 		return dsio_alloc(a, n);
-	else
+	} else {
 		return realloc(ptr, n);
+	}
 }
 
 static void dsio_free(const struct dsio_allocator *a, void *ptr)
@@ -37,15 +38,5 @@ static void dsio_free(const struct dsio_allocator *a, void *ptr)
 static struct stdlib_allocator dsio_allocator = {
 	{ dsio_alloc, dsio_realloc, dsio_free }, 0, 0
 };
-
-struct dsio_allocator *dsio_allocator_create(void)
-{
-	return &dsio_allocator.base;
-}
-
-void dsio_allocator_delete(const struct dsio_allocator *allocator)
-{
-	assert(allocator == &dsio_allocator.base);
-}
 
 struct dsio_allocator *dsio_stdlib_allocator = &dsio_allocator.base;

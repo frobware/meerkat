@@ -5,10 +5,11 @@
 #include <dsio/allocator.h>
 
 /*
- * Print into memory obtained from malloc().  sprintf fmt/args into a
- * buffer that grows to accomodate the result. Returns NULL if there
- * was insufficient memory, or a pointer to the formatted message on
- * success.
+ * Print into memory obtained from malloc() - this is the example code
+ * from the vsnprintf manual page. This function sprintf's fmt/args
+ * into a buffer that grows to accomodate the result. Returns NULL if
+ * there was insufficient memory, or a pointer to the formatted
+ * message on success.
  */
 char *dsio_mprintf(const struct dsio_allocator *allocator, const char *fmt, ...)
 {

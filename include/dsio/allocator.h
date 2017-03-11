@@ -16,8 +16,6 @@ struct dsio_allocator {
 	void (*free)(const struct dsio_allocator *, void *p);
 };
 
-extern struct dsio_allocator *dsio_allocator_create(void);
-extern void dsio_allocator_delete(const struct dsio_allocator *allocator);
 extern struct dsio_allocator *dsio_stdlib_allocator;
 
 #ifdef __cplusplus
