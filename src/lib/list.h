@@ -7,23 +7,23 @@
 #define DSIO_LIST_ENTRY(PTR, TYPE, FIELD) \
 	((TYPE *)(((char *)PTR) - offsetof(TYPE, FIELD)))
 
-#define DSIO_LIST_INIT(list) {&list, &list}
+#define DSIO_LIST_INIT(LIST) {&LIST, &LIST}
 
-#define dsio_list_foreach(ptr, head) \
-	for (ptr = (head)->next; ptr != head; ptr = ptr->next)
+#define dsio_list_foreach(PTR, HEAD) \
+	for (PTR = (HEAD)->next; PTR != HEAD; PTR = PTR->next)
 
-#define dsio_list_foreach_rev(ptr, head) \
-	for (ptr = (head)->prev; ptr != head; ptr = ptr->prev)
+#define dsio_list_foreach_rev(PTR, HEAD) \
+	for (PTR = (HEAD)->prev; PTR != HEAD; PTR = PTR->prev)
 
-#define dsio_list_foreach_safe(ptr, head, tmp)		\
-	for (ptr = (head)->next, tmp = ptr->next;	\
-	     ptr != head;				\
-	     ptr = tmp, tmp = tmp->next)
+#define dsio_list_foreach_safe(PTR, HEAD, TMP)		\
+	for (PTR = (HEAD)->next, TMP = PTR->next;	\
+	     PTR != HEAD;				\
+	     PTR = TMP, TMP = TMP->next)
 
-#define dsio_list_foreach_rev_safe(ptr, head, tmp)	\
-	for (ptr = (head)->prev, tmp = ptr->prev;	\
-	     ptr != head;				\
-	     ptr = tmp, tmp = tmp->prev)
+#define dsio_list_foreach_rev_safe(PTR, HEAD, TMP)	\
+	for (PTR = (HEAD)->prev, TMP = PTR->prev;	\
+	     PTR != HEAD;				\
+	     PTR = TMP, TMP = TMP->prev)
 
 struct dsio_list_head {
 	struct dsio_list_head *next;
