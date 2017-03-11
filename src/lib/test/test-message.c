@@ -70,7 +70,7 @@ static int test_topic_good_action_but_no_unit_separator(void)
 	return 0;
 }
 
-static int test_topic_good_ident_and_good_action(void)
+static int test_topic_good_topic_and_good_action(void)
 {
 	int rc;
 	struct dsio_message msg;
@@ -81,11 +81,12 @@ static int test_topic_good_ident_and_good_action(void)
 	};
 	rc = dsio_message_parse(dsio_stdlib_allocator, input, &msg);
 	CUT_ASSERT_EQUAL(DSIO_OK, rc);
-	/* Partial message parsing was OK */
 	CUT_ASSERT_EQUAL(msg.topic.len, 1);
 	CUT_ASSERT_EQUAL(strcmp("E", msg.topic.ident), 0);
 	CUT_ASSERT_EQUAL(msg.action.len, 1);
 	CUT_ASSERT_EQUAL(strcmp("C", msg.action.ident), 0);
+	CUT_ASSERT_EQUAL(msg.npayload, 0);
+	CUT_ASSERT_EQUAL(msg.payload, NULL);
 	return 0;
 }
 
@@ -96,5 +97,5 @@ CUT_RUN_TEST(test_topic_bad_ident);
 CUT_RUN_TEST(test_topic_good_ident_but_missing_unit_separator);
 CUT_RUN_TEST(test_topic_good_ident_but_no_action);
 CUT_RUN_TEST(test_topic_good_action_but_no_unit_separator);
-CUT_RUN_TEST(test_topic_good_ident_and_good_action);
+CUT_RUN_TEST(test_topic_good_topic_and_good_action);
 CUT_END_TEST_HARNESS
