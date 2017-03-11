@@ -57,32 +57,32 @@ struct topic topics[] = {
 /* This table _MUST_ remain sorted on ident. It is used by bsearch. */
 
 struct action actions[] = {
-	{"A",	"ACK"},
-	{"C",	"CREATE"},
-	{"CH",	"CHALLENGE"},
+	{"A", "ACK"},
+	{"C", "CREATE"},
+	{"CH", "CHALLENGE"},
 	{"CHR", "CHALLENGE_RESPONSE"},
-	{"CR",	"CREATEORREAD"},
-	{"D",	"DELETE"},
-	{"E",	"ERROR"},
+	{"CR", "CREATEORREAD"},
+	{"D", "DELETE"},
+	{"E", "ERROR"},
 	{"EVT", "EVENT"},
-	{"H",	"HAS"},
-	{"L",	"LISTEN"},
-	{"LA",	"LISTEN_ACCEPT"},
-	{"LR",	"LISTEN_REJECT"},
-	{"P",	"PATCH"},
-	{"PU",	"PROVIDER_UPDATE"},
-	{"Q",	"QUERY"},
-	{"R",	"READ"},
+	{"H", "HAS"},
+	{"L", "LISTEN"},
+	{"LA", "LISTEN_ACCEPT"},
+	{"LR", "LISTEN_REJECT"},
+	{"P", "PATCH"},
+	{"PU", "PROVIDER_UPDATE"},
+	{"Q", "QUERY"},
+	{"R", "READ"},
 	{"RED", "REDIRECT"},
 	{"REJ", "REJECTION"},
 	{"REQ", "REQUEST"},
 	{"RES", "RESPONSE"},
-	{"S",	"SUBSCRIBE"},
-	{"SH",	"SUBSCRIPTION_HAS_PROVIDER"},
-	{"SN",	"SNAPSHOT"},
-	{"U",	"UPDATE"},
-	{"UL",	"UNLISTEN"},
-	{"US",	"UNSUBSCRIBE"},
+	{"S", "SUBSCRIBE"},
+	{"SH", "SUBSCRIPTION_HAS_PROVIDER"},
+	{"SN", "SNAPSHOT"},
+	{"U", "UPDATE"},
+	{"UL", "UNLISTEN"},
+	{"US", "UNSUBSCRIBE"},
 	{NULL},
 };
 
@@ -101,7 +101,7 @@ static int topic_bsearch_comparator(const void *a, const void *b)
 
 static int is_valid_topic_p(const char *ident)
 {
-	struct topic key = {.ident = ident};
+	struct topic key = {.ident = ident };
 
 	return bsearch(&key, topics, DSIO_NELEMENTS(topics) - 1,
 		       sizeof key, topic_bsearch_comparator) != NULL;
@@ -115,7 +115,7 @@ static int action_bsearch_comparator(const void *a, const void *b)
 
 static int is_valid_action_p(const char *ident)
 {
-	struct action key = {.ident = ident};
+	struct action key = {.ident = ident };
 
 	return bsearch(&key, actions, DSIO_NELEMENTS(actions) - 1,
 		       sizeof key, action_bsearch_comparator) != NULL;
@@ -169,8 +169,7 @@ static int parse_payload(struct parser *p)
 }
 
 int dsio_message_parse(const struct dsio_allocator *a,
-		       const char *input,
-		       struct dsio_message *msg)
+		       const char *input, struct dsio_message *msg)
 {
 	int rc;
 	struct parser p;

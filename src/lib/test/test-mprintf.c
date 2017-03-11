@@ -12,7 +12,7 @@
  * implied. See the License for the specific language governing
  * permissions and limitations under the License.
  */
-	
+
 #include <stdio.h>
 #include <string.h>
 #include <dsio/dsio.h>
@@ -53,7 +53,7 @@ static int test_mprintf_alloc_fails(void)
 }
 
 CUT_BEGIN_TEST_HARNESS(mprintf_suite)
-CUT_RUN_TEST(test_mprintf_empty_fails);
+    CUT_RUN_TEST(test_mprintf_empty_fails);
 CUT_RUN_TEST(test_mprintf_alloc_succeeds);
 CUT_RUN_TEST(test_mprintf_alloc_fails);
 CUT_END_TEST_HARNESS

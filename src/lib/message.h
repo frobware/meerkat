@@ -51,4 +51,5 @@ struct dsio_message {
 extern struct topic topics[];
 extern struct action actions[];
 
-extern int dsio_message_parse(const struct dsio_allocator *a, const char *input, struct dsio_message *msg);
+extern int dsio_message_parse(const struct dsio_allocator *a, const char *input,
+			      struct dsio_message *msg);

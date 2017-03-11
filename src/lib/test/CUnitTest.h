@@ -151,9 +151,9 @@ extern int CUT_tests_failed;
 extern int CUT_suite_tests_run;
 extern int CUT_suite_tests_failed;
 extern int CUT_assertions_count;
-extern const char * CUT_curr_suite;
-void (*CUT_fixture_setup)(void);
-void (*CUT_fixture_teardown)(void);
+extern const char *CUT_curr_suite;
+void (*CUT_fixture_setup) (void);
+void (*CUT_fixture_teardown) (void);
 
 /*!
 @group CUnitTest Core Test Macros

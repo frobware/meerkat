@@ -48,9 +48,9 @@ static int test_topic_bad_topic(void)
 {
 	int rc;
 	struct dsio_message msg;
-	const char input[] = { 
+	const char input[] = {
 		'!', DSIO_MESSAGE_UNIT_SEPARATOR,
-		'\0' 
+		'\0'
 	};
 	rc = dsio_message_parse(dsio_stdlib_allocator, input, &msg);
 	CUT_ASSERT_EQUAL(DSIO_ERROR, rc);
@@ -70,9 +70,9 @@ static int test_topic_good_ident_but_no_action(void)
 {
 	int rc;
 	struct dsio_message msg;
-	const char input[] = { 
+	const char input[] = {
 		'E', DSIO_MESSAGE_UNIT_SEPARATOR,
-		'\0' 
+		'\0'
 	};
 	rc = dsio_message_parse(dsio_stdlib_allocator, input, &msg);
 	CUT_ASSERT_EQUAL(DSIO_ERROR, rc);
@@ -135,14 +135,16 @@ static int test_topic_good_topic_and_good_action(void)
 
 static int test_all_topics_and_actions(void)
 {
-	for (struct topic *t = topics; t->ident; t++) {
+	for (struct topic * t = topics; t->ident; t++) {
 		if (strcmp(t->ident, "private") == 0)
 			continue;
-		for (struct action *a = actions; a->ident; a++) {
+		for (struct action * a = actions; a->ident; a++) {
 			struct dsio_message msg;
 			char *input = make_msg(t->ident, a->ident);
 			CUT_ASSERT_NOT_NULL(input);
-			int rc = dsio_message_parse(dsio_stdlib_allocator, input, &msg);
+			int rc =
+			    dsio_message_parse(dsio_stdlib_allocator, input,
+					       &msg);
 			CUT_ASSERT_EQUAL(DSIO_OK, rc);
 			CUT_ASSERT_EQUAL(strlen(t->ident), msg.topic.len);
 			CUT_ASSERT_EQUAL(strcmp(t->ident, msg.topic.ident), 0);
@@ -150,7 +152,8 @@ static int test_all_topics_and_actions(void)
 			CUT_ASSERT_EQUAL(strcmp(a->ident, msg.action.ident), 0);
 			CUT_ASSERT_EQUAL(0, msg.npayload);
 			CUT_ASSERT_EQUAL(NULL, msg.payload);
-			dsio_stdlib_allocator->free(dsio_stdlib_allocator, input);
+			dsio_stdlib_allocator->free(dsio_stdlib_allocator,
+						    input);
 		}
 	}
 
@@ -158,7 +161,7 @@ static int test_all_topics_and_actions(void)
 }
 
 CUT_BEGIN_TEST_HARNESS(message_suite)
-CUT_RUN_TEST(test_topic_null_ident);
+    CUT_RUN_TEST(test_topic_null_ident);
 CUT_RUN_TEST(test_topic_empty_ident);
 CUT_RUN_TEST(test_topic_missing_unit_separator);
 CUT_RUN_TEST(test_topic_bad_topic);

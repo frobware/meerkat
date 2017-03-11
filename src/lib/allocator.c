@@ -36,7 +36,7 @@ static void dsio_free(const struct dsio_allocator *a, void *ptr)
 }
 
 static struct stdlib_allocator dsio_allocator = {
-	{ dsio_alloc, dsio_realloc, dsio_free }, 0, 0
+	{dsio_alloc, dsio_realloc, dsio_free}, 0, 0
 };
 
 struct dsio_allocator *dsio_stdlib_allocator = &dsio_allocator.base;

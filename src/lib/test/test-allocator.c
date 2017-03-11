@@ -12,7 +12,7 @@
  * implied. See the License for the specific language governing
  * permissions and limitations under the License.
  */
-	
+
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
@@ -65,7 +65,7 @@ static int test_realloc_fails(void)
 }
 
 CUT_BEGIN_TEST_HARNESS(allocator_suite)
-CUT_RUN_TEST(test_alloc_succeeds);
+    CUT_RUN_TEST(test_alloc_succeeds);
 CUT_RUN_TEST(test_alloc_fails);
 CUT_RUN_TEST(test_realloc_succeeds);
 CUT_RUN_TEST(test_realloc_fails);
