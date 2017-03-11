@@ -57,7 +57,7 @@ static inline void dsio_list_add_first(struct dsio_list_head *item,
 }
 
 static inline void dsio_list_add_last(struct dsio_list_head *item,
-				      struct dscore_list_head *list)
+				      struct dsio_list_head *list)
 {
 	item->next = list;
 	item->prev = list->prev;
@@ -65,10 +65,10 @@ static inline void dsio_list_add_last(struct dsio_list_head *item,
 	list->prev = item;
 }
 
-static inline void dscore_list_concat(struct dscore_list_head *item,
-				      struct dscore_list_head *list)
+static inline void dsio_list_concat(struct dsio_list_head *item,
+				    struct dsio_list_head *list)
 {
-	if (!dscore_list_is_empty(list)) {
+	if (!dsio_list_is_empty(list)) {
 		item->prev->next = list->next;
 		list->next->prev = item->prev;
 		item->prev = list->prev;
