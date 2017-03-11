@@ -39,3 +39,4 @@ $(LIB_OBJS): Makefile
 
 -include obj/lib/*.d
 -include obj/lib/test/*.d
+-include bin/*.d
