@@ -1,8 +1,8 @@
 LIB_SRCS = $(wildcard src/lib/*.c)
-LIB_OBJS = $(patsubst src/lib/%.c, obj/lib/%.o, $(LIB_SRCS))
+LIB_OBJS = $(patsubst src/lib/%.c,obj/lib/%.o,$(LIB_SRCS))
 
 TEST_SRCS := $(wildcard src/lib/test/test-*.c)
-TEST_BINS := $(patsubst src/lib/test/test-%.c, bin/test-%, $(TEST_SRCS))
+TEST_BINS := $(patsubst src/lib/test/test-%.c,bin/test-%,$(TEST_SRCS))
 
 LIB_DSIO = lib/libdsio.a
 
