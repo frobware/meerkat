@@ -16,6 +16,16 @@ typedef enum dsio_connection_state {
 	CONNECTION_STATE_RECONNECTING
 } dsio_connection_state_t;
 
+struct topic {
+	const char *ident;
+	const char *descr;
+};
+
+struct action {
+	const char *ident;
+	const char *descr;
+};
+
 struct dsio_topic {
 	const char *ident;
 	size_t len;
@@ -38,5 +48,7 @@ struct dsio_message {
 	size_t npayload;
 };
 
-extern int dsio_message_parse(const struct dsio_allocator *a, const char *input,
-			      struct dsio_message *msg);
+extern struct topic topics[];
+extern struct action actions[];
+
+extern int dsio_message_parse(const struct dsio_allocator *a, const char *input, struct dsio_message *msg);

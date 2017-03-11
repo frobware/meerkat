@@ -40,17 +40,7 @@ more data fields.
 #include <dsio/dsio.h>
 #include "message.h"
 
-struct topic {
-	const char *ident;
-	const char *descr;
-};
-
-struct action {
-	const char *ident;
-	const char *descr;
-};
-
-static struct topic topics[] = {
+struct topic topics[] = {
 	{"C",		"CONNECTION"},
 	{"A",		"AUTH"},
 	{"X",		"ERROR"},
@@ -58,11 +48,12 @@ static struct topic topics[] = {
 	{"R",		"RECORD"},
 	{"P",		"RPC"},
 	{"private",	"PRIVATE/"},
+	{ NULL },
 };
 
 /* This table _MUST_ remain sorted on ident. It is used by bsearch. */
 
-static struct action actions[] = {
+struct action actions[] = {
         {"A",	"ACK"},
         {"C",	"CREATE"},
         {"CH",	"CHALLENGE"},
@@ -89,6 +80,7 @@ static struct action actions[] = {
         {"U",	"UPDATE"},
         {"UL",	"UNLISTEN"},
         {"US",	"UNSUBSCRIBE"},
+	{ NULL },
 };
 
 struct scanner {
@@ -100,7 +92,7 @@ struct scanner {
 
 static int is_valid_topic_p(const char *ident, size_t len)
 {
-	for (size_t i = 0; i < DSIO_NELEMENTS(topics); i++) {
+	for (size_t i = 0; i < DSIO_NELEMENTS(topics) - 1; i++) {
 		if (strncmp(ident, topics[i].ident, len) == 0) {
 			return 1;
 		}
@@ -111,7 +103,7 @@ static int is_valid_topic_p(const char *ident, size_t len)
 
 static int is_valid_action_p(const char *ident, size_t len)
 {
-	for (size_t i = 0; i < DSIO_NELEMENTS(actions); i++) {
+	for (size_t i = 0; i < DSIO_NELEMENTS(actions) - 1; i++) {
 		if (strncmp(ident, actions[i].ident, len) == 0) {
 			return 1;
 		}
@@ -120,12 +112,14 @@ static int is_valid_action_p(const char *ident, size_t len)
 	return 0;
 }
 
+#if 0
 static int action_bsearch_comparator(const void *a, const void *b)
 {
 	const struct dsio_message *x = a;
 	const struct action *y = b;
 	return strncmp(x->action.ident, y->ident, x->action.len); 
 }
+#endif
 
 static int parse_topic(struct scanner *s)
 {
@@ -137,7 +131,7 @@ static int parse_topic(struct scanner *s)
 
 	s->message->topic.ident = s->curr;
 	s->message->topic.len = found - s->curr;
-	*found = '\0';
+	*found = '\0';		/* punch hole in input */
 	
 	if (!is_valid_topic_p(s->message->topic.ident, s->message->topic.len)) {
 		return DSIO_ERROR;
@@ -158,7 +152,7 @@ static int parse_action(struct scanner *s)
 
 	s->message->action.ident = s->curr;
 	s->message->action.len = found - s->curr;
-	*found = '\0';
+	*found = '\0';		/* punch hole in input */
 
 	if (!is_valid_action_p(s->message->action.ident, s->message->action.len)) {
 		return DSIO_ERROR;
