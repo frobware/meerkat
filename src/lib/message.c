@@ -51,7 +51,7 @@ struct topic topics[] = {
 	{"R", "RECORD"},
 	{"X", "ERROR"},
 	{"private", "PRIVATE/"},
-	{NULL},
+	{NULL, NULL},
 };
 
 /* This table _MUST_ remain sorted on ident. It is used by bsearch. */
@@ -83,7 +83,7 @@ struct action actions[] = {
 	{"U", "UPDATE"},
 	{"UL", "UNLISTEN"},
 	{"US", "UNSUBSCRIBE"},
-	{NULL},
+	{NULL, NULL},
 };
 
 struct parser {
@@ -165,6 +165,7 @@ static int parse_action(struct parser *p)
 
 static int parse_payload(struct parser *p)
 {
+	p->message->payload = NULL;
 	return DSIO_OK;
 }
 

@@ -4,6 +4,10 @@
 #include <dsio/dsio.h>
 #include <dsio/allocator.h>
 
+#include "mprintf.h"
+
+char *dsio_mprintf(const struct dsio_allocator *a, const char *format, ...) __attribute__((format(printf, 2, 3)));
+
 /*
  * Print into memory obtained from malloc() - this is the example code
  * from the vsnprintf manual page. This function sprintf's fmt/args
@@ -23,10 +27,6 @@ char *dsio_mprintf(const struct dsio_allocator *allocator, const char *fmt, ...)
 	size = vsnprintf(p, size, fmt, ap);
 	va_end(ap);
 
-	if (size < 0) {
-		return NULL;
-	}
-
 	size++;			/* For '\0' */
 
 	if ((p = allocator->alloc(allocator, size)) == NULL) {
@@ -35,10 +35,6 @@ char *dsio_mprintf(const struct dsio_allocator *allocator, const char *fmt, ...)
 
 	va_start(ap, fmt);
 	size = vsnprintf(p, size, fmt, ap);
-	if (size < 0) {
-		DSIO_FREE(allocator, p);
-		return NULL;
-	}
 	va_end(ap);
 
 	return p;
