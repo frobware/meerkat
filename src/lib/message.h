@@ -67,8 +67,8 @@ struct dsio_data {
 struct dsio_message {
 	struct dsio_topic topic;
 	struct dsio_action action;
-	struct dsio_payload *payload;
-	size_t npayload;
+	struct dsio_data *data;
+	size_t ndata;
 };
 
 extern int dsio_message_parse(const struct dsio_allocator *a, const char *input,
