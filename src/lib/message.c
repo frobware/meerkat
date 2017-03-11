@@ -4,6 +4,9 @@
 #include <dsio/dsio.h>
 #include "message.h"
 
+#define DSIO_MESSAGE_UNIT_SEPARATOR	0x1f
+#define DSIO_MESSAGE_RECORD_SEPARATOR	0x1e
+
 struct topic {
 	const char *ident;
 	const char *descr;

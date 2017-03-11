@@ -13,8 +13,8 @@ string-based protocol. Every message follows the same structure:
 <topic>|<action>|<data[0]>|...|<data[n]>+
 
 | and + are used above as placeholders, but messages are actually
-separated by ASCII control characters ("unit separator" (31) and
-"record separator" (30)).
+separated by ASCII control characters ("unit separator" 31) and
+"record separator" 30).
 
 Every message has a topic (e.g., RECORD, EVENT, AUTH) and an action
 (e.g., CREATE, DELETE, SUBSCRIBE).
@@ -48,9 +48,6 @@ typedef enum dsio_connection_state {
 	CONNECTION_STATE_ERROR,
 	CONNECTION_STATE_RECONNECTING
 } dsio_connection_state_t;
-
-#define DSIO_MESSAGE_UNIT_SEPARATOR	0x1f
-#define DSIO_MESSAGE_RECORD_SEPARATOR	0x1e
 
 struct dsio_topic {
 	const char *ident;
