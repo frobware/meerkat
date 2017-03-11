@@ -152,13 +152,8 @@ extern int CUT_suite_tests_run;
 extern int CUT_suite_tests_failed;
 extern int CUT_assertions_count;
 extern const char * CUT_curr_suite;
-#ifdef __VXWORKS__
-extern void (*CUT_fixture_setup)(void);
-extern void (*CUT_fixture_teardown)(void);
-#else
 void (*CUT_fixture_setup)(void);
 void (*CUT_fixture_teardown)(void);
-#endif
 
 /*!
 @group CUnitTest Core Test Macros
@@ -224,21 +219,12 @@ do { \
  @parseOnly
  (Internal) Sets up the test harness global vars for statistics collection
  */
-#ifdef __VXWORKS__
-#define _CUT_INIT extern int CUT_tests_run; \
-extern int CUT_tests_failed; \
-extern int CUT_suite_tests_run; \
-extern int CUT_suite_tests_failed; \
-extern int CUT_assertions_count; \
-extern const char * CUT_curr_suite;
-#else
 #define _CUT_INIT int CUT_tests_run = 0; \
 int CUT_tests_failed = 0;\
 int CUT_suite_tests_run = 0; \
 int CUT_suite_tests_failed = 0; \
 int CUT_assertions_count = 0; \
 const char * CUT_curr_suite = CUT_NO_SUITE;
-#endif /* __VXWORKS__ */
 /*!
  @define     CUT_BEGIN_TEST_HARNESS
  @abstract   Begin test harness definition.

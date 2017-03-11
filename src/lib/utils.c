@@ -12,34 +12,33 @@
  */
 char *dsio_mprintf(const struct dsio_allocator *allocator, const char *fmt, ...)
 {
-	int n, size = 17;
-	char *p, *np;
+	size_t size = 0;
+	char *p = NULL;
 	va_list ap;
 
-	if ((p = DSIO_ALLOC(allocator, size)) == NULL)
+	/* Determine required size */
+
+	va_start(ap, fmt);
+	size = vsnprintf(p, size, fmt, ap);
+	va_end(ap);
+
+	if (size < 0) {
 		return NULL;
-
-	while (1) {
-		va_start(ap, fmt);
-		n = vsnprintf(p, size, fmt, ap);
-		va_end(ap);
-
-		if (n > -1 && n < size)
-			return p;
-
-		/* Not enough space; grow some! */
-
-		if (n > -1) {
-			size = n+1;
-		} else {
-			size *= 2;
-		}
-
-		if ((np = DSIO_REALLOC(allocator, p, size)) == NULL) {
-			DSIO_FREE(allocator, p);
-			return NULL;
-		} else {
-			p = np;
-		}
 	}
+
+	size++;			/* For '\0' */
+
+	if ((p = allocator->alloc(allocator, size)) == NULL) {
+		return NULL;
+	}
+
+	va_start(ap, fmt);
+	size = vsnprintf(p, size, fmt, ap);
+	if (size < 0) {
+		DSIO_FREE(allocator, p);
+		return NULL;
+	}
+	va_end(ap);
+
+	return p;
 }

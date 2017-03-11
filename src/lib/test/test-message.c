@@ -35,11 +35,24 @@ static int test_topic_empty_ident(void)
 	return 0;
 }
 
-static int test_topic_bad_ident(void)
+static int test_topic_missing_unit_separator(void)
 {
 	int rc;
 	struct dsio_message msg;
-	rc = dsio_message_parse(dsio_stdlib_allocator, "!", &msg);
+	rc = dsio_message_parse(dsio_stdlib_allocator, "E", &msg);
+	CUT_ASSERT_EQUAL(DSIO_ERROR, rc);
+	return 0;
+}
+
+static int test_topic_bad_topic(void)
+{
+	int rc;
+	struct dsio_message msg;
+	const char input[] = { 
+		'!', DSIO_MESSAGE_UNIT_SEPARATOR,
+		'\0' 
+	};
+	rc = dsio_message_parse(dsio_stdlib_allocator, input, &msg);
 	CUT_ASSERT_EQUAL(DSIO_ERROR, rc);
 	return 0;
 }
@@ -58,11 +71,12 @@ static int test_topic_good_ident_but_no_action(void)
 	int rc;
 	struct dsio_message msg;
 	const char input[] = { 
-		'E', DSIO_MESSAGE_UNIT_SEPARATOR, '\0' 
+		'E', DSIO_MESSAGE_UNIT_SEPARATOR,
+		'\0' 
 	};
 	rc = dsio_message_parse(dsio_stdlib_allocator, input, &msg);
 	CUT_ASSERT_EQUAL(DSIO_ERROR, rc);
-	CUT_ASSERT_EQUAL(msg.topic.len, 1);
+	CUT_ASSERT_EQUAL(1, msg.topic.len);
 	CUT_ASSERT_EQUAL(strcmp("E", msg.topic.ident), 0);
 	return 0;
 }
@@ -78,7 +92,23 @@ static int test_topic_good_action_but_no_unit_separator(void)
 	};
 	rc = dsio_message_parse(dsio_stdlib_allocator, input, &msg);
 	CUT_ASSERT_EQUAL(DSIO_ERROR, rc);
-	CUT_ASSERT_EQUAL(msg.topic.len, 1);
+	CUT_ASSERT_EQUAL(1, msg.topic.len);
+	CUT_ASSERT_EQUAL(strcmp("E", msg.topic.ident), 0);
+	return 0;
+}
+
+static int test_topic_good_topic_bad_action(void)
+{
+	int rc;
+	struct dsio_message msg;
+	const char input[] = {
+		'E', DSIO_MESSAGE_UNIT_SEPARATOR,
+		'!', DSIO_MESSAGE_UNIT_SEPARATOR,
+		'\0',
+	};
+	rc = dsio_message_parse(dsio_stdlib_allocator, input, &msg);
+	CUT_ASSERT_EQUAL(DSIO_ERROR, rc);
+	CUT_ASSERT_EQUAL(1, msg.topic.len);
 	CUT_ASSERT_EQUAL(strcmp("E", msg.topic.ident), 0);
 	return 0;
 }
@@ -94,12 +124,12 @@ static int test_topic_good_topic_and_good_action(void)
 	};
 	rc = dsio_message_parse(dsio_stdlib_allocator, input, &msg);
 	CUT_ASSERT_EQUAL(DSIO_OK, rc);
-	CUT_ASSERT_EQUAL(msg.topic.len, 1);
+	CUT_ASSERT_EQUAL(1, msg.topic.len);
 	CUT_ASSERT_EQUAL(strcmp("E", msg.topic.ident), 0);
-	CUT_ASSERT_EQUAL(msg.action.len, 1);
+	CUT_ASSERT_EQUAL(1, msg.action.len);
 	CUT_ASSERT_EQUAL(strcmp("C", msg.action.ident), 0);
-	CUT_ASSERT_EQUAL(msg.npayload, 0);
-	CUT_ASSERT_EQUAL(msg.payload, NULL);
+	CUT_ASSERT_EQUAL(0, msg.npayload);
+	CUT_ASSERT_EQUAL(NULL, msg.payload);
 	return 0;
 }
 
@@ -118,8 +148,8 @@ static int test_all_topics_and_actions(void)
 			CUT_ASSERT_EQUAL(strcmp(t->ident, msg.topic.ident), 0);
 			CUT_ASSERT_EQUAL(strlen(a->ident), msg.action.len);
 			CUT_ASSERT_EQUAL(strcmp(a->ident, msg.action.ident), 0);
-			CUT_ASSERT_EQUAL(msg.npayload, 0);
-			CUT_ASSERT_EQUAL(msg.payload, NULL);
+			CUT_ASSERT_EQUAL(0, msg.npayload);
+			CUT_ASSERT_EQUAL(NULL, msg.payload);
 			dsio_stdlib_allocator->free(dsio_stdlib_allocator, input);
 		}
 	}
@@ -130,10 +160,12 @@ static int test_all_topics_and_actions(void)
 CUT_BEGIN_TEST_HARNESS(message_suite)
 CUT_RUN_TEST(test_topic_null_ident);
 CUT_RUN_TEST(test_topic_empty_ident);
-CUT_RUN_TEST(test_topic_bad_ident);
+CUT_RUN_TEST(test_topic_missing_unit_separator);
+CUT_RUN_TEST(test_topic_bad_topic);
 CUT_RUN_TEST(test_topic_good_ident_but_missing_unit_separator);
 CUT_RUN_TEST(test_topic_good_ident_but_no_action);
 CUT_RUN_TEST(test_topic_good_action_but_no_unit_separator);
+CUT_RUN_TEST(test_topic_good_topic_bad_action);
 CUT_RUN_TEST(test_topic_good_topic_and_good_action);
 CUT_RUN_TEST(test_all_topics_and_actions);
 CUT_END_TEST_HARNESS
