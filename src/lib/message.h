@@ -58,11 +58,13 @@ static struct message_topic message_topics[] = {
 	{"private",	"PRIVATE/"},
 };
 
+/* This table _MUST_ remain sorted on ident. It is used by bsearch. */
+
 static struct message_action message_actions[] = {
         {"A",	"ACK"},
+        {"C",	"CREATE"},
         {"CH",	"CHALLENGE"},
         {"CHR",	"CHALLENGE_RESPONSE"},
-        {"C",	"CREATE"},
         {"CR",	"CREATEORREAD"},
         {"D",	"DELETE"},
         {"E",	"ERROR"},
@@ -79,12 +81,12 @@ static struct message_action message_actions[] = {
         {"REJ",	"REJECTION"},
         {"REQ",	"REQUEST"},
         {"RES",	"RESPONSE"},
-        {"SN",	"SNAPSHOT"},
         {"S",	"SUBSCRIBE"},
         {"SH",	"SUBSCRIPTION_HAS_PROVIDER"},
+        {"SN",	"SNAPSHOT"},
+        {"U",	"UPDATE"},
         {"UL",	"UNLISTEN"},
         {"US",	"UNSUBSCRIBE"},
-        {"U",	"UPDATE"},
 };
 typedef enum dsio_connection_state {
 	CONNECTION_STATE_CLOSED,

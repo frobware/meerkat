@@ -22,6 +22,13 @@ static int is_valid_topic_p(const char *ident, size_t len)
 	return 0;
 }
 
+static int message_action_bsearch_comparator(const void *a, const void *b)
+{
+	const struct dsio_message *x = a;
+	const struct message_action *y = b;
+	return strncmp(x->action.ident, y->ident, x->action.len); 
+}
+
 static int is_valid_action_p(const char *ident, size_t len)
 {
 	for (size_t i = 0; i < DSIO_NELEMENTS(message_actions); i++) {
