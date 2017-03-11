@@ -13,10 +13,10 @@ clean:
 	$(RM) -r $(LIB_OBJS) lib obj
 
 obj/lib:
-	mkdir -p $@
+	@mkdir -p $@
 
 lib:
-	mkdir -p $@
+	@mkdir -p $@
 
 verify:
 	@echo LIB_SRCS=$(LIB_SRCS)
