@@ -39,6 +39,7 @@ verify:
 	@echo TEST_BINS=$(TEST_BINS)
 
 $(LIB_OBJS): Makefile
+$(TEST_BINS): $(LIB_OBJS)
 
 -include obj/lib/*.d
 -include obj/lib/test/*.d

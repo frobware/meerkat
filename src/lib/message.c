@@ -33,19 +33,23 @@
  * or more data fields.
  */
 
+#include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <assert.h>
 
 #include <dsio/dsio.h>
 #include "message.h"
 
+/* This table _MUST_ remain sorted on ident. It is used by bsearch. */
+
 struct topic topics[] = {
-	{"C", "CONNECTION"},
 	{"A", "AUTH"},
-	{"X", "ERROR"},
+	{"C", "CONNECTION"},
 	{"E", "ERROR"},
-	{"R", "RECORD"},
 	{"P", "RPC"},
+	{"R", "RECORD"},
+	{"X", "ERROR"},
 	{"private", "PRIVATE/"},
 	{NULL},
 };
@@ -89,36 +93,33 @@ struct parser {
 	const struct dsio_allocator *allocator;
 };
 
+static int topic_bsearch_comparator(const void *a, const void *b)
+{
+	return strcmp(((const struct topic *)a)->ident,
+		      ((const struct topic *)b)->ident);
+}
+
 static int is_valid_topic_p(const char *ident)
 {
-	for (size_t i = 0; i < DSIO_NELEMENTS(topics) - 1; i++) {
-		if (strcmp(ident, topics[i].ident) == 0) {
-			return 1;
-		}
-	}
+	struct topic key = {.ident = ident};
 
-	return 0;
+	return bsearch(&key, topics, DSIO_NELEMENTS(topics) - 1,
+		       sizeof key, topic_bsearch_comparator) != NULL;
+}
+
+static int action_bsearch_comparator(const void *a, const void *b)
+{
+	return strcmp(((const struct action *)a)->ident,
+		      ((const struct action *)b)->ident);
 }
 
 static int is_valid_action_p(const char *ident)
 {
-	for (size_t i = 0; i < DSIO_NELEMENTS(actions) - 1; i++) {
-		if (strcmp(ident, actions[i].ident) == 0) {
-			return 1;
-		}
-	}
+	struct action key = {.ident = ident};
 
-	return 0;
+	return bsearch(&key, actions, DSIO_NELEMENTS(actions) - 1,
+		       sizeof key, action_bsearch_comparator) != NULL;
 }
-
-#if 0
-static int action_bsearch_comparator(const void *a, const void *b)
-{
-	const struct dsio_message *x = a;
-	const struct action *y = b;
-	return strncmp(x->action.ident, y->ident, x->action.len);
-}
-#endif
 
 static int parse_topic(struct parser *p)
 {
