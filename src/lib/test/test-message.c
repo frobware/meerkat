@@ -1,8 +1,21 @@
+#include <stdio.h>
 #include <string.h>
 #include <dsio/dsio.h>
 #include "../message.h"
+#include "../utils.h"
 
 #include "CUnitTest.h"
+
+static char *make_msg(const char *topic, const char *action)
+{
+	return dsio_mprintf(dsio_stdlib_allocator,
+			    "%s%c%s%c%c",
+			    topic,
+			    DSIO_MESSAGE_UNIT_SEPARATOR,
+			    action,
+			    DSIO_MESSAGE_UNIT_SEPARATOR,
+			    DSIO_MESSAGE_RECORD_SEPARATOR);
+}
 
 static int test_topic_null_ident(void)
 {
@@ -92,20 +105,27 @@ static int test_topic_good_topic_and_good_action(void)
 
 static int test_all_topics_and_actions(void)
 {
-	struct topic *topic;
-	
-	for (topic = topics; topic->ident; topic++) {
-		if (strcmp(topic->ident, "private") == 0)
+	for (struct topic *t = topics; t->ident; t++) {
+		if (strcmp(t->ident, "private") == 0)
 			continue;
-		struct action *action;
-		for (action = actions; action->ident; action++) {
-			fprintf(stdout, "%s %s\n", topic->ident, action->ident);
+		for (struct action *a = actions; a->ident; a++) {
+			struct dsio_message msg;
+			char *input = make_msg(t->ident, a->ident);
+			CUT_ASSERT_NOT_NULL(input);
+			int rc = dsio_message_parse(dsio_stdlib_allocator, input, &msg);
+			CUT_ASSERT_EQUAL(DSIO_OK, rc);
+			CUT_ASSERT_EQUAL(strlen(t->ident), msg.topic.len);
+			CUT_ASSERT_EQUAL(strcmp(t->ident, msg.topic.ident), 0);
+			CUT_ASSERT_EQUAL(strlen(a->ident), msg.action.len);
+			CUT_ASSERT_EQUAL(strcmp(a->ident, msg.action.ident), 0);
+			CUT_ASSERT_EQUAL(msg.npayload, 0);
+			CUT_ASSERT_EQUAL(msg.payload, NULL);
+			dsio_stdlib_allocator->free(dsio_stdlib_allocator, input);
 		}
 	}
 
 	return 0;
 }
-
 
 CUT_BEGIN_TEST_HARNESS(message_suite)
 CUT_RUN_TEST(test_topic_null_ident);
