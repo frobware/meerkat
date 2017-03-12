@@ -14,22 +14,17 @@
  * limitations under the License.
  */
 
-#pragma once
+#include <stdlib.h>
+#include "topics.h"
 
-typedef enum {
-	TOPIC_AUTH = 0,
-	TOPIC_CONNECTION,
-	TOPIC_EVENT,
-	TOPIC_RPC,
-	TOPIC_RECORD,
-	TOPIC_ERROR,
-	TOPIC_NR_TOPICS,
-} dsio_topic_tag;
+/* This table _MUST_ remain sorted on ident. It is used by bsearch. */
 
-struct dsio_topic_type {
-	const char *ident;
-	const char *descr;
-	const dsio_topic_tag type;
+struct dsio_topic_type topics[] = {
+	{"A",	"AUTH",		TOPIC_AUTH},
+	{"C",	"CONNECTION",	TOPIC_CONNECTION},
+	{"E",	"EVENT",	TOPIC_EVENT},
+	{"P",	"RPC",		TOPIC_RPC},
+	{"R",	"RECORD",	TOPIC_RECORD},
+	{"X",	"ERROR",	TOPIC_ERROR},
+	{NULL, NULL},
 };
-
-extern struct dsio_topic_type topics[];

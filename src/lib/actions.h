@@ -17,7 +17,7 @@
 #pragma once
 
 typedef enum {
-	ACTION_ACK = 1,
+	ACTION_ACK = 0,
 	ACTION_CHALLENGE,
 	ACTION_CHALLENGE_RESPONSE,
 	ACTION_CREATE,
@@ -43,6 +43,8 @@ typedef enum {
 	ACTION_UNLISTEN,
 	ACTION_UNSUBSCRIBE,
 	ACTION_UPDATE,
+
+	ACTION_NR_ACTIONS,
 } dsio_action_tag;
 
 struct dsio_action_type {
