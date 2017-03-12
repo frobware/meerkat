@@ -134,7 +134,7 @@ static int test_topic_and_action_and_one_record(void)
 	struct dsio_msg msg;
 	const char input[] = {
 		'E', DSIO_MSG_UNIT_SEPARATOR,
-		'C', DSIO_MSG_UNIT_SEPARATOR,
+		'C', 'H', 'R', DSIO_MSG_UNIT_SEPARATOR,
 		'1', DSIO_MSG_UNIT_SEPARATOR,
 		DSIO_MSG_RECORD_SEPARATOR,
 		'\0',
@@ -146,8 +146,8 @@ static int test_topic_and_action_and_one_record(void)
 
 static int test_all_topics_and_actions(void)
 {
-	for (struct topic *t = topics; t->ident; t++) {
-		for (struct action *a = actions; a->ident; a++) {
+	for (struct topic_type *t = topics; t->ident; t++) {
+		for (struct action_type *a = actions; a->ident; a++) {
 			struct dsio_msg msg;
 			char *input = make_msg(t->ident, a->ident);
 			CUT_ASSERT_NOT_NULL(input);

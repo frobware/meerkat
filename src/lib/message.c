@@ -43,7 +43,7 @@
 
 /* This table _MUST_ remain sorted on ident. It is used by bsearch. */
 
-struct topic topics[] = {
+struct topic_type topics[] = {
 	{"A", "AUTH"},
 	{"C", "CONNECTION"},
 	{"E", "ERROR"},
@@ -56,7 +56,7 @@ struct topic topics[] = {
 
 /* This table _MUST_ remain sorted on ident. It is used by bsearch. */
 
-struct action actions[] = {
+struct action_type actions[] = {
 	{"A", "ACK"},
 	{"C", "CREATE"},
 	{"CH", "CHALLENGE"},
@@ -95,26 +95,32 @@ struct parser {
 
 static int topic_bsearch_comparator(const void *a, const void *b)
 {
-	return strcmp(((const struct topic *)a)->ident, ((const struct topic *)b)->ident);
+	return strcmp(((const struct topic_type *)a)->ident,
+		      ((const struct topic_type *)b)->ident);
 }
 
 static int is_valid_topic_p(const char *ident)
 {
-	struct topic key = {.ident = ident };
+	struct topic_type key = {.ident = ident };
 
-	return bsearch(&key, topics, DSIO_NELEMENTS(topics) - 1, sizeof key, topic_bsearch_comparator) != NULL;
+	return bsearch(&key, topics, DSIO_NELEMENTS(topics) - 1,
+		       sizeof key,
+		       topic_bsearch_comparator) != NULL;
 }
 
 static int action_bsearch_comparator(const void *a, const void *b)
 {
-	return strcmp(((const struct action *)a)->ident, ((const struct action *)b)->ident);
+	return strcmp(((const struct action_type *)a)->ident,
+		      ((const struct action_type *)b)->ident);
 }
 
 static int is_valid_action_p(const char *ident)
 {
-	struct action key = {.ident = ident };
+	struct action_type key = {.ident = ident };
 
-	return bsearch(&key, actions, DSIO_NELEMENTS(actions) - 1, sizeof key, action_bsearch_comparator) != NULL;
+	return bsearch(&key, actions, DSIO_NELEMENTS(actions) - 1,
+		       sizeof key,
+		       action_bsearch_comparator) != NULL;
 }
 
 static int parse_topic(struct parser *p)
@@ -161,13 +167,17 @@ static int parse_action(struct parser *p)
 
 static int parse_payload(struct parser *p)
 {
+	const char *mark = p->curr;
+  
 	while (*p->curr) {
 		switch (*p->curr) {
 		case DSIO_MSG_RECORD_SEPARATOR:
 			p->curr++;
 			return DSIO_OK;
 		case DSIO_MSG_UNIT_SEPARATOR:
+			printf("%*s\n", 1, mark);
 			p->curr++;
+			mark = p->curr;
 			break;
 		}
 		p->curr++;

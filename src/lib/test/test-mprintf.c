@@ -29,7 +29,7 @@ static int test_mprintf_alloc_succeeds(void)
 	test_allocator_reset(ta);
 	char *s = dsio_mprintf(&ta->base, "%s", "test_mprintf_alloc_succeeds");
 	CUT_ASSERT_NOT_NULL(s);
-	ta->base.free(&ta->base, s);
+	DSIO_FREE(&ta->base, s);
 	return 0;
 }
 
