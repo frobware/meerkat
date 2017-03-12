@@ -147,8 +147,8 @@ static int test_topic_and_action_and_one_record(void)
 
 static int test_all_topics_and_actions(void)
 {
-	for (struct topic_type *t = topics; t->ident; t++) {
-		for (struct action_type *a = actions; a->ident; a++) {
+	for (struct dsio_topic_type *t = topics; t->ident; t++) {
+		for (struct dsio_action_type *a = actions; a->ident; a++) {
 			struct dsio_msg msg;
 			char *input = make_msg(t->ident, a->ident);
 			CUT_ASSERT_NOT_NULL(input);

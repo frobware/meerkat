@@ -43,7 +43,7 @@
 
 /* This table _MUST_ remain sorted on ident. It is used by bsearch. */
 
-struct topic_type topics[] = {
+struct dsio_topic_type topics[] = {
 	{"A", "AUTH"},
 	{"C", "CONNECTION"},
 	{"E", "ERROR"},
@@ -56,7 +56,7 @@ struct topic_type topics[] = {
 
 /* This table _MUST_ remain sorted on ident. It is used by bsearch. */
 
-struct action_type actions[] = {
+struct dsio_action_type actions[] = {
 	{"A", "ACK"},
 	{"C", "CREATE"},
 	{"CH", "CHALLENGE"},
@@ -95,13 +95,13 @@ struct scanner {
 
 static int topic_bsearch_comparator(const void *a, const void *b)
 {
-	return strcmp(((const struct topic_type *)a)->ident,
-		      ((const struct topic_type *)b)->ident);
+	return strcmp(((const struct dsio_topic_type *)a)->ident,
+		      ((const struct dsio_topic_type *)b)->ident);
 }
 
 static int is_valid_topic_p(const char *ident)
 {
-	struct topic_type key = {.ident = ident };
+	struct dsio_topic_type key = {.ident = ident };
 
 	return bsearch(&key, topics, DSIO_NELEMENTS(topics) - 1,
 		       sizeof key,
@@ -110,13 +110,13 @@ static int is_valid_topic_p(const char *ident)
 
 static int action_bsearch_comparator(const void *a, const void *b)
 {
-	return strcmp(((const struct action_type *)a)->ident,
-		      ((const struct action_type *)b)->ident);
+	return strcmp(((const struct dsio_action_type *)a)->ident,
+		      ((const struct dsio_action_type *)b)->ident);
 }
 
 static int is_valid_action_p(const char *ident)
 {
-	struct action_type key = {.ident = ident };
+	struct dsio_action_type key = {.ident = ident };
 
 	return bsearch(&key, actions, DSIO_NELEMENTS(actions) - 1,
 		       sizeof key,

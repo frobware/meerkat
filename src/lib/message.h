@@ -5,16 +5,6 @@
 #define DSIO_MSG_PART_SEPARATOR	0x1f
 #define DSIO_MSG_RECORD_SEPARATOR 0x1e
 
-struct topic_type {
-	const char *ident;
-	const char *descr;
-};
-
-struct action_type {
-	const char *ident;
-	const char *descr;
-};
-
 struct dsio_topic {
 	const char *ident;
 	size_t len;
@@ -42,7 +32,7 @@ struct dsio_msg {
 	size_t npayload;
 };
 
-extern struct topic_type topics[];
-extern struct action_type actions[];
+extern struct dsio_topic_type topics[];
+extern struct dsio_action_type actions[];
 
 extern int dsio_msg_parse(const struct dsio_allocator *a, char *const input, struct dsio_msg *msg);
