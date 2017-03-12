@@ -18,14 +18,12 @@
 #include <string.h>
 #include "topics.h"
 
-/* This table _MUST_ remain sorted on ident. It is used by bsearch. */
-
 struct dsio_topic_type topics[] = {
-	{"A",	"AUTH",		TOPIC_AUTH},
-	{"C",	"CONNECTION",	TOPIC_CONNECTION},
 	{"E",	"EVENT",	TOPIC_EVENT},
 	{"P",	"RPC",		TOPIC_RPC},
 	{"R",	"RECORD",	TOPIC_RECORD},
+	{"A",	"AUTH",		TOPIC_AUTH},
+	{"C",	"CONNECTION",	TOPIC_CONNECTION},
 	{"X",	"ERROR",	TOPIC_ERROR},
 	{NULL,	NULL,		TOPIC_NR_TOPICS},
 };
