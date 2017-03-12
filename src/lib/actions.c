@@ -45,7 +45,7 @@ struct dsio_action_type actions[] = {
 	{"U",	"UPDATE",			ACTION_UPDATE},
 	{"UL",	"UNLISTEN",			ACTION_UNLISTEN},
 	{"US",	"UNSUBSCRIBE",			ACTION_UNSUBSCRIBE},
-	{NULL, NULL, 0},
+	{NULL,	NULL,				ACTION_NR_ACTIONS},
 };
 
 static int bsearch_comparator(const void *a, const void *b)

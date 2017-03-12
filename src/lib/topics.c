@@ -27,7 +27,7 @@ struct dsio_topic_type topics[] = {
 	{"P",	"RPC",		TOPIC_RPC},
 	{"R",	"RECORD",	TOPIC_RECORD},
 	{"X",	"ERROR",	TOPIC_ERROR},
-	{NULL, NULL},
+	{NULL,	NULL,		TOPIC_NR_TOPICS},
 };
 
 static int bsearch_comparator(const void *a, const void *b)
