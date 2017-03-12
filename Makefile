@@ -6,7 +6,7 @@ TEST_BINS := $(patsubst src/lib/test/test-%.c,bin/test-%,$(TEST_SRCS))
 
 LIB_DSIO = lib/libdsio.a
 
-CFLAGS += -Wall -pedantic -ggdb -fno-inline -Iinclude -MMD -coverage
+CFLAGS += -Wall -pedantic -ggdb -fno-inline -Iinclude -MMD -coverage -Werror
 
 .PHONY: clean verify
 

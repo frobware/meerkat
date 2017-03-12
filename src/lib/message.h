@@ -40,4 +40,4 @@ struct dsio_msg {
 extern struct topic_type topics[];
 extern struct action_type actions[];
 
-extern int dsio_msg_parse(const struct dsio_allocator *a, const char *input, struct dsio_msg *msg);
+extern int dsio_msg_parse(const struct dsio_allocator *a, char *const input, struct dsio_msg *msg);

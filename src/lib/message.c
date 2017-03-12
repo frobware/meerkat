@@ -87,8 +87,8 @@ struct action_type actions[] = {
 };
 
 struct parser {
-	const char *input;
-	const char *curr;
+	char *input;
+	char *curr;
 	struct dsio_msg *msg;
 	const struct dsio_allocator *allocator;
 };
@@ -167,7 +167,7 @@ static int parse_action(struct parser *p)
 
 static int parse_payload(struct parser *p)
 {
-	const char *mark = p->curr;
+	char *mark = p->curr;
   
 	for (; *p->curr; p->curr++) {
 		switch (*p->curr) {
@@ -175,8 +175,9 @@ static int parse_payload(struct parser *p)
 			p->curr++;
 			return DSIO_OK;
 		case DSIO_MSG_UNIT_SEPARATOR:
-			p->curr = '\0';
-			fprintf(stdout, "%s\n", mark);
+			*p->curr++ = '\0';
+			fprintf(stdout, "<<<%.*s>>>\n", (int)(p->curr - mark), mark);
+			mark = p->curr;
 			break;
 		}
 	}
@@ -184,7 +185,7 @@ static int parse_payload(struct parser *p)
 	return DSIO_ERROR;
 }
 
-int dsio_msg_parse(const struct dsio_allocator *a, const char *input, struct dsio_msg *msg)
+int dsio_msg_parse(const struct dsio_allocator *a, char *const input, struct dsio_msg *msg)
 {
 	int rc;
 	struct parser p;
