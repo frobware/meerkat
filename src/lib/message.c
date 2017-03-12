@@ -81,16 +81,6 @@ static int parse_unit(struct scanner *s, scope_t scope)
 
 	return DSIO_OK;
 }
-	
-static int parse_topic(struct scanner *s)
-{
-	return parse_unit(s, TOPIC);
-}
-
-static int parse_action(struct scanner *s)
-{
-	return parse_unit(s, ACTION);
-}
 
 static int parse_payload(struct scanner *s)
 {
@@ -134,10 +124,10 @@ int dsio_msg_parse(const struct dsio_allocator *a, char *const input, struct dsi
 	s.msg = msg;
 	s.msg->raw = input;
 
-	if ((rc = parse_topic(&s)) != DSIO_OK)
+	if ((rc = parse_unit(&s, TOPIC)) != DSIO_OK)
 		return rc;
 
-	if ((rc = parse_action(&s)) != DSIO_OK)
+	if ((rc = parse_unit(&s, ACTION)) != DSIO_OK)
 		return rc;
 
 	if ((rc = parse_payload(&s)) != DSIO_OK)
