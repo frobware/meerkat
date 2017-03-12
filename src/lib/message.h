@@ -20,8 +20,10 @@
 #include "topics.h"
 #include "actions.h"
 
-#define DSIO_MSG_PART_SEPARATOR	0x1f
-#define DSIO_MSG_RECORD_SEPARATOR 0x1e
+enum {
+	DSIO_MSG_RECORD_SEPARATOR = 0x1e,
+	DSIO_MSG_PART_SEPARATOR = 0x1f,
+};
 
 struct dsio_msg {
 	char *raw;

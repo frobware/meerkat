@@ -24,6 +24,26 @@
 #include "actions.h"
 #include "message.h"
 
+/*
+ * Message Structure Overview
+ * ==========================
+ *
+ * deepstream messages are transmitted using a proprietary, minimal,
+ * string-based protocol. Every message follows the same structure:
+ *
+ * <topic>|<action>|<data[0]>|...|<data[n]>+
+ *
+ * | and + are used above as placeholders, but messages are actually
+ * separated by ASCII control characters ("unit separator" 31) and
+ * "record separator" 30).
+ *
+ * Every message has a topic (e.g., RECORD, EVENT, AUTH) and an action
+ * (e.g., CREATE, DELETE, SUBSCRIBE).
+ *
+ * Messages always start with TOPIC, then ACTION, but can contain zero
+ * or more data fields.
+ */
+
 struct scanner {
 	char *input;
 	char *curr;
@@ -93,40 +113,6 @@ static int parse_payload(struct scanner *s)
 	return DSIO_ERROR;
 }
 
-/*
- *
- * Message Structure Overview
- * ==========================
- *
- * deepstream messages are transmitted using a proprietary, minimal,
- * string-based protocol. Every message follows the same structure:
- *
- * <topic>|<action>|<data[0]>|...|<data[n]>+
- *
- * | and + are used above as placeholders, but messages are actually
- * separated by ASCII control characters ("unit separator" 31) and
- * "record separator" 30).
- *
- * Every message has a topic (e.g., RECORD, EVENT, AUTH) and an action
- * (e.g., CREATE, DELETE, SUBSCRIBE).
- *
- * TOPICS
- *
- * | name       | value    | server | client |
- * |------------+----------+--------+--------|
- * | CONNECTION | C        | YES    | YES    |
- * | AUTH       | A        | YES    | YES    |
- * | ERROR      | X        | YES    | YES    |
- * | EVENT      | E        | YES    | YES    |
- * | RECORD     | R        | YES    | YES    |
- * | RPC        | P        | YES    | YES    |
- * | PRIVATE    | PRIVATE/ | YES    | YES    |
- *
- * ACTIONS
- *
- * Messages always start with TOPIC, then ACTION, but can contain zero
- * or more data fields.
- */
 int dsio_msg_parse(const struct dsio_allocator *a, char *const input, struct dsio_msg *msg)
 {
 	int rc;
