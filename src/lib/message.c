@@ -89,41 +89,37 @@ struct action actions[] = {
 struct parser {
 	const char *input;
 	const char *curr;
-	struct dsio_message *message;
+	struct dsio_msg *message;
 	const struct dsio_allocator *allocator;
 };
 
 static int topic_bsearch_comparator(const void *a, const void *b)
 {
-	return strcmp(((const struct topic *)a)->ident,
-		      ((const struct topic *)b)->ident);
+	return strcmp(((const struct topic *)a)->ident, ((const struct topic *)b)->ident);
 }
 
 static int is_valid_topic_p(const char *ident)
 {
 	struct topic key = {.ident = ident };
 
-	return bsearch(&key, topics, DSIO_NELEMENTS(topics) - 1,
-		       sizeof key, topic_bsearch_comparator) != NULL;
+	return bsearch(&key, topics, DSIO_NELEMENTS(topics) - 1, sizeof key, topic_bsearch_comparator) != NULL;
 }
 
 static int action_bsearch_comparator(const void *a, const void *b)
 {
-	return strcmp(((const struct action *)a)->ident,
-		      ((const struct action *)b)->ident);
+	return strcmp(((const struct action *)a)->ident, ((const struct action *)b)->ident);
 }
 
 static int is_valid_action_p(const char *ident)
 {
 	struct action key = {.ident = ident };
 
-	return bsearch(&key, actions, DSIO_NELEMENTS(actions) - 1,
-		       sizeof key, action_bsearch_comparator) != NULL;
+	return bsearch(&key, actions, DSIO_NELEMENTS(actions) - 1, sizeof key, action_bsearch_comparator) != NULL;
 }
 
 static int parse_topic(struct parser *p)
 {
-	char *found = strchr(p->curr, DSIO_MESSAGE_UNIT_SEPARATOR);
+	char *found = strchr(p->curr, DSIO_MSG_UNIT_SEPARATOR);
 
 	if (found == NULL) {
 		return DSIO_ERROR;
@@ -144,7 +140,7 @@ static int parse_topic(struct parser *p)
 
 static int parse_action(struct parser *p)
 {
-	char *found = strchr(p->curr, DSIO_MESSAGE_UNIT_SEPARATOR);
+	char *found = strchr(p->curr, DSIO_MSG_UNIT_SEPARATOR);
 
 	if (found == NULL) {
 		return DSIO_ERROR;
@@ -165,22 +161,24 @@ static int parse_action(struct parser *p)
 
 static int parse_payload(struct parser *p)
 {
-	for (; p->curr; p->curr++) {
+	for (;;) {
 		switch (*p->curr) {
 		case '\0':
 			return DSIO_ERROR;
-		case DSIO_MESSAGE_RECORD_SEPARATOR:
+		case DSIO_MSG_RECORD_SEPARATOR:
 			p->curr++;
 			return DSIO_OK;
-		case DSIO_MESSAGE_UNIT_SEPARATOR:
+		case DSIO_MSG_UNIT_SEPARATOR:
 			p->curr++;
 			break;
 		}
+		p->curr++;
 	}
+
+	return DSIO_ERROR;
 }
 
-int dsio_message_parse(const struct dsio_allocator *a,
-		       const char *input, struct dsio_message *msg)
+int dsio_msg_parse(const struct dsio_allocator *a, const char *input, struct dsio_msg *msg)
 {
 	int rc;
 	struct parser p;

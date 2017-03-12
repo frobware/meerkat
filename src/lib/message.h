@@ -2,8 +2,8 @@
 
 #include <dsio/allocator.h>
 
-#define DSIO_MESSAGE_UNIT_SEPARATOR	0x1f
-#define DSIO_MESSAGE_RECORD_SEPARATOR	0x1e
+#define DSIO_MSG_UNIT_SEPARATOR	0x1f
+#define DSIO_MSG_RECORD_SEPARATOR	0x1e
 
 typedef enum dsio_connection_state {
 	CONNECTION_STATE_CLOSED,
@@ -41,7 +41,7 @@ struct dsio_payload {
 	size_t len;
 };
 
-struct dsio_message {
+struct dsio_msg {
 	struct dsio_topic topic;
 	struct dsio_action action;
 	struct dsio_payload *payload;
@@ -51,5 +51,5 @@ struct dsio_message {
 extern struct topic topics[];
 extern struct action actions[];
 
-extern int dsio_message_parse(const struct dsio_allocator *a, const char *input,
-			      struct dsio_message *msg);
+extern int dsio_msg_parse(const struct dsio_allocator *a, const char *input,
+			      struct dsio_msg *msg);
