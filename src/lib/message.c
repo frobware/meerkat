@@ -165,8 +165,18 @@ static int parse_action(struct parser *p)
 
 static int parse_payload(struct parser *p)
 {
-	p->message->payload = NULL;
-	return DSIO_OK;
+	for (; p->curr; p->curr++) {
+		switch (*p->curr) {
+		case '\0':
+			return DSIO_ERROR;
+		case DSIO_MESSAGE_RECORD_SEPARATOR:
+			p->curr++;
+			return DSIO_OK;
+		case DSIO_MESSAGE_UNIT_SEPARATOR:
+			p->curr++;
+			break;
+		}
+	}
 }
 
 int dsio_message_parse(const struct dsio_allocator *a,

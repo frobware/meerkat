@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 lcov --directory . --zerocounters
 make clean
 make
