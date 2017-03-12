@@ -163,8 +163,6 @@ static int parse_payload(struct parser *p)
 {
 	while (*p->curr) {
 		switch (*p->curr) {
-		case '\0':
-			return DSIO_ERROR;
 		case DSIO_MSG_RECORD_SEPARATOR:
 			p->curr++;
 			return DSIO_OK;
