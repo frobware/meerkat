@@ -30,17 +30,13 @@ struct dsio_topic_type topics[] = {
 	{NULL,	NULL,		TOPIC_NR_TOPICS},
 };
 
-static int bsearch_comparator(const void *a, const void *b)
-{
-	return strcmp(((const struct dsio_topic_type *)a)->ident,
-		      ((const struct dsio_topic_type *)b)->ident);
-}
-
 struct dsio_topic_type *topic_lookup(const char *ident)
 {
-	struct dsio_topic_type key = {.ident = ident };
+	/* Faster than bsearch given the table size. */
+	for (size_t i = 0; i < TOPIC_NR_TOPICS; i++) {
+		if (strcmp(ident, topics[i].ident) == 0)
+			return &topics[i];
+	}
 
-	return bsearch(&key, topics, TOPIC_NR_TOPICS,
-		       sizeof key,
-		       bsearch_comparator);
+	return NULL;
 }
