@@ -17,16 +17,6 @@ static char *make_msg(const char *topic, const char *action)
 			    DSIO_MESSAGE_RECORD_SEPARATOR);
 }
 
-static char *make_msg_without_record_separator(const char *topic, const char *action)
-{
-	return dsio_mprintf(dsio_stdlib_allocator,
-			    "%s%c%s%c",
-			    topic,
-			    DSIO_MESSAGE_UNIT_SEPARATOR,
-			    action,
-			    DSIO_MESSAGE_UNIT_SEPARATOR);
-}
-
 static int test_topic_null_ident(void)
 {
 	int rc;
@@ -125,11 +115,14 @@ static int test_topic_and_action_without_record_separator(void)
 {
 	int rc;
 	struct dsio_message msg;
-	char *input = make_msg_without_record_separator("E", "C");
+	const char input[] = {
+		'E', DSIO_MESSAGE_UNIT_SEPARATOR,
+		'C', DSIO_MESSAGE_UNIT_SEPARATOR,
+		'\0',
+	};
 	CUT_ASSERT_NOT_NULL(input);
 	rc = dsio_message_parse(dsio_stdlib_allocator, input, &msg);
 	CUT_ASSERT_EQUAL(DSIO_ERROR, rc);
-	dsio_stdlib_allocator->free(dsio_stdlib_allocator, input);
 	return 0;
 }
 
