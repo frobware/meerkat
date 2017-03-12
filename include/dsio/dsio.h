@@ -18,13 +18,3 @@ typedef enum dsio_connection_state {
 	CONNECTION_STATE_ERROR,
 	CONNECTION_STATE_RECONNECTING
 } dsio_connection_state_t;
-
-struct dsio_topic_type {
-	const char *ident;
-	const char *descr;
-};
-
-struct dsio_action_type {
-	const char *ident;
-	const char *descr;
-};

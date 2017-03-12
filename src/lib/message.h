@@ -21,6 +21,56 @@
 #define DSIO_MSG_PART_SEPARATOR	0x1f
 #define DSIO_MSG_RECORD_SEPARATOR 0x1e
 
+typedef enum {
+	TOPIC_AUTH = 1,
+	TOPIC_CONNECTION,
+	TOPIC_EVENT,
+	TOPIC_RPC,
+	TOPIC_RECORD,
+	TOPIC_ERROR,
+} dsio_topic_tag;
+
+typedef enum {
+	ACTION_ACK = 1,
+	ACTION_CHALLENGE,
+	ACTION_CHALLENGE_RESPONSE,
+	ACTION_CREATE,
+	ACTION_CREATEORREAD,
+	ACTION_DELETE,
+	ACTION_ERROR,
+	ACTION_EVENT,
+	ACTION_HAS,
+	ACTION_LISTEN,
+	ACTION_LISTEN_ACCEPT,
+	ACTION_LISTEN_REJECT,
+	ACTION_PATCH,
+	ACTION_PROVIDER_UPDATE,
+	ACTION_QUERY,
+	ACTION_READ,
+	ACTION_REDIRECT,
+	ACTION_REJECTION,
+	ACTION_REQUEST,
+	ACTION_RESPONSE,
+	ACTION_SNAPSHOT,
+	ACTION_SUBSCRIBE,
+	ACTION_SUBSCRIPTION_HAS_PROVIDER,
+	ACTION_UNLISTEN,
+	ACTION_UNSUBSCRIBE,
+	ACTION_UPDATE,
+} dsio_action_tag;
+
+struct dsio_topic_type {
+	const char *ident;
+	const char *descr;
+	const dsio_topic_tag type;
+};
+
+struct dsio_action_type {
+	const char *ident;
+	const char *descr;
+	const dsio_action_tag type;
+};
+
 struct dsio_msg {
 	char *raw;
 	const struct dsio_topic_type *topic;

@@ -208,13 +208,17 @@ static int test_payload_data_alloc_fails(void)
 
 static int test_all_topics_and_actions(void)
 {
-	for (struct dsio_topic_type *t = topics; t->ident; t++) {
-		for (struct dsio_action_type *a = actions; a->ident; a++) {
+	size_t i = 0;
+	for (struct dsio_topic_type *t = topics; t->ident; t++, i++) {
+		size_t j = 0;
+		for (struct dsio_action_type *a = actions; a->ident; a++, j++) {
 			struct dsio_msg msg;
 			char *input = make_msg(t->ident, a->ident);
 			CUT_ASSERT_NOT_NULL(input);
 			int rc = dsio_msg_parse(dsio_stdlib_allocator, input, &msg);
 			CUT_ASSERT_EQUAL(DSIO_OK, rc);
+			CUT_ASSERT_EQUAL(topics[i].type, msg.topic->type);
+			CUT_ASSERT_EQUAL(actions[j].type, msg.action->type);
 			CUT_ASSERT_EQUAL(strcmp(t->ident, msg.topic->ident), 0);
 			CUT_ASSERT_EQUAL(strcmp(a->ident, msg.action->ident), 0);
 			CUT_ASSERT_NULL(msg.data);
