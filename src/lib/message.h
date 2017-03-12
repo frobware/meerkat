@@ -2,8 +2,8 @@
 
 #include <dsio/allocator.h>
 
-#define DSIO_MSG_UNIT_SEPARATOR	0x1f
-#define DSIO_MSG_RECORD_SEPARATOR	0x1e
+#define DSIO_MSG_PART_SEPARATOR	0x1f
+#define DSIO_MSG_RECORD_SEPARATOR 0x1e
 
 struct topic_type {
 	const char *ident;

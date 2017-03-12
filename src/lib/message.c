@@ -125,7 +125,7 @@ static int is_valid_action_p(const char *ident)
 
 static int parse_topic(struct parser *p)
 {
-	char *found = strchr(p->curr, DSIO_MSG_UNIT_SEPARATOR);
+	char *found = strchr(p->curr, DSIO_MSG_PART_SEPARATOR);
 
 	if (!found) {
 		return DSIO_ERROR;
@@ -146,7 +146,7 @@ static int parse_topic(struct parser *p)
 
 static int parse_action(struct parser *p)
 {
-	char *found = strchr(p->curr, DSIO_MSG_UNIT_SEPARATOR);
+	char *found = strchr(p->curr, DSIO_MSG_PART_SEPARATOR);
 
 	if (!found) {
 		return DSIO_ERROR;
@@ -172,9 +172,9 @@ static int parse_payload(struct parser *p)
 	for (; *p->curr; p->curr++) {
 		switch (*p->curr) {
 		case DSIO_MSG_RECORD_SEPARATOR:
-			p->curr++;
+			*p->curr++ = '\0';
 			return DSIO_OK;
-		case DSIO_MSG_UNIT_SEPARATOR:
+		case DSIO_MSG_PART_SEPARATOR:
 			*p->curr++ = '\0';
 			fprintf(stdout, "<<<%.*s>>>\n", (int)(p->curr - mark), mark);
 			mark = p->curr;
