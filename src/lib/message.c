@@ -89,7 +89,7 @@ struct action actions[] = {
 struct parser {
 	const char *input;
 	const char *curr;
-	struct dsio_msg *message;
+	struct dsio_msg *msg;
 	const struct dsio_allocator *allocator;
 };
 
@@ -125,11 +125,11 @@ static int parse_topic(struct parser *p)
 		return DSIO_ERROR;
 	}
 
-	p->message->topic.ident = p->curr;
-	p->message->topic.len = found - p->curr;
+	p->msg->topic.ident = p->curr;
+	p->msg->topic.len = found - p->curr;
 	*found = '\0';		/* punch hole in input */
 
-	if (!is_valid_topic_p(p->message->topic.ident)) {
+	if (!is_valid_topic_p(p->msg->topic.ident)) {
 		return DSIO_ERROR;
 	}
 
@@ -146,11 +146,11 @@ static int parse_action(struct parser *p)
 		return DSIO_ERROR;
 	}
 
-	p->message->action.ident = p->curr;
-	p->message->action.len = found - p->curr;
+	p->msg->action.ident = p->curr;
+	p->msg->action.len = found - p->curr;
 	*found = '\0';		/* punch hole in input */
 
-	if (!is_valid_action_p(p->message->action.ident)) {
+	if (!is_valid_action_p(p->msg->action.ident)) {
 		return DSIO_ERROR;
 	}
 
@@ -191,7 +191,7 @@ int dsio_msg_parse(const struct dsio_allocator *a, const char *input, struct dsi
 	memset(&p, 0, sizeof p);
 	p.allocator = a;
 	p.curr = p.input = input;
-	p.message = msg;
+	p.msg = msg;
 
 	if ((rc = parse_topic(&p)) != DSIO_OK)
 		return rc;
