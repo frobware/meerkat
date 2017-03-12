@@ -51,7 +51,12 @@ struct scanner {
 	const struct dsio_allocator *allocator;
 };
 
-static int parse_topic(struct scanner *s)
+typedef enum {
+	TOPIC,
+	ACTION
+} scope_t;
+	
+static int parse_unit(struct scanner *s, scope_t scope)
 {
 	char *found = strchr(s->curr, DSIO_MSG_PART_SEPARATOR);
 
@@ -61,30 +66,30 @@ static int parse_topic(struct scanner *s)
 
 	*found = '\0';		/* punch hole in input */
 
-	if ((s->msg->topic = topic_lookup(s->curr)) == NULL)
-		return DSIO_ERROR;
+	switch (scope) {
+	case TOPIC:
+		if ((s->msg->topic = topic_lookup(s->curr)) == NULL)
+			return DSIO_ERROR;
+		break;
+	case ACTION:
+		if ((s->msg->action = action_lookup(s->curr)) == NULL)
+			return DSIO_ERROR;
+		break;
+	}
 
 	s->curr = ++found;
 
 	return DSIO_OK;
 }
+	
+static int parse_topic(struct scanner *s)
+{
+	return parse_unit(s, TOPIC);
+}
 
 static int parse_action(struct scanner *s)
 {
-	char *found = strchr(s->curr, DSIO_MSG_PART_SEPARATOR);
-
-	if (!found) {
-		return DSIO_ERROR;
-	}
-
-	*found = '\0';		/* punch hole in input */
-
-	if ((s->msg->action = action_lookup(s->curr)) == NULL)
-		return DSIO_ERROR;
-
-	s->curr = ++found;
-
-	return DSIO_OK;
+	return parse_unit(s, ACTION);
 }
 
 static int parse_payload(struct scanner *s)
