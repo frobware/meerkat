@@ -21,15 +21,14 @@ char *dsio_mprintf(const struct dsio_allocator *allocator, const char *fmt, ...)
 	char *p = NULL;
 	va_list ap;
 
-	/* Determine required size */
-
+	/* Determine required size. */
 	va_start(ap, fmt);
 	size = vsnprintf(p, size, fmt, ap);
 	va_end(ap);
 
 	size++;			/* For '\0' */
 
-	if ((p = allocator->alloc(allocator, size)) == NULL) {
+	if ((p = DSIO_ALLOC(allocator, size)) == NULL) {
 		return NULL;
 	}
 
