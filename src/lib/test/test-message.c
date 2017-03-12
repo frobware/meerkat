@@ -159,7 +159,7 @@ static int test_all_topics_and_actions(void)
 			CUT_ASSERT_EQUAL(strcmp(a->ident, msg.action.ident), 0);
 			CUT_ASSERT_EQUAL(0, msg.npayload);
 			CUT_ASSERT_EQUAL(NULL, msg.payload);
-			dsio_stdlib_allocator->free(dsio_stdlib_allocator, input);
+			DSIO_FREE(dsio_stdlib_allocator, input);
 		}
 	}
 
