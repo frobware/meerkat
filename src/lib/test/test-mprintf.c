@@ -24,15 +24,6 @@
 
 static struct test_allocator *ta = &_test_allocator;
 
-static int test_mprintf_empty_fails(void)
-{
-	test_allocator_reset(ta);
-	char *s = dsio_mprintf(&ta->base, "%Q", NULL);
-	CUT_ASSERT_NOT_NULL(s);
-	ta->base.free(&ta->base, s);
-	return 0;
-}
-
 static int test_mprintf_alloc_succeeds(void)
 {
 	test_allocator_reset(ta);
@@ -53,7 +44,6 @@ static int test_mprintf_alloc_fails(void)
 }
 
 CUT_BEGIN_TEST_HARNESS(mprintf_suite)
-    CUT_RUN_TEST(test_mprintf_empty_fails);
 CUT_RUN_TEST(test_mprintf_alloc_succeeds);
 CUT_RUN_TEST(test_mprintf_alloc_fails);
 CUT_END_TEST_HARNESS
