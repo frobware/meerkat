@@ -15,6 +15,7 @@
  */
 
 #include <stdlib.h>
+#include <string.h>
 #include "topics.h"
 
 /* This table _MUST_ remain sorted on ident. It is used by bsearch. */
@@ -28,3 +29,18 @@ struct dsio_topic_type topics[] = {
 	{"X",	"ERROR",	TOPIC_ERROR},
 	{NULL, NULL},
 };
+
+static int bsearch_comparator(const void *a, const void *b)
+{
+	return strcmp(((const struct dsio_topic_type *)a)->ident,
+		      ((const struct dsio_topic_type *)b)->ident);
+}
+
+struct dsio_topic_type *topic_lookup(const char *ident)
+{
+	struct dsio_topic_type key = {.ident = ident };
+
+	return bsearch(&key, topics, TOPIC_NR_TOPICS,
+		       sizeof key,
+		       bsearch_comparator);
+}

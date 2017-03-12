@@ -33,3 +33,4 @@ struct dsio_topic_type {
 };
 
 extern struct dsio_topic_type topics[];
+extern struct dsio_topic_type *topic_lookup(const char *ident);

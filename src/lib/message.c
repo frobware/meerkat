@@ -20,6 +20,8 @@
 #include <assert.h>
 
 #include <dsio/dsio.h>
+#include "topics.h"
+#include "actions.h"
 #include "message.h"
 
 struct scanner {
@@ -28,36 +30,6 @@ struct scanner {
 	struct dsio_msg *msg;
 	const struct dsio_allocator *allocator;
 };
-
-static int topic_bsearch_comparator(const void *a, const void *b)
-{
-	return strcmp(((const struct dsio_topic_type *)a)->ident,
-		      ((const struct dsio_topic_type *)b)->ident);
-}
-
-static struct dsio_topic_type *is_valid_topic(const char *ident)
-{
-	struct dsio_topic_type key = {.ident = ident };
-
-	return bsearch(&key, topics, TOPIC_NR_TOPICS,
-		       sizeof key,
-		       topic_bsearch_comparator);
-}
-
-static int action_bsearch_comparator(const void *a, const void *b)
-{
-	return strcmp(((const struct dsio_action_type *)a)->ident,
-		      ((const struct dsio_action_type *)b)->ident);
-}
-
-static struct dsio_action_type *is_valid_action(const char *ident)
-{
-	struct dsio_action_type key = {.ident = ident };
-
-	return bsearch(&key, actions, ACTION_NR_ACTIONS,
-		       sizeof key,
-		       action_bsearch_comparator);
-}
 
 static int parse_topic(struct scanner *s)
 {
@@ -69,7 +41,7 @@ static int parse_topic(struct scanner *s)
 
 	*found = '\0';		/* punch hole in input */
 
-	if ((s->msg->topic = is_valid_topic(s->curr)) == NULL)
+	if ((s->msg->topic = topic_lookup(s->curr)) == NULL)
 		return DSIO_ERROR;
 
 	s->curr = ++found;
@@ -87,7 +59,7 @@ static int parse_action(struct scanner *s)
 
 	*found = '\0';		/* punch hole in input */
 
-	if ((s->msg->action = is_valid_action(s->curr)) == NULL)
+	if ((s->msg->action = action_lookup(s->curr)) == NULL)
 		return DSIO_ERROR;
 
 	s->curr = ++found;

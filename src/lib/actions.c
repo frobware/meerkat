@@ -15,6 +15,7 @@
  */
 
 #include <stdlib.h>
+#include <string.h>
 #include "actions.h"
 
 struct dsio_action_type actions[] = {
@@ -46,3 +47,18 @@ struct dsio_action_type actions[] = {
 	{"US",	"UNSUBSCRIBE",			ACTION_UNSUBSCRIBE},
 	{NULL, NULL, 0},
 };
+
+static int bsearch_comparator(const void *a, const void *b)
+{
+	return strcmp(((const struct dsio_action_type *)a)->ident,
+		      ((const struct dsio_action_type *)b)->ident);
+}
+
+struct dsio_action_type *action_lookup(const char *ident)
+{
+	struct dsio_action_type key = {.ident = ident };
+
+	return bsearch(&key, actions, ACTION_NR_ACTIONS,
+		       sizeof key,
+		       bsearch_comparator);
+}
