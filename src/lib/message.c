@@ -127,7 +127,7 @@ static int parse_topic(struct parser *p)
 {
 	char *found = strchr(p->curr, DSIO_MSG_UNIT_SEPARATOR);
 
-	if (found == NULL) {
+	if (!found) {
 		return DSIO_ERROR;
 	}
 
@@ -148,7 +148,7 @@ static int parse_action(struct parser *p)
 {
 	char *found = strchr(p->curr, DSIO_MSG_UNIT_SEPARATOR);
 
-	if (found == NULL) {
+	if (!found) {
 		return DSIO_ERROR;
 	}
 
@@ -169,18 +169,16 @@ static int parse_payload(struct parser *p)
 {
 	const char *mark = p->curr;
   
-	while (*p->curr) {
+	for (; *p->curr; p->curr++) {
 		switch (*p->curr) {
 		case DSIO_MSG_RECORD_SEPARATOR:
 			p->curr++;
 			return DSIO_OK;
 		case DSIO_MSG_UNIT_SEPARATOR:
-			printf("%*s\n", 1, mark);
-			p->curr++;
-			mark = p->curr;
+			p->curr = '\0';
+			fprintf(stdout, "%s\n", mark);
 			break;
 		}
-		p->curr++;
 	}
 
 	return DSIO_ERROR;
