@@ -30,6 +30,11 @@ struct dsio_payload {
 	size_t len;
 };
 
+struct dsio_msgdata {
+	size_t len;
+	const char data[1];
+};
+
 struct dsio_msg {
 	struct dsio_topic topic;
 	struct dsio_action action;

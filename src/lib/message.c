@@ -86,7 +86,7 @@ struct action_type actions[] = {
 	{NULL, NULL},
 };
 
-struct parser {
+struct scanner {
 	char *input;
 	char *curr;
 	struct dsio_msg *msg;
@@ -123,61 +123,61 @@ static int is_valid_action_p(const char *ident)
 		       action_bsearch_comparator) != NULL;
 }
 
-static int parse_topic(struct parser *p)
+static int parse_topic(struct scanner *s)
 {
-	char *found = strchr(p->curr, DSIO_MSG_PART_SEPARATOR);
+	char *found = strchr(s->curr, DSIO_MSG_PART_SEPARATOR);
 
 	if (!found) {
 		return DSIO_ERROR;
 	}
 
-	p->msg->topic.ident = p->curr;
-	p->msg->topic.len = found - p->curr;
+	s->msg->topic.ident = s->curr;
+	s->msg->topic.len = found - s->curr;
 	*found = '\0';		/* punch hole in input */
 
-	if (!is_valid_topic_p(p->msg->topic.ident)) {
+	if (!is_valid_topic_p(s->msg->topic.ident)) {
 		return DSIO_ERROR;
 	}
 
-	p->curr = ++found;
+	s->curr = ++found;
 
 	return DSIO_OK;
 }
 
-static int parse_action(struct parser *p)
+static int parse_action(struct scanner *s)
 {
-	char *found = strchr(p->curr, DSIO_MSG_PART_SEPARATOR);
+	char *found = strchr(s->curr, DSIO_MSG_PART_SEPARATOR);
 
 	if (!found) {
 		return DSIO_ERROR;
 	}
 
-	p->msg->action.ident = p->curr;
-	p->msg->action.len = found - p->curr;
+	s->msg->action.ident = s->curr;
+	s->msg->action.len = found - s->curr;
 	*found = '\0';		/* punch hole in input */
 
-	if (!is_valid_action_p(p->msg->action.ident)) {
+	if (!is_valid_action_p(s->msg->action.ident)) {
 		return DSIO_ERROR;
 	}
 
-	p->curr = ++found;
+	s->curr = ++found;
 
 	return DSIO_OK;
 }
 
-static int parse_payload(struct parser *p)
+static int parse_payload(struct scanner *s)
 {
-	char *mark = p->curr;
+	char *mark = s->curr;
   
-	for (; *p->curr; p->curr++) {
-		switch (*p->curr) {
+	for (; *s->curr; s->curr++) {
+		switch (*s->curr) {
 		case DSIO_MSG_RECORD_SEPARATOR:
-			*p->curr++ = '\0';
+			*s->curr++ = '\0';
 			return DSIO_OK;
 		case DSIO_MSG_PART_SEPARATOR:
-			*p->curr++ = '\0';
-			fprintf(stdout, "<<<%.*s>>>\n", (int)(p->curr - mark), mark);
-			mark = p->curr;
+			*s->curr++ = '\0';
+			fprintf(stdout, "<<<%.*s>>>\n", (int)(s->curr - mark), mark);
+			mark = s->curr;
 			break;
 		}
 	}
@@ -188,25 +188,25 @@ static int parse_payload(struct parser *p)
 int dsio_msg_parse(const struct dsio_allocator *a, char *const input, struct dsio_msg *msg)
 {
 	int rc;
-	struct parser p;
+	struct scanner s;
 
 	memset(msg, 0, sizeof *msg);
 
 	if (input == NULL || *input == '\0')
 		return DSIO_ERROR;
 
-	memset(&p, 0, sizeof p);
-	p.allocator = a;
-	p.curr = p.input = input;
-	p.msg = msg;
+	memset(&s, 0, sizeof s);
+	s.allocator = a;
+	s.curr = s.input = input;
+	s.msg = msg;
 
-	if ((rc = parse_topic(&p)) != DSIO_OK)
+	if ((rc = parse_topic(&s)) != DSIO_OK)
 		return rc;
 
-	if ((rc = parse_action(&p)) != DSIO_OK)
+	if ((rc = parse_action(&s)) != DSIO_OK)
 		return rc;
 
-	if ((rc = parse_payload(&p)) != DSIO_OK)
+	if ((rc = parse_payload(&s)) != DSIO_OK)
 		return rc;
 
 	return DSIO_OK;
