@@ -1,3 +1,11 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <assert.h>
+
+#include <dsio/dsio.h>
+#include "message.h"
+
 /*
  *
  * Message Structure Overview
@@ -32,14 +40,6 @@
  * Messages always start with TOPIC, then ACTION, but can contain zero
  * or more data fields.
  */
-
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <assert.h>
-
-#include <dsio/dsio.h>
-#include "message.h"
 
 /* This table _MUST_ remain sorted on ident. It is used by bsearch. */
 
@@ -161,17 +161,23 @@ static int parse_action(struct scanner *s)
 
 static int parse_payload(struct scanner *s)
 {
-	char *mark = s->curr;
-  
+	char *token = s->curr;
+
 	for (; *s->curr; s->curr++) {
 		switch (*s->curr) {
 		case DSIO_MSG_RECORD_SEPARATOR:
-			*s->curr++ = '\0';
+			*s->curr = '\0';
 			return DSIO_OK;
 		case DSIO_MSG_PART_SEPARATOR:
-			*s->curr++ = '\0';
-			fprintf(stdout, "<<<%.*s>>>\n", (int)(s->curr - mark), mark);
-			mark = s->curr;
+			*s->curr = '\0';
+			s->msg->data = DSIO_REALLOC(s->allocator,
+						    s->msg->data,
+						    (1 + s->msg->ndata) * sizeof(char *));
+			if (s->msg->data == NULL) {
+				return DSIO_NOMEM;
+			}
+			s->msg->data[s->msg->ndata++] = token;
+			token = s->curr + 1;
 			break;
 		}
 	}
@@ -193,6 +199,7 @@ int dsio_msg_parse(const struct dsio_allocator *a, char *const input, struct dsi
 	s.allocator = a;
 	s.curr = s.input = input;
 	s.msg = msg;
+	s.msg->raw = input;
 
 	if ((rc = parse_topic(&s)) != DSIO_OK)
 		return rc;
