@@ -20,8 +20,7 @@ static void *test_allocator_alloc(const struct dsio_allocator *a, size_t size)
 	return p;
 }
 
-static void *test_allocator_realloc(const struct dsio_allocator *a, void *ptr,
-				    size_t size)
+static void *test_allocator_realloc(const struct dsio_allocator *a, void *ptr, size_t size)
 {
 	void *p;
 	struct test_allocator *ta = (struct test_allocator *)a;
@@ -45,9 +44,10 @@ static void test_allocator_free(const struct dsio_allocator *a, void *ptr)
 
 static struct test_allocator _test_allocator = {
 	{
-	 test_allocator_alloc,
-	 test_allocator_realloc,
-	 test_allocator_free}
+		test_allocator_alloc,
+		test_allocator_realloc,
+		test_allocator_free,
+	}
 };
 
 static void test_allocator_reset(struct test_allocator *a)

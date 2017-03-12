@@ -161,7 +161,7 @@ static int parse_action(struct parser *p)
 
 static int parse_payload(struct parser *p)
 {
-	for (;;) {
+	while (*p->curr) {
 		switch (*p->curr) {
 		case '\0':
 			return DSIO_ERROR;
