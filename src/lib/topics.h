@@ -16,19 +16,19 @@
 
 #pragma once
 
-#include <dsio/allocator.h>
-#include "topics.h"
-#include "actions.h"
+typedef enum {
+	TOPIC_AUTH = 1,
+	TOPIC_CONNECTION,
+	TOPIC_EVENT,
+	TOPIC_RPC,
+	TOPIC_RECORD,
+	TOPIC_ERROR,
+} dsio_topic_tag;
 
-#define DSIO_MSG_PART_SEPARATOR	0x1f
-#define DSIO_MSG_RECORD_SEPARATOR 0x1e
-
-struct dsio_msg {
-	char *raw;
-	const struct dsio_topic_type *topic;
-	const struct dsio_action_type *action;
-	char **data;
-	size_t ndata;
+struct dsio_topic_type {
+	const char *ident;
+	const char *descr;
+	const dsio_topic_tag type;
 };
 
-extern int dsio_msg_parse(const struct dsio_allocator *a, char *const input, struct dsio_msg *msg);
+extern struct dsio_topic_type topics[];
