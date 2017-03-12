@@ -99,13 +99,13 @@ static int topic_bsearch_comparator(const void *a, const void *b)
 		      ((const struct dsio_topic_type *)b)->ident);
 }
 
-static int is_valid_topic_p(const char *ident)
+static struct dsio_topic_type *is_valid_topic(const char *ident)
 {
 	struct dsio_topic_type key = {.ident = ident };
 
 	return bsearch(&key, topics, DSIO_NELEMENTS(topics) - 1,
 		       sizeof key,
-		       topic_bsearch_comparator) != NULL;
+		       topic_bsearch_comparator);
 }
 
 static int action_bsearch_comparator(const void *a, const void *b)
@@ -114,13 +114,13 @@ static int action_bsearch_comparator(const void *a, const void *b)
 		      ((const struct dsio_action_type *)b)->ident);
 }
 
-static int is_valid_action_p(const char *ident)
+static struct dsio_action_type *is_valid_action(const char *ident)
 {
 	struct dsio_action_type key = {.ident = ident };
 
 	return bsearch(&key, actions, DSIO_NELEMENTS(actions) - 1,
 		       sizeof key,
-		       action_bsearch_comparator) != NULL;
+		       action_bsearch_comparator);
 }
 
 static int parse_topic(struct scanner *s)
@@ -131,13 +131,10 @@ static int parse_topic(struct scanner *s)
 		return DSIO_ERROR;
 	}
 
-	s->msg->topic.ident = s->curr;
-	s->msg->topic.len = found - s->curr;
 	*found = '\0';		/* punch hole in input */
 
-	if (!is_valid_topic_p(s->msg->topic.ident)) {
+	if ((s->msg->topic = is_valid_topic(s->curr)) == NULL)
 		return DSIO_ERROR;
-	}
 
 	s->curr = ++found;
 
@@ -152,13 +149,10 @@ static int parse_action(struct scanner *s)
 		return DSIO_ERROR;
 	}
 
-	s->msg->action.ident = s->curr;
-	s->msg->action.len = found - s->curr;
 	*found = '\0';		/* punch hole in input */
 
-	if (!is_valid_action_p(s->msg->action.ident)) {
+	if ((s->msg->action = is_valid_action(s->curr)) == NULL)
 		return DSIO_ERROR;
-	}
 
 	s->curr = ++found;
 

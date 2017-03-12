@@ -27,4 +27,3 @@ struct dsio_action_type {
 	const char *ident;
 	const char *descr;
 };
-

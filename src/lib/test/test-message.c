@@ -76,8 +76,7 @@ static int test_topic_good_ident_but_no_action(void)
 	};
 	rc = dsio_msg_parse(dsio_stdlib_allocator, input, &msg);
 	CUT_ASSERT_EQUAL(DSIO_ERROR, rc);
-	CUT_ASSERT_EQUAL(1, msg.topic.len);
-	CUT_ASSERT_EQUAL(strcmp("E", msg.topic.ident), 0);
+	CUT_ASSERT_EQUAL(strcmp("E", msg.topic->ident), 0);
 	return 0;
 }
 
@@ -92,8 +91,7 @@ static int test_topic_good_action_but_no_unit_separator(void)
 	};
 	rc = dsio_msg_parse(dsio_stdlib_allocator, input, &msg);
 	CUT_ASSERT_EQUAL(DSIO_ERROR, rc);
-	CUT_ASSERT_EQUAL(1, msg.topic.len);
-	CUT_ASSERT_EQUAL(strcmp("E", msg.topic.ident), 0);
+	CUT_ASSERT_EQUAL(strcmp("E", msg.topic->ident), 0);
 	return 0;
 }
 
@@ -109,8 +107,7 @@ static int test_topic_good_topic_bad_action(void)
 	};
 	rc = dsio_msg_parse(dsio_stdlib_allocator, input, &msg);
 	CUT_ASSERT_EQUAL(DSIO_ERROR, rc);
-	CUT_ASSERT_EQUAL(1, msg.topic.len);
-	CUT_ASSERT_EQUAL(strcmp("E", msg.topic.ident), 0);
+	CUT_ASSERT_EQUAL(strcmp("E", msg.topic->ident), 0);
 	return 0;
 }
 
@@ -154,10 +151,8 @@ static int test_all_topics_and_actions(void)
 			CUT_ASSERT_NOT_NULL(input);
 			int rc = dsio_msg_parse(dsio_stdlib_allocator, input, &msg);
 			CUT_ASSERT_EQUAL(DSIO_OK, rc);
-			CUT_ASSERT_EQUAL(strlen(t->ident), msg.topic.len);
-			CUT_ASSERT_EQUAL(strcmp(t->ident, msg.topic.ident), 0);
-			CUT_ASSERT_EQUAL(strlen(a->ident), msg.action.len);
-			CUT_ASSERT_EQUAL(strcmp(a->ident, msg.action.ident), 0);
+			CUT_ASSERT_EQUAL(strcmp(t->ident, msg.topic->ident), 0);
+			CUT_ASSERT_EQUAL(strcmp(a->ident, msg.action->ident), 0);
 			CUT_ASSERT_EQUAL(0, msg.npayload);
 			CUT_ASSERT_EQUAL(NULL, msg.payload);
 			DSIO_FREE(dsio_stdlib_allocator, input);
