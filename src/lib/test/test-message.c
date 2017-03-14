@@ -22,8 +22,6 @@
 #include "allocator.c"
 #include "CUnitTest.h"
 
-static struct test_allocator *ta = &_test_allocator;
-
 static char *make_msg(const char *topic, const char *action)
 {
 	return dsio_mprintf(dsio_stdlib_allocator,
@@ -196,13 +194,13 @@ static int test_payload_data_alloc_fails(void)
 		DSIO_MSG_RECORD_SEPARATOR,
 		'\0',
 	};
-	test_allocator_reset(ta);
-	ta->alloc_fail_now = 1;
-	ta->realloc_fail_now = 1;
-	rc = dsio_msg_parse(&ta->base, input, &msg);
+	test_allocator_intercept();
+	test_allocator_realloc_fail_next = 1;
+	rc = dsio_msg_parse(dsio_stdlib_allocator, input, &msg);
 	CUT_ASSERT_EQUAL(DSIO_NOMEM, rc);
 	CUT_ASSERT_NULL(msg.data);
 	CUT_ASSERT_EQUAL(0, msg.ndata);
+	test_allocator_restore();
 	return 0;
 }
 

@@ -22,46 +22,50 @@
 #include "allocator.c"
 #include "CUnitTest.h"
 
-static struct test_allocator *ta = &_test_allocator;
-
 static int test_alloc_succeeds(void)
 {
-	test_allocator_reset(ta);
-	void *p = ta->base.alloc(&ta->base, 100);
+	void *p;
+	test_allocator_intercept();
+	p = DSIO_MALLOC(dsio_stdlib_allocator, 100);
 	CUT_ASSERT_NOT_NULL(p);
-	ta->base.free(&ta->base, p);
+	DSIO_FREE(dsio_stdlib_allocator, p);
 	return 0;
 }
 
 static int test_alloc_fails(void)
 {
-	test_allocator_reset(ta);
-	ta->alloc_fail_now = 1;
-	void *p = ta->base.alloc(&ta->base, 100);
+	test_allocator_intercept();
+	test_allocator_malloc_fail_next = 1;
+	void *p = DSIO_MALLOC(dsio_stdlib_allocator, 100);
 	CUT_ASSERT_NULL(p);
+	test_allocator_restore();
 	return 0;
 }
 
 static int test_realloc_succeeds(void)
 {
-	test_allocator_reset(ta);
-	void *p = ta->base.alloc(&ta->base, 100);
+	void *p;
+	test_allocator_intercept();
+	p = DSIO_MALLOC(dsio_stdlib_allocator, 100);
 	CUT_ASSERT_NOT_NULL(p);
-	p = ta->base.realloc(&ta->base, p, 200);
+	p = DSIO_REALLOC(dsio_stdlib_allocator, p, 200);
 	CUT_ASSERT_NOT_NULL(p);
-	ta->base.free(&ta->base, p);
+	DSIO_FREE(dsio_stdlib_allocator, p);
+	test_allocator_restore();
 	return 0;
 }
 
 static int test_realloc_fails(void)
 {
-	test_allocator_reset(ta);
-	void *p = ta->base.alloc(&ta->base, 100);
+	void *p, *q;
+	test_allocator_intercept();
+	p = DSIO_MALLOC(dsio_stdlib_allocator, 100);
 	CUT_ASSERT_NOT_NULL(p);
-	ta->realloc_fail_now = 1;
-	void *q = ta->base.realloc(&ta->base, p, 200);
+	test_allocator_realloc_fail_next = 1;
+	q = DSIO_REALLOC(dsio_stdlib_allocator, p, 200);
 	CUT_ASSERT_NULL(q);
-	ta->base.free(&ta->base, p);
+	DSIO_FREE(dsio_stdlib_allocator, p);
+	test_allocator_restore();
 	return 0;
 }
 

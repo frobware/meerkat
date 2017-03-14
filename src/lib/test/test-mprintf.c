@@ -19,28 +19,27 @@
 #include <dsio/dsio.h>
 #include <dsio/allocator.h>
 #include <assert.h>
-#include "allocator.c"
 #include "../mprintf.h"
+#include "allocator.c"
 #include "CUnitTest.h"
-
-static struct test_allocator *ta = &_test_allocator;
 
 static int test_mprintf_alloc_succeeds(void)
 {
-	test_allocator_reset(ta);
-	char *s = dsio_mprintf(&ta->base, "%s", "test_mprintf_alloc_succeeds");
+	test_allocator_intercept();
+	char *s = dsio_mprintf(dsio_stdlib_allocator, "%s", "test_mprintf_alloc_succeeds");
 	CUT_ASSERT_NOT_NULL(s);
-	DSIO_FREE(&ta->base, s);
+	DSIO_FREE(dsio_stdlib_allocator, s);
 	return 0;
 }
 
 static int test_mprintf_alloc_fails(void)
 {
-	test_allocator_reset(ta);
-	ta->alloc_fail_now = 1;
-	ta->realloc_fail_now = 1;
-	char *s = dsio_mprintf(&ta->base, "%s", "test_mprintf_succeeds");
+	test_allocator_intercept();
+	test_allocator_malloc_fail_next = 1;
+	test_allocator_realloc_fail_next = 1;
+	char *s = dsio_mprintf(dsio_stdlib_allocator, "%s", "test_mprintf_succeeds");
 	CUT_ASSERT_NULL(s);
+	test_allocator_restore();
 	return 0;
 }
 

@@ -44,7 +44,7 @@ char *dsio_mprintf(const struct dsio_allocator *allocator, const char *fmt, ...)
 
 	size++;			/* For '\0' */
 
-	if ((p = DSIO_ALLOC(allocator, size)) == NULL) {
+	if ((p = DSIO_MALLOC(allocator, size)) == NULL) {
 		return NULL;
 	}
 

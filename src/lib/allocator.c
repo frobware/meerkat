@@ -25,7 +25,7 @@ struct stdlib_allocator {
 	unsigned long long nfrees;
 };
 
-static void *dsio_alloc(const struct dsio_allocator *a, size_t n)
+static void *dsio_malloc(const struct dsio_allocator *a, size_t n)
 {
 	void *p = malloc(n);
 	if (p != NULL) {
@@ -37,7 +37,7 @@ static void *dsio_alloc(const struct dsio_allocator *a, size_t n)
 static void *dsio_realloc(const struct dsio_allocator *a, void *ptr, size_t n)
 {
 	if (ptr == NULL) {
-		return dsio_alloc(a, n);
+		return dsio_malloc(a, n);
 	} else {
 		return realloc(ptr, n);
 	}
@@ -52,7 +52,7 @@ static void dsio_free(const struct dsio_allocator *a, void *ptr)
 }
 
 static struct stdlib_allocator dsio_allocator = {
-	{dsio_alloc, dsio_realloc, dsio_free}, 0, 0
+	{dsio_malloc, dsio_realloc, dsio_free}, 0, 0
 };
 
 struct dsio_allocator *dsio_stdlib_allocator = &dsio_allocator.base;

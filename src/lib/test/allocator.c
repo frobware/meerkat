@@ -1,5 +1,4 @@
-/*
- * Copyright 2017 Andrew McDermott
+/* Copyright 2017 Andrew McDermott
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,60 +13,55 @@
  * limitations under the License.
  */
 
-struct test_allocator {
-	struct dsio_allocator base;
-	int alloc_fail_now;
-	int realloc_fail_now;
-};
+#include <dsio/allocator.h>
 
-static void *test_allocator_alloc(const struct dsio_allocator *a, size_t size)
+static DSIO_MALLOC_FUNC orig_malloc;
+static DSIO_REALLOC_FUNC orig_realloc;
+static DSIO_FREE_FUNC orig_free;
+
+static int test_allocator_malloc_fail_next;
+static int test_allocator_realloc_fail_next;
+
+static void test_allocator_restore(void)
 {
-	void *p;
-	struct test_allocator *ta = (struct test_allocator *)a;
+	dsio_stdlib_allocator->malloc = orig_malloc;
+	dsio_stdlib_allocator->realloc = orig_realloc;
+	dsio_stdlib_allocator->free = orig_free;
+}
 
-	if (ta->alloc_fail_now) {
+static void *test_allocator_malloc(const struct dsio_allocator *a, size_t size)
+{
+	if (test_allocator_malloc_fail_next) {
 		return NULL;
 	}
 
-	if ((p = malloc(size)) == NULL) {
-		return NULL;
-	}
-
-	return p;
+	return orig_malloc(a, size);
 }
 
 static void *test_allocator_realloc(const struct dsio_allocator *a, void *ptr, size_t size)
 {
-	void *p;
-	struct test_allocator *ta = (struct test_allocator *)a;
-
-	if (ta->realloc_fail_now) {
+	if (test_allocator_realloc_fail_next) {
 		return NULL;
 	}
 
-	if ((p = realloc(ptr, size)) == NULL) {
-		return NULL;
-	}
-
-	return p;
+	return orig_realloc(a, ptr, size);
 }
 
 static void test_allocator_free(const struct dsio_allocator *a, void *ptr)
 {
-	if (ptr != NULL)
-		free(ptr);
+	orig_free(a, ptr);
 }
 
-static struct test_allocator _test_allocator = {
-	{
-		test_allocator_alloc,
-		test_allocator_realloc,
-		test_allocator_free,
-	}
-};
-
-static void test_allocator_reset(struct test_allocator *a)
+static void test_allocator_intercept(void)
 {
-	a->alloc_fail_now = 0;
-	a->realloc_fail_now = 0;
+	if (!orig_malloc || !orig_realloc || !orig_free) {
+		orig_malloc = dsio_stdlib_allocator->malloc;
+		orig_realloc = dsio_stdlib_allocator->realloc;
+		orig_free = dsio_stdlib_allocator->free;
+	}
+	dsio_stdlib_allocator->malloc = test_allocator_malloc;
+	dsio_stdlib_allocator->realloc = test_allocator_realloc;
+	dsio_stdlib_allocator->free = test_allocator_free;
+	test_allocator_malloc_fail_next = 0;
+	test_allocator_realloc_fail_next = 0;
 }
