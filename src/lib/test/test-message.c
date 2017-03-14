@@ -204,28 +204,48 @@ static int test_payload_data_alloc_fails(void)
 	return 0;
 }
 
-static int test_all_topics_and_actions(void)
+static int test_all_topics_and_actions(int alloc_failure)
 {
 	size_t i = 0;
 	for (struct dsio_topic_type *t = topics; t->ident; t++, i++) {
 		size_t j = 0;
 		for (struct dsio_action_type *a = actions; a->ident; a++, j++) {
 			struct dsio_msg msg;
-			char *input = make_msg(t->ident, a->ident);
-			CUT_ASSERT_NOT_NULL(input);
-			int rc = dsio_msg_parse(dsio_stdlib_allocator, input, &msg);
-			CUT_ASSERT_EQUAL(DSIO_OK, rc);
-			CUT_ASSERT_EQUAL(topics[i].type, msg.topic->type);
-			CUT_ASSERT_EQUAL(actions[j].type, msg.action->type);
-			CUT_ASSERT_EQUAL(strcmp(t->ident, msg.topic->ident), 0);
-			CUT_ASSERT_EQUAL(strcmp(a->ident, msg.action->ident), 0);
-			CUT_ASSERT_NULL(msg.data);
-			CUT_ASSERT_EQUAL(0, msg.ndata);
-			DSIO_FREE(dsio_stdlib_allocator, input);
+			char *input;
+			int rc;
+			test_allocator_intercept();
+			test_allocator_malloc_fail_next = alloc_failure;
+			test_allocator_realloc_fail_next = alloc_failure;
+			input = make_msg(t->ident, a->ident);
+			if (!alloc_failure) {
+				CUT_ASSERT_NOT_NULL(input);
+				rc = dsio_msg_parse(dsio_stdlib_allocator, input, &msg);
+				CUT_ASSERT_EQUAL(DSIO_OK, rc);
+				CUT_ASSERT_EQUAL(topics[i].type, msg.topic->type);
+				CUT_ASSERT_EQUAL(actions[j].type, msg.action->type);
+				CUT_ASSERT_EQUAL(strcmp(t->ident, msg.topic->ident), 0);
+				CUT_ASSERT_EQUAL(strcmp(a->ident, msg.action->ident), 0);
+				CUT_ASSERT_NULL(msg.data);
+				CUT_ASSERT_EQUAL(0, msg.ndata);
+				DSIO_FREE(dsio_stdlib_allocator, input);
+			} else {
+				CUT_ASSERT_NULL(input);
+			}
+			test_allocator_restore();
 		}
 	}
 
 	return 0;
+}
+
+static int test_all_topics_and_actions_with_alloc_failure(void)
+{
+	return test_all_topics_and_actions(1);
+}
+
+static int test_all_topics_and_actions_without_alloc_failure(void)
+{
+	return test_all_topics_and_actions(0);
 }
 
 CUT_BEGIN_TEST_HARNESS(message_suite)
@@ -241,5 +261,6 @@ CUT_RUN_TEST(test_topic_and_action_and_one_data);
 CUT_RUN_TEST(test_topic_and_action_and_multiple_data);
 CUT_RUN_TEST(test_payload_data_alloc_fails);
 CUT_RUN_TEST(test_topic_and_action_without_record_separator);
-CUT_RUN_TEST(test_all_topics_and_actions);
+CUT_RUN_TEST(test_all_topics_and_actions_with_alloc_failure);
+CUT_RUN_TEST(test_all_topics_and_actions_without_alloc_failure);
 CUT_END_TEST_HARNESS

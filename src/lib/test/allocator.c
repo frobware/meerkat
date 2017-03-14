@@ -29,15 +29,6 @@ static void test_allocator_restore(void)
 	dsio_stdlib_allocator->free = orig_free;
 }
 
-static void *test_allocator_malloc(const struct dsio_allocator *a, size_t size)
-{
-	if (test_allocator_malloc_fail_next) {
-		return NULL;
-	}
-
-	return orig_malloc(a, size);
-}
-
 static void *test_allocator_realloc(const struct dsio_allocator *a, void *ptr, size_t size)
 {
 	if (test_allocator_realloc_fail_next) {
@@ -45,6 +36,15 @@ static void *test_allocator_realloc(const struct dsio_allocator *a, void *ptr, s
 	}
 
 	return orig_realloc(a, ptr, size);
+}
+
+static void *test_allocator_malloc(const struct dsio_allocator *a, size_t size)
+{
+	if (test_allocator_malloc_fail_next) {
+		return NULL;
+	}
+
+	return test_allocator_realloc(a, NULL, size);
 }
 
 static void test_allocator_free(const struct dsio_allocator *a, void *ptr)
