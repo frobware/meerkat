@@ -24,7 +24,7 @@
 
 static char *make_msg(const char *topic, const char *action)
 {
-	return dsio_mprintf(dsio_stdlib_allocator,
+	return dsio_mprintf(test_allocator,
 			    "%s%c%s%c%c",
 			    topic,
 			    DSIO_MSG_PART_SEPARATOR,
@@ -37,7 +37,8 @@ static int test_topic_null_ident(void)
 {
 	int rc;
 	struct dsio_msg msg;
-	rc = dsio_msg_parse(dsio_stdlib_allocator, NULL, &msg);
+	test_allocator_reset();
+	rc = dsio_msg_parse(test_allocator, NULL, &msg);
 	CUT_ASSERT_EQUAL(DSIO_ERROR, rc);
 	return 0;
 }
@@ -46,7 +47,8 @@ static int test_topic_empty_ident(void)
 {
 	int rc;
 	struct dsio_msg msg;
-	rc = dsio_msg_parse(dsio_stdlib_allocator, "", &msg);
+	test_allocator_reset();
+	rc = dsio_msg_parse(test_allocator, "", &msg);
 	CUT_ASSERT_EQUAL(DSIO_ERROR, rc);
 	return 0;
 }
@@ -55,7 +57,8 @@ static int test_topic_missing_unit_separator(void)
 {
 	int rc;
 	struct dsio_msg msg;
-	rc = dsio_msg_parse(dsio_stdlib_allocator, "E", &msg);
+	test_allocator_reset();
+	rc = dsio_msg_parse(test_allocator, "E", &msg);
 	CUT_ASSERT_EQUAL(DSIO_ERROR, rc);
 	return 0;
 }
@@ -68,7 +71,8 @@ static int test_topic_bad_topic(void)
 		'!', DSIO_MSG_PART_SEPARATOR,
 		'\0'
 	};
-	rc = dsio_msg_parse(dsio_stdlib_allocator, input, &msg);
+	test_allocator_reset();
+	rc = dsio_msg_parse(test_allocator, input, &msg);
 	CUT_ASSERT_EQUAL(DSIO_ERROR, rc);
 	return 0;
 }
@@ -77,7 +81,8 @@ static int test_topic_good_ident_but_missing_unit_separator(void)
 {
 	int rc;
 	struct dsio_msg msg;
-	rc = dsio_msg_parse(dsio_stdlib_allocator, "E", &msg);
+	test_allocator_reset();
+	rc = dsio_msg_parse(test_allocator, "E", &msg);
 	CUT_ASSERT_EQUAL(DSIO_ERROR, rc);
 	return 0;
 }
@@ -90,7 +95,8 @@ static int test_topic_good_ident_but_no_action(void)
 		'E', DSIO_MSG_PART_SEPARATOR,
 		'\0'
 	};
-	rc = dsio_msg_parse(dsio_stdlib_allocator, input, &msg);
+	test_allocator_reset();
+	rc = dsio_msg_parse(test_allocator, input, &msg);
 	CUT_ASSERT_EQUAL(DSIO_ERROR, rc);
 	CUT_ASSERT_EQUAL(strcmp("E", msg.topic->ident), 0);
 	return 0;
@@ -105,7 +111,8 @@ static int test_topic_good_action_but_no_unit_separator(void)
 		'C', DSIO_MSG_RECORD_SEPARATOR,
 		'\0',
 	};
-	rc = dsio_msg_parse(dsio_stdlib_allocator, input, &msg);
+	test_allocator_reset();
+	rc = dsio_msg_parse(test_allocator, input, &msg);
 	CUT_ASSERT_EQUAL(DSIO_ERROR, rc);
 	CUT_ASSERT_EQUAL(strcmp("E", msg.topic->ident), 0);
 	return 0;
@@ -121,7 +128,8 @@ static int test_topic_good_topic_bad_action(void)
 		DSIO_MSG_RECORD_SEPARATOR,
 		'\0',
 	};
-	rc = dsio_msg_parse(dsio_stdlib_allocator, input, &msg);
+	test_allocator_reset();
+	rc = dsio_msg_parse(test_allocator, input, &msg);
 	CUT_ASSERT_EQUAL(DSIO_ERROR, rc);
 	CUT_ASSERT_EQUAL(strcmp("E", msg.topic->ident), 0);
 	return 0;
@@ -136,7 +144,8 @@ static int test_topic_and_action_without_record_separator(void)
 		'C', DSIO_MSG_PART_SEPARATOR,
 		'\0',
 	};
-	rc = dsio_msg_parse(dsio_stdlib_allocator, input, &msg);
+	test_allocator_reset();
+	rc = dsio_msg_parse(test_allocator, input, &msg);
 	CUT_ASSERT_EQUAL(DSIO_ERROR, rc);
 	return 0;
 }
@@ -152,7 +161,8 @@ static int test_topic_and_action_and_one_data(void)
 		DSIO_MSG_RECORD_SEPARATOR,
 		'\0',
 	};
-	rc = dsio_msg_parse(dsio_stdlib_allocator, input, &msg);
+	test_allocator_reset();
+	rc = dsio_msg_parse(test_allocator, input, &msg);
 	CUT_ASSERT_EQUAL(DSIO_OK, rc);
 	CUT_ASSERT_NOT_NULL(msg.data);
 	CUT_ASSERT_EQUAL(1, msg.ndata);
@@ -173,7 +183,8 @@ static int test_topic_and_action_and_multiple_data(void)
 		DSIO_MSG_RECORD_SEPARATOR,
 		'\0',
 	};
-	rc = dsio_msg_parse(dsio_stdlib_allocator, input, &msg);
+	test_allocator_reset();
+	rc = dsio_msg_parse(test_allocator, input, &msg);
 	CUT_ASSERT_EQUAL(DSIO_OK, rc);
 	CUT_ASSERT_NOT_NULL(msg.data);
 	CUT_ASSERT_EQUAL(3, msg.ndata);
@@ -194,13 +205,13 @@ static int test_payload_data_alloc_fails(void)
 		DSIO_MSG_RECORD_SEPARATOR,
 		'\0',
 	};
-	test_allocator_intercept();
-	test_allocator_realloc_fail_next = 1;
-	rc = dsio_msg_parse(dsio_stdlib_allocator, input, &msg);
+	test_allocator_reset();
+	test_allocator_realloc_fail(1);
+	rc = dsio_msg_parse(test_allocator, input, &msg);
 	CUT_ASSERT_EQUAL(DSIO_NOMEM, rc);
 	CUT_ASSERT_NULL(msg.data);
 	CUT_ASSERT_EQUAL(0, msg.ndata);
-	test_allocator_restore();
+	test_allocator_reset();
 	return 0;
 }
 
@@ -213,25 +224,24 @@ static int test_all_topics_and_actions(int alloc_failure)
 			struct dsio_msg msg;
 			char *input;
 			int rc;
-			test_allocator_intercept();
-			test_allocator_malloc_fail_next = alloc_failure;
-			test_allocator_realloc_fail_next = alloc_failure;
+			test_allocator_reset();
+			test_allocator_malloc_fail(alloc_failure);
+			test_allocator_realloc_fail(alloc_failure);
 			input = make_msg(t->ident, a->ident);
-			if (!alloc_failure) {
-				CUT_ASSERT_NOT_NULL(input);
-				rc = dsio_msg_parse(dsio_stdlib_allocator, input, &msg);
-				CUT_ASSERT_EQUAL(DSIO_OK, rc);
-				CUT_ASSERT_EQUAL(topics[i].type, msg.topic->type);
-				CUT_ASSERT_EQUAL(actions[j].type, msg.action->type);
-				CUT_ASSERT_EQUAL(strcmp(t->ident, msg.topic->ident), 0);
-				CUT_ASSERT_EQUAL(strcmp(a->ident, msg.action->ident), 0);
-				CUT_ASSERT_NULL(msg.data);
-				CUT_ASSERT_EQUAL(0, msg.ndata);
-				DSIO_FREE(dsio_stdlib_allocator, input);
-			} else {
+			if (alloc_failure) {
 				CUT_ASSERT_NULL(input);
+				continue;
 			}
-			test_allocator_restore();
+			CUT_ASSERT_NOT_NULL(input);
+			rc = dsio_msg_parse(test_allocator, input, &msg);
+			CUT_ASSERT_EQUAL(DSIO_OK, rc);
+			CUT_ASSERT_EQUAL(topics[i].type, msg.topic->type);
+			CUT_ASSERT_EQUAL(actions[j].type, msg.action->type);
+			CUT_ASSERT_EQUAL(strcmp(t->ident, msg.topic->ident), 0);
+			CUT_ASSERT_EQUAL(strcmp(a->ident, msg.action->ident), 0);
+			CUT_ASSERT_NULL(msg.data);
+			CUT_ASSERT_EQUAL(0, msg.ndata);
+			DSIO_FREE(test_allocator, input);
 		}
 	}
 

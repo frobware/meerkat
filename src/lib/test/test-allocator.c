@@ -25,47 +25,44 @@
 static int test_alloc_succeeds(void)
 {
 	void *p;
-	test_allocator_intercept();
-	p = DSIO_MALLOC(dsio_stdlib_allocator, 100);
+	test_allocator_reset();
+	p = DSIO_MALLOC(test_allocator, 100);
 	CUT_ASSERT_NOT_NULL(p);
-	DSIO_FREE(dsio_stdlib_allocator, p);
+	DSIO_FREE(test_allocator, p);
 	return 0;
 }
 
 static int test_alloc_fails(void)
 {
-	test_allocator_intercept();
-	test_allocator_malloc_fail_next = 1;
-	void *p = DSIO_MALLOC(dsio_stdlib_allocator, 100);
+	test_allocator_reset();
+	test_allocator_malloc_fail(1);
+	void *p = DSIO_MALLOC(test_allocator, 100);
 	CUT_ASSERT_NULL(p);
-	test_allocator_restore();
 	return 0;
 }
 
 static int test_realloc_succeeds(void)
 {
 	void *p;
-	test_allocator_intercept();
-	p = DSIO_MALLOC(dsio_stdlib_allocator, 100);
+	test_allocator_reset();
+	p = DSIO_MALLOC(test_allocator, 100);
 	CUT_ASSERT_NOT_NULL(p);
-	p = DSIO_REALLOC(dsio_stdlib_allocator, p, 200);
+	p = DSIO_REALLOC(test_allocator, p, 200);
 	CUT_ASSERT_NOT_NULL(p);
-	DSIO_FREE(dsio_stdlib_allocator, p);
-	test_allocator_restore();
+	DSIO_FREE(test_allocator, p);
 	return 0;
 }
 
 static int test_realloc_fails(void)
 {
 	void *p, *q;
-	test_allocator_intercept();
-	p = DSIO_MALLOC(dsio_stdlib_allocator, 100);
+	test_allocator_reset();
+	p = DSIO_MALLOC(test_allocator, 100);
 	CUT_ASSERT_NOT_NULL(p);
-	test_allocator_realloc_fail_next = 1;
-	q = DSIO_REALLOC(dsio_stdlib_allocator, p, 200);
+	test_allocator_realloc_fail(1);
+	q = DSIO_REALLOC(test_allocator, p, 200);
 	CUT_ASSERT_NULL(q);
-	DSIO_FREE(dsio_stdlib_allocator, p);
-	test_allocator_restore();
+	DSIO_FREE(test_allocator, p);
 	return 0;
 }
 

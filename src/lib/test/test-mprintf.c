@@ -25,21 +25,20 @@
 
 static int test_mprintf_alloc_succeeds(void)
 {
-	test_allocator_intercept();
-	char *s = dsio_mprintf(dsio_stdlib_allocator, "%s", "test_mprintf_alloc_succeeds");
+	test_allocator_reset();
+	char *s = dsio_mprintf(test_allocator, "%s", "test_mprintf_alloc_succeeds");
 	CUT_ASSERT_NOT_NULL(s);
-	DSIO_FREE(dsio_stdlib_allocator, s);
+	DSIO_FREE(test_allocator, s);
 	return 0;
 }
 
 static int test_mprintf_alloc_fails(void)
 {
-	test_allocator_intercept();
-	test_allocator_malloc_fail_next = 1;
-	test_allocator_realloc_fail_next = 1;
-	char *s = dsio_mprintf(dsio_stdlib_allocator, "%s", "test_mprintf_succeeds");
+	test_allocator_malloc_fail(1);
+	test_allocator_realloc_fail(1);
+	char *s = dsio_mprintf(test_allocator, "%s", "test_mprintf_succeeds");
 	CUT_ASSERT_NULL(s);
-	test_allocator_restore();
+	test_allocator_reset();
 	return 0;
 }
 

@@ -15,32 +15,28 @@
 
 #include <dsio/allocator.h>
 
-static DSIO_MALLOC_FUNC orig_malloc;
-static DSIO_REALLOC_FUNC orig_realloc;
-static DSIO_FREE_FUNC orig_free;
-
-static int test_allocator_malloc_fail_next;
-static int test_allocator_realloc_fail_next;
-
-static void test_allocator_restore(void)
-{
-	dsio_stdlib_allocator->malloc = orig_malloc;
-	dsio_stdlib_allocator->realloc = orig_realloc;
-	dsio_stdlib_allocator->free = orig_free;
-}
+struct test_allocator {
+	struct dsio_allocator base;
+	int malloc_fail;
+	int realloc_fail;
+};
 
 static void *test_allocator_realloc(const struct dsio_allocator *a, void *ptr, size_t size)
 {
-	if (test_allocator_realloc_fail_next) {
+	struct test_allocator *ta = (struct test_allocator *)a;
+
+	if (ta->realloc_fail) {
 		return NULL;
 	}
 
-	return orig_realloc(a, ptr, size);
+	return DSIO_REALLOC(dsio_stdlib_allocator, ptr, size);
 }
 
 static void *test_allocator_malloc(const struct dsio_allocator *a, size_t size)
 {
-	if (test_allocator_malloc_fail_next) {
+	struct test_allocator *ta = (struct test_allocator *)a;
+
+	if (ta->malloc_fail) {
 		return NULL;
 	}
 
@@ -49,19 +45,27 @@ static void *test_allocator_malloc(const struct dsio_allocator *a, size_t size)
 
 static void test_allocator_free(const struct dsio_allocator *a, void *ptr)
 {
-	orig_free(a, ptr);
+	DSIO_FREE(dsio_stdlib_allocator, ptr);
 }
 
-static void test_allocator_intercept(void)
+static struct test_allocator _test_allocator = {
+	{test_allocator_malloc, test_allocator_realloc, test_allocator_free}, 0, 0
+};
+
+static struct dsio_allocator *test_allocator = &_test_allocator.base;
+
+static void test_allocator_malloc_fail(int value)
 {
-	if (!orig_malloc || !orig_realloc || !orig_free) {
-		orig_malloc = dsio_stdlib_allocator->malloc;
-		orig_realloc = dsio_stdlib_allocator->realloc;
-		orig_free = dsio_stdlib_allocator->free;
-	}
-	dsio_stdlib_allocator->malloc = test_allocator_malloc;
-	dsio_stdlib_allocator->realloc = test_allocator_realloc;
-	dsio_stdlib_allocator->free = test_allocator_free;
-	test_allocator_malloc_fail_next = 0;
-	test_allocator_realloc_fail_next = 0;
+	_test_allocator.malloc_fail = value;
+}
+
+static void test_allocator_realloc_fail(int value)
+{
+	_test_allocator.realloc_fail = value;
+}
+
+static void test_allocator_reset(void)
+{
+	test_allocator_malloc_fail(0);
+	test_allocator_realloc_fail(0);
 }
