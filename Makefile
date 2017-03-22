@@ -68,6 +68,7 @@ verify:
 $(LIB_OBJS): Makefile
 $(TEST_BINS): $(LIB_OBJS)
 
+-include build/bin/*.d
+-include build/examples/*.d
 -include build/obj/lib/*.d
 -include build/obj/lib/test/*.d
--include build/bin/*.d
