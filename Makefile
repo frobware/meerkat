@@ -13,17 +13,17 @@
 # permissions and limitations under the License.
 
 LIB_SRCS = $(wildcard src/lib/*.c)
-LIB_OBJS = $(patsubst src/lib/%.c,obj/lib/%.o,$(LIB_SRCS))
+LIB_OBJS = $(patsubst src/lib/%.c,build/obj/lib/%.o,$(LIB_SRCS))
 
 TEST_SRCS := $(wildcard src/lib/test/test-*.c)
-TEST_BINS := $(patsubst src/lib/test/test-%.c,bin/test-%,$(TEST_SRCS))
+TEST_BINS := $(patsubst src/lib/test/test-%.c,build/bin/test-%,$(TEST_SRCS))
 
 LOGIN_SRCS := examples/login.c examples/dsio-libwebsockets-impl.c
-LOGIN_OBJS := $(patsubst examples/%.c,examples/%.o,$(LOGIN_SRCS)) 
+LOGIN_OBJS := $(patsubst examples/%.c,build/examples/%.o,$(LOGIN_SRCS)) 
 
-EXAMPLES := bin/login
+EXAMPLES := build/bin/login
 
-LIB_DSIO = lib/libdsio.a
+LIB_DSIO = build/lib/libdsio.a
 
 CFLAGS += -Wall -pedantic -ggdb -fno-inline -Iinclude -MMD -coverage -Werror
 
@@ -31,28 +31,31 @@ CFLAGS += -Wall -pedantic -ggdb -fno-inline -Iinclude -MMD -coverage -Werror
 
 all: $(TEST_BINS) $(EXAMPLES)
 
-$(LIB_DSIO): $(LIB_OBJS) | lib
+$(LIB_DSIO): $(LIB_OBJS) | build/lib
 	ar cr $@ $^
 
-obj/lib/%.o: src/lib/%.c | obj/lib
+build/obj/lib/%.o: src/lib/%.c | build/obj/lib
 	$(COMPILE.c) $< -o $@
 
-obj/lib/test/%.o: src/lib/test/%.c | obj/lib/test
+build/obj/lib/test/%.o: src/lib/test/%.c | build/obj/lib/test
 	$(COMPILE.c) $< -o $@
 
-bin/test-%: src/lib/test/test-%.c | $(LIB_DSIO) $(LIB_OBJS) bin
-	$(LINK.c) $< -Llib -ldsio -o $@
+build/examples/%.o: examples/%.c | build/examples
+	$(COMPILE.c) $< -o $@
 
-bin/login: $(LOGIN_OBJS) | $(LIB_DSIO)
-	$(LINK.c) $^ -Llib -ldsio $(shell pkg-config --libs libwebsockets) -o $@
+build/bin/test-%: src/lib/test/test-%.c | $(LIB_DSIO) $(LIB_OBJS) build/bin
+	$(LINK.c) $< -Lbuild/lib -ldsio -o $@
 
-bin/lib/%: lib/test
+build/bin/login: $(LOGIN_OBJS) | $(LIB_DSIO)
+	$(LINK.c) $^ -Lbuild/lib -ldsio $(shell pkg-config --libs libwebsockets) -o $@
 
-obj/lib/test obj/lib bin lib:
+build/bin/lib/%: build/lib/test
+
+build/obj/lib/test build/obj/lib build/bin build/lib build/examples:
 	@mkdir -p $@
 
 clean:
-	$(RM) -r $(LIB_OBJS) lib obj bin
+	$(RM) -r build
 
 verify:
 	@echo LIB_SRCS=$(LIB_SRCS)
@@ -65,6 +68,6 @@ verify:
 $(LIB_OBJS): Makefile
 $(TEST_BINS): $(LIB_OBJS)
 
--include obj/lib/*.d
--include obj/lib/test/*.d
--include bin/*.d
+-include build/obj/lib/*.d
+-include build/obj/lib/test/*.d
+-include build/bin/*.d
