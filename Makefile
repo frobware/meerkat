@@ -18,13 +18,18 @@ LIB_OBJS = $(patsubst src/lib/%.c,obj/lib/%.o,$(LIB_SRCS))
 TEST_SRCS := $(wildcard src/lib/test/test-*.c)
 TEST_BINS := $(patsubst src/lib/test/test-%.c,bin/test-%,$(TEST_SRCS))
 
+LOGIN_SRCS := examples/login.c examples/dsio-libwebsockets-impl.c
+LOGIN_OBJS := $(patsubst examples/%.c,examples/%.o,$(LOGIN_SRCS)) 
+
+EXAMPLES := bin/login
+
 LIB_DSIO = lib/libdsio.a
 
 CFLAGS += -Wall -pedantic -ggdb -fno-inline -Iinclude -MMD -coverage -Werror
 
 .PHONY: clean verify
 
-all: $(TEST_BINS)
+all: $(TEST_BINS) $(EXAMPLES)
 
 $(LIB_DSIO): $(LIB_OBJS) | lib
 	ar cr $@ $^
@@ -37,6 +42,9 @@ obj/lib/test/%.o: src/lib/test/%.c | obj/lib/test
 
 bin/test-%: src/lib/test/test-%.c | $(LIB_DSIO) $(LIB_OBJS) bin
 	$(LINK.c) $< -Llib -ldsio -o $@
+
+bin/login: $(LOGIN_OBJS) | $(LIB_DSIO)
+	$(LINK.c) $^ -Llib -ldsio $(shell pkg-config --libs libwebsockets) -o $@
 
 bin/lib/%: lib/test
 
@@ -51,6 +59,8 @@ verify:
 	@echo LIB_OBJS=$(LIB_OBJS)
 	@echo TEST_SRCS=$(TEST_SRCS)
 	@echo TEST_BINS=$(TEST_BINS)
+	@echo LOGIN_SRCS=$(LOGIN_SRCS)
+	@echo LOGIN_OBJS=$(LOGIN_OBJS)
 
 $(LIB_OBJS): Makefile
 $(TEST_BINS): $(LIB_OBJS)

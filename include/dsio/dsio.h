@@ -1,5 +1,9 @@
 #pragma once
 
+#include <dsio/allocator.h>
+#include <dsio/client.h>
+#include <dsio/websocket.h>
+
 /* Status codes. */
 
 #define DSIO_OK		0
@@ -18,3 +22,4 @@ typedef enum dsio_connection_state {
 	CONNECTION_STATE_ERROR,
 	CONNECTION_STATE_RECONNECTING
 } dsio_connection_state_t;
+
