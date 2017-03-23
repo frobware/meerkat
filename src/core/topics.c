@@ -30,8 +30,10 @@ struct dsio_topic_type topics[] = {
 
 struct dsio_topic_type *topic_lookup(const char *ident)
 {
+	size_t i;
+	
 	/* Faster than bsearch given the table size. */
-	for (size_t i = 0; i < TOPIC_NR_TOPICS; i++) {
+	for (i = 0; i < TOPIC_NR_TOPICS; i++) {
 		if (strcmp(ident, topics[i].ident) == 0)
 			return &topics[i];
 	}
