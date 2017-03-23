@@ -95,7 +95,7 @@ static int parse_payload(struct scanner *s)
 {
 	char *token = s->curr;
 
-	for (; !s->parse_complete && *s->curr != '\0'; s->curr++) {
+	for (; *s->curr != '\0'; s->curr++) {
 		switch (*s->curr) {
 		case DSIO_MSG_RECORD_SEPARATOR:
 			*s->curr = '\0';
@@ -140,8 +140,10 @@ int dsio_msg_parse(const struct dsio_allocator *a, char *const input, struct dsi
 	if ((rc = parse_action(&s)) != DSIO_OK)
 		return rc;
 
-	if ((rc = parse_payload(&s)) != DSIO_OK)
-		return rc;
+	if (!s.parse_complete) { /* payload is optional */
+		if ((rc = parse_payload(&s)) != DSIO_OK)
+			return rc;
+	}
 
 	return s.parse_complete ? DSIO_OK : DSIO_ERROR;
 }

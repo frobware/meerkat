@@ -78,7 +78,7 @@ static int test_topic_bad_topic(void)
 	return 0;
 }
 
-static int test_topic_good_ident_but_missing_unit_separator(void)
+static int test_incomplete_topic(void)
 {
 	int rc;
 	struct dsio_msg msg;
@@ -315,7 +315,7 @@ CUT_RUN_TEST(test_topic_null_ident);
 CUT_RUN_TEST(test_topic_empty_ident);
 CUT_RUN_TEST(test_topic_missing_unit_separator);
 CUT_RUN_TEST(test_topic_bad_topic);
-CUT_RUN_TEST(test_topic_good_ident_but_missing_unit_separator);
+CUT_RUN_TEST(test_incomplete_topic);
 CUT_RUN_TEST(test_topic_good_ident_but_no_action);
 CUT_RUN_TEST(test_topic_good_topic_bad_action);
 CUT_RUN_TEST(test_topic_and_action_and_one_data);
