@@ -12,7 +12,7 @@ static int client_recv;
 
 static int callback_dumb_increment(struct lws *wsi,
 				   enum lws_callback_reasons reason,
-				   void *user, void *in, size_t len)
+				   void *userdata, void *in, size_t len)
 {
 	unsigned char buf[LWS_PRE + 4096];
 	int l = 0;
@@ -173,11 +173,6 @@ int dsio_libwebsockets_connect(char *uri,
 
 	memset(*ws, 0, sizeof **ws);
 	(*ws)->userdata = context;
-	/* int n = 0; */
-
-	/* while (n >= 0) { */
-	/*         n = lws_service(context, 0); */
-	/* } */
 
 	return 0;
 }

@@ -9,6 +9,7 @@ struct dsio_websocket {
 	int (*shutdown)();
 	int (*send)(void *buffer, size_t length);
 	int (*recv)(void *buffer, size_t *length);
+	int (*on_open)(struct dsio_websocket *ws, void *userdata);
 };
 
 typedef int (*DSIO_WEBSOCKET_CONNECT)(char *uri,
