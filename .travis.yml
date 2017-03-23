@@ -4,6 +4,11 @@ dist: trusty
 
 cache: ccache
 
+addons:
+  apt:
+    packages:
+      - ninja-build
+
 compiler:
   - gcc
   - clang
