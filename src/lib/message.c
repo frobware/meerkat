@@ -47,49 +47,59 @@
 struct scanner {
 	char *input;
 	char *curr;
+	int parse_complete;
 	struct dsio_msg *msg;
 	const struct dsio_allocator *allocator;
 };
 
-typedef enum {
-	TOPIC,
-	ACTION
-} scope_t;
-	
-static int parse_unit(struct scanner *s, scope_t scope)
+static int parse_topic(struct scanner *s)
 {
-	char *found = strchr(s->curr, DSIO_MSG_PART_SEPARATOR);
+	char *token = s->curr;
 
-	if (!found) {
-		return DSIO_ERROR;
+	for (; *s->curr != '\0'; s->curr++) {
+		switch (*s->curr) {
+		case DSIO_MSG_PART_SEPARATOR:
+			*s->curr = '\0';
+			if ((s->msg->topic = topic_lookup(token)) == NULL)
+				return DSIO_ERROR;
+			s->curr++;
+			return DSIO_OK;
+		}
 	}
 
-	*found = '\0';		/* punch hole in input */
+	return DSIO_ERROR;
+}
 
-	switch (scope) {
-	case TOPIC:
-		if ((s->msg->topic = topic_lookup(s->curr)) == NULL)
-			return DSIO_ERROR;
-		break;
-	case ACTION:
-		if ((s->msg->action = action_lookup(s->curr)) == NULL)
-			return DSIO_ERROR;
-		break;
+static int parse_action(struct scanner *s)
+{
+	char *token = s->curr;
+
+	for (; *s->curr != '\0'; s->curr++) {
+		switch (*s->curr) {
+		case DSIO_MSG_RECORD_SEPARATOR:
+			s->parse_complete = 1;
+			/* fall through */
+		case DSIO_MSG_PART_SEPARATOR:
+			*s->curr = '\0';
+			if ((s->msg->action = action_lookup(token)) == NULL)
+				return DSIO_ERROR;
+			s->curr++;
+			return DSIO_OK;
+		}
 	}
 
-	s->curr = ++found;
-
-	return DSIO_OK;
+	return DSIO_ERROR;
 }
 
 static int parse_payload(struct scanner *s)
 {
 	char *token = s->curr;
 
-	for (; *s->curr; s->curr++) {
+	for (; !s->parse_complete && *s->curr != '\0'; s->curr++) {
 		switch (*s->curr) {
 		case DSIO_MSG_RECORD_SEPARATOR:
 			*s->curr = '\0';
+			s->parse_complete = 1;
 			return DSIO_OK;
 		case DSIO_MSG_PART_SEPARATOR:
 			*s->curr = '\0';
@@ -105,7 +115,7 @@ static int parse_payload(struct scanner *s)
 		}
 	}
 
-	return DSIO_ERROR;
+	return DSIO_OK;
 }
 
 int dsio_msg_parse(const struct dsio_allocator *a, char *const input, struct dsio_msg *msg)
@@ -113,25 +123,25 @@ int dsio_msg_parse(const struct dsio_allocator *a, char *const input, struct dsi
 	int rc;
 	struct scanner s;
 
-	memset(msg, 0, sizeof *msg);
-
 	if (input == NULL || *input == '\0')
 		return DSIO_ERROR;
 
-	memset(&s, 0, sizeof s);
-	s.allocator = a;
-	s.curr = s.input = input;
+	memset(msg, 0, sizeof *msg);
+	s.input = input;
+	s.curr = input;
+	s.parse_complete = 0;
 	s.msg = msg;
 	s.msg->raw = input;
+	s.allocator = a;
 
-	if ((rc = parse_unit(&s, TOPIC)) != DSIO_OK)
+	if ((rc = parse_topic(&s)) != DSIO_OK)
 		return rc;
 
-	if ((rc = parse_unit(&s, ACTION)) != DSIO_OK)
+	if ((rc = parse_action(&s)) != DSIO_OK)
 		return rc;
 
 	if ((rc = parse_payload(&s)) != DSIO_OK)
 		return rc;
 
-	return DSIO_OK;
+	return s.parse_complete ? DSIO_OK : DSIO_ERROR;
 }
