@@ -20,9 +20,9 @@
 #include <assert.h>
 
 #include <dsio/dsio.h>
-#include "topics.h"
-#include "actions.h"
-#include "message.h"
+#include <dsio/message.h>
+#include <dsio/topics.h>
+#include <dsio/actions.h>
 
 /*
  * Message Structure Overview

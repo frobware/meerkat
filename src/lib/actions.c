@@ -16,7 +16,7 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include "actions.h"
+#include <dsio/actions.h>
 
 struct dsio_action_type actions[] = {
 	{"A",	"ACK",				ACTION_ACK},

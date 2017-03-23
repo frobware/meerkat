@@ -1,46 +1,82 @@
-#include <libwebsockets.h>
 #include <dsio/dsio.h>
 #include <dsio/allocator.h>
 #include <dsio/websocket.h>
+#include <dsio/message.h>
 #include "dsio-libwebsockets-impl.h"
 
-static int
-callback_dumb_increment(struct lws *wsi, enum lws_callback_reasons reason,
-                        void *user, void *in, size_t len)
+#include <assert.h>
+
+#include <libwebsockets.h>
+
+static int client_recv;
+
+static int callback_dumb_increment(struct lws *wsi,
+				   enum lws_callback_reasons reason,
+				   void *user, void *in, size_t len)
 {
-        switch (reason) {
-        case LWS_CALLBACK_CLIENT_ESTABLISHED:
-                lwsl_info("dumb: LWS_CALLBACK_CLIENT_ESTABLISHED\n");
-                break;
+	unsigned char buf[LWS_PRE + 4096];
+	int l = 0;
+	int n;
 
-        case LWS_CALLBACK_CLOSED:
-                lwsl_notice("dumb: LWS_CALLBACK_CLOSED\n");
-                break;
+	switch (reason) {
+	case LWS_CALLBACK_CLIENT_ESTABLISHED:
+		lwsl_notice("dumb: LWS_CALLBACK_CLIENT_ESTABLISHED\n");
+		lws_callback_on_writable(wsi);
+		break;
 
-        case LWS_CALLBACK_CLIENT_RECEIVE:
-                ((char *)in)[len] = '\0';
-                lwsl_info("rx %d '%s'\n", (int)len, (char *)in);
-                break;
+	case LWS_CALLBACK_CLOSED:
+		lwsl_notice("dumb: LWS_CALLBACK_CLOSED\n");
+		break;
 
-        /* because we are protocols[0] ... */
+	case LWS_CALLBACK_CLIENT_RECEIVE:
+	{
+		((char *)in)[len] = '\0';
+		lwsl_notice("RECV %d '%s'\n", (int)len, (char *)in);
+		struct dsio_msg msg;
+		printf("msg rc = %d\n", dsio_msg_parse(dsio_stdlib_allocator, (char *const)in, &msg));
+		client_recv = 1;
+		break;
+	}
+	case LWS_CALLBACK_CLIENT_WRITEABLE:
+		if (!client_recv) {
+			lws_callback_on_writable(wsi);
+			return 0;
+		}
+		memset(buf, 0, sizeof(buf));
+		lwsl_notice("LWS_CALLBACK_CLIENT_WRITEABLE\n");
+		l = sprintf((char *)&buf[LWS_PRE + l], "C%cCHR%c%s%c",
+			    DSIO_MSG_PART_SEPARATOR,
+			    DSIO_MSG_PART_SEPARATOR,
+			    "ws://deepstream:6020/deepstream",
+			    DSIO_MSG_RECORD_SEPARATOR);
+		printf("l=%d\n", l);
+		printf("s=%s\n", &buf[LWS_PRE]);
+		n = lws_write(wsi, &buf[LWS_PRE], l, LWS_WRITE_TEXT);
+		if (n < 0) {
+			lwsl_err("write error LWS_CALLBACK_CLIENT_WRITEABLE\n");
+			return -1;
+		}
+		if (n < l) {
+			lwsl_err("Partial write LWS_CALLBACK_CLIENT_WRITEABLE\n");
+			return -1;
+		}
+		printf("n=%d\n", n);
+		/* get notified as soon as we can write again */
+		/* lws_callback_on_writable(wsi); */
+		break;
 
-        case LWS_CALLBACK_CLIENT_CONNECTION_ERROR:
+	case LWS_CALLBACK_CLIENT_CONNECTION_ERROR:
 		lwsl_err("dumb: LWS_CALLBACK_CLIENT_CONNECTION_ERROR\n");
-                break;
+		break;
 
-        case LWS_CALLBACK_CLIENT_CONFIRM_EXTENSION_SUPPORTED:
-                if ((strcmp(in, "x-webkit-deflate-frame") == 0))
-                        return 1;
-                if ((strcmp(in, "deflate-frame") == 0))
-                        return 1;
-                break;
+	default:
+#if 0
+		lwsl_notice("dumb: reason = %d\n", reason);
+#endif
+		break;
+	}
 
-        default:
-                lwsl_info("dumb: reason = %d\n", reason);
-                break;
-        }
-
-        return 0;
+	return 0;
 }
 
 /*
@@ -112,10 +148,8 @@ int dsio_libwebsockets_connect(char *uri,
 	path[0] = '/';
 	path[1] = '\0';
 	strcat(path, p);
+
 	client_info.path = path;
-
-	printf("protocol: %s, path=%s\n", prot, client_info.path);
-
 	client_info.context = context;
 	client_info.ssl_connection = is_ssl_protocol(prot);
 	client_info.host = client_info.address;
@@ -123,6 +157,8 @@ int dsio_libwebsockets_connect(char *uri,
 	client_info.ietf_version_or_minus_one = -1;
 	client_info.client_exts = NULL;
 	client_info.protocol = protocols[0].name;
+
+	printf("protocol: %s, path=%s\n", prot, client_info.path);
 
 	if ((wsi = lws_client_connect_via_info(&client_info)) == NULL) {
 		fprintf(stderr, "[Main] wsi create error.\n");
@@ -137,11 +173,11 @@ int dsio_libwebsockets_connect(char *uri,
 
 	memset(*ws, 0, sizeof **ws);
 	(*ws)->userdata = context;
-	int n = 0;
+	/* int n = 0; */
 
-        while (n >= 0) {
-                n = lws_service(context, 0);
-        }
+	/* while (n >= 0) { */
+	/*         n = lws_service(context, 0); */
+	/* } */
 
 	return 0;
 }

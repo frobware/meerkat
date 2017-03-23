@@ -17,7 +17,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <dsio/dsio.h>
-#include "../message.h"
+#include <dsio/message.h>
 #include "../mprintf.h"
 #include "allocator.c"
 #include "CUnitTest.h"

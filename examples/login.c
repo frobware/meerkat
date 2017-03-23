@@ -13,12 +13,11 @@ int main(int argc, char *argv[])
 		fprintf(stderr, "usage: <URI>\n");
 		return EXIT_FAILURE;
 	}
-	
-	rc = dsio_libwebsockets_connect(argv[1], NULL, &ws);
 
+	rc = dsio_libwebsockets_connect(argv[1], NULL, &ws);
 	printf("rc=%d\n", rc);
 
-	/* dsio_libwebsockets_service(ws); */
+	dsio_libwebsockets_service(ws);
 
 	return 0;
 }
