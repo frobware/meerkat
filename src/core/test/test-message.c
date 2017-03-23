@@ -270,9 +270,12 @@ static int test_payload_data_alloc_fails(void)
 static int test_all_topics_and_actions(int alloc_failure)
 {
 	size_t i = 0;
-	for (struct dsio_topic_type *t = topics; t->ident; t++, i++) {
+	struct dsio_topic_type *t;
+	struct dsio_action_type *a;
+	
+	for (t = topics; t->ident; t++, i++) {
 		size_t j = 0;
-		for (struct dsio_action_type *a = actions; a->ident; a++, j++) {
+		for (a = actions; a->ident; a++, j++) {
 			struct dsio_msg msg;
 			char *input;
 			int rc;
