@@ -5,22 +5,24 @@
 #define DSIO_CLIENT_OK 0
 #define DSIO_CLIENT_CONNECT_ERROR 1
 
-typedef enum {
+enum dsio_client_state {
 	DSIO_CLIENT_OPEN,
 	DSIO_CLIENT_CLOSED
-} client_state_t;
-
-struct dsio_client {
-	struct dsio_websocket *ws;
 };
 
 struct dsio_client_cfg {
 	const struct dsio_allocator *allocator;
 	const char *uri;
-	const char *name;
-	const char *passwd;
+	const char *username;
+	const char *password;
+	DSIO_WEBSOCKET_FACTORY wsk_factory;
 };
 
-extern int dsio_login(const struct dsio_client_cfg *cfg,
-		      struct dsio_client *client,
-		      DSIO_WEBSOCKET_CONNECT *wsf);
+struct dsio_client {
+	enum dsio_client_state state;
+	const struct dsio_client_cfg *cfg;
+	struct dsio_websocket *ws;
+};
+
+extern struct dsio_client *dsio_login(const struct dsio_client_cfg *cfg);
+extern void dsio_logout(struct dsio_client *c);

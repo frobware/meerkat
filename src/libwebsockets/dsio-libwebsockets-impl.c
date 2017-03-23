@@ -1,4 +1,3 @@
-#include <pthread.h>
 #include <libwebsockets.h>
 
 #include <dsio/dsio.h>
@@ -110,7 +109,7 @@ static int is_ssl_protocol(const char *proto)
 	return strcmp(proto, "https://") == 0 || strcmp(proto, "wss://") == 0;
 }
 
-int dsio_libwebsockets_connect(char *uri,
+int dsio_libwebsockets_factory(char *uri,
 			       const struct dsio_allocator *allocator,
 			       struct dsio_websocket **ws)
 {

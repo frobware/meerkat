@@ -1,16 +1,21 @@
 #include <string.h>
 #include <dsio/client.h>
 
-int dsio_login(const struct dsio_client_cfg *cfg,
-	       struct dsio_client *client,
-	       DSIO_WEBSOCKET_CONNECT *wsf)
+struct dsio_client *dsio_login(const struct dsio_client_cfg *cfg)
 {
-	memset(client, 0, sizeof *client);
-	/* client->ws = (*wsf)(cfg->uri, cfg->allocator, 0); */
+	struct dsio_client *c;
 
-	if (client->ws == NULL) {
-		return DSIO_CLIENT_CONNECT_ERROR;
-	}
+	if ((c = DSIO_MALLOC(cfg->allocator, sizeof *c)) == NULL)
+		return NULL;
+	
+	memset(c, 0, sizeof *c);
+ 	c->cfg = cfg;
 
-	return 0;
+	return c;
 }
+
+void dsio_logout(struct dsio_client *c)
+{
+	DSIO_FREE(c->cfg->allocator, c);
+}
+
