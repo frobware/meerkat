@@ -1,0 +1,16 @@
+language: c
+
+dist: trusty
+
+cache: ccache
+
+compiler:
+  - gcc
+  - clang
+
+script:
+  - make
+  - make test
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
