@@ -17,7 +17,7 @@ include(use-gold-linker)
 include(CheckCCompilerFlag)
 include(FindLibWebSockets)
 
-option(ENABLE_COVERAGE "Build with code coverage" OFF)
+option(ENABLE_COVERAGE "Build with code coverage" ON)
 
 if(ENABLE_COVERAGE)
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --coverage")
