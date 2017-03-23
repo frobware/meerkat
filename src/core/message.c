@@ -47,9 +47,9 @@
 struct scanner {
 	char *input;
 	char *curr;
-	int parse_complete;
 	struct dsio_msg *msg;
 	const struct dsio_allocator *allocator;
+	int parse_complete;
 };
 
 static int parse_topic(struct scanner *s)

@@ -25,13 +25,18 @@ if(ENABLE_COVERAGE)
   set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} --coverage")
 endif()
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Werror")
+if(CMAKE_C_COMPILER_ID MATCHES "Clang")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Weverything -Wno-padded -Wno-unused-parameter")
+elseif(CMAKE_C_COMPILER_ID MATCHES "GNU")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Werror -Wno-unused-parameter")
+endif()
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 option(ENABLE_ASAN "Enable Address Sanitizer on debug builds" ON)
+
 if(ENABLE_ASAN)
   set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -fsanitize=address -fno-omit-frame-pointer")
 endif()
@@ -52,4 +57,3 @@ message("C Compiler is '${CMAKE_C_COMPILER}'")
 message("CFLAGS for all types: ${CMAKE_C_FLAGS}")
 message("CFLAGS for Debug: ${CMAKE_C_FLAGS_DEBUG}")
 message("CFLAGS for Release: ${CMAKE_C_FLAGS_RELEASE}")
- 

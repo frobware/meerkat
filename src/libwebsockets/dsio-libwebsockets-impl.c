@@ -92,8 +92,17 @@ static struct lws_protocols protocols[] = {
 		callback_dumb_increment,
 		1000,
 		2000,
+		0,
+		NULL
 	},
-	{ NULL, NULL, 0, 0 }	/* end */
+	{
+		NULL, 		/* name */
+		NULL, 		/* callback */
+		0, 		/* per_session_data_size */
+		0,		/* rx_buffer_size */
+		0,		/* id */
+		NULL		/* userdata */
+	}
 };
 
 static int is_ssl_protocol(const char *proto)
