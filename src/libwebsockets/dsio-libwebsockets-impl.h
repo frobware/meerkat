@@ -1,6 +1,6 @@
 #pragma once
 
-extern int dsio_libwebsockets_factory(char *uri,
+extern int dsio_libwebsockets_factory(const char *uri,
 				      const struct dsio_allocator *a,
 				      struct dsio_websocket **wsp);
 

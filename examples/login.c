@@ -26,6 +26,8 @@ int main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
+	dsio_logout(client);
+
 #if 0	
 	struct dsio_websocket *ws;
 

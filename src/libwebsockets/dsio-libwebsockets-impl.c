@@ -4,15 +4,13 @@
 #include <dsio/allocator.h>
 #include <dsio/websocket.h>
 #include <dsio/message.h>
-#include "dsio-libwebsockets-impl.h"
-
-#include <assert.h>
+#include "../src/core/mprintf.h"
 
 static int client_recv;
 
-static int callback_dumb_increment(struct lws *wsi,
-				   enum lws_callback_reasons reason,
-				   void *userdata, void *in, size_t len)
+static int ws_callback(struct lws *wsi,
+		       enum lws_callback_reasons reason,
+		       void *userdata, void *in, size_t len)
 {
 	unsigned char buf[LWS_PRE + 4096];
 	int l = 0;
@@ -23,20 +21,16 @@ static int callback_dumb_increment(struct lws *wsi,
 		lwsl_notice("dumb: LWS_CALLBACK_CLIENT_ESTABLISHED\n");
 		lws_callback_on_writable(wsi);
 		break;
-
 	case LWS_CALLBACK_CLOSED:
 		lwsl_notice("dumb: LWS_CALLBACK_CLOSED\n");
 		break;
-
 	case LWS_CALLBACK_CLIENT_RECEIVE:
-	{
 		((char *)in)[len] = '\0';
 		lwsl_notice("RECV %d '%s'\n", (int)len, (char *)in);
 		struct dsio_msg msg;
 		printf("msg rc = %d\n", dsio_msg_parse(dsio_stdlib_allocator, (char *const)in, &msg));
 		client_recv = 1;
 		break;
-	}
 	case LWS_CALLBACK_CLIENT_WRITEABLE:
 		if (!client_recv) {
 			lws_callback_on_writable(wsi);
@@ -64,33 +58,22 @@ static int callback_dumb_increment(struct lws *wsi,
 		/* get notified as soon as we can write again */
 		/* lws_callback_on_writable(wsi); */
 		break;
-
 	case LWS_CALLBACK_CLIENT_CONNECTION_ERROR:
 		lwsl_err("dumb: LWS_CALLBACK_CLIENT_CONNECTION_ERROR\n");
 		break;
-
 	default:
-#if 0
-		lwsl_notice("dumb: reason = %d\n", reason);
-#endif
 		break;
 	}
 
 	return 0;
 }
 
-/*
- * dumb_increment protocol
- *
- * since this also happens to be protocols[0], some callbacks that are not
- * bound to a specific protocol also turn up here.
- */
 static struct lws_protocols protocols[] = {
 	{
-		"dumb-increment-protocol",
-		callback_dumb_increment,
-		1000,
-		2000,
+		"dsio",
+		ws_callback,
+		1000,		/* TODO */
+		2000,		/* TODO */
 		0,
 		NULL
 	},
@@ -109,7 +92,7 @@ static int is_ssl_protocol(const char *proto)
 	return strcmp(proto, "https://") == 0 || strcmp(proto, "wss://") == 0;
 }
 
-int dsio_libwebsockets_factory(char *uri,
+int dsio_libwebsockets_factory(const char *uri,
 			       const struct dsio_allocator *allocator,
 			       struct dsio_websocket **ws)
 {
@@ -118,11 +101,15 @@ int dsio_libwebsockets_factory(char *uri,
 	struct lws_context_creation_info ctx_info;
 	struct lws_client_connect_info client_info;
 	const char *prot, *p;
+	char *uri_cp;
 	char path[1024];	/* FIXME */
 
 	if (allocator == NULL) {
 		allocator = dsio_stdlib_allocator;
 	}
+
+	if ((uri_cp = dsio_mprintf(allocator, "%s", uri)) == NULL)
+		return DSIO_NOMEM;
 
 	/*
 	 * Create the websockets context. This tracks open connections
@@ -144,15 +131,16 @@ int dsio_libwebsockets_factory(char *uri,
 
 	memset(&client_info, 0, sizeof client_info);
 
-	if (lws_parse_uri(strdup(uri), &prot,
+	if (lws_parse_uri(strdup(uri_cp), &prot,
 			  &client_info.address,
 			  &client_info.port,
 			  &p)) {
 		fprintf(stderr, "cannot parse URI %s\n", uri);
+		DSIO_FREE(allocator, uri_cp);
 		return 1;
 	}
 
-	/* add back the leading / on path */
+	/* add back the leading / to path */
 	memset(path, 0, sizeof(path));
 	path[0] = '/';
 	path[1] = '\0';
@@ -171,17 +159,20 @@ int dsio_libwebsockets_factory(char *uri,
 
 	if ((wsi = lws_client_connect_via_info(&client_info)) == NULL) {
 		fprintf(stderr, "[Main] wsi create error.\n");
+		DSIO_FREE(allocator, uri_cp);
 		return -1;
 	}
 
 	*ws = DSIO_MALLOC(allocator, sizeof **ws);
 
 	if (ws == NULL) {
+		DSIO_FREE(allocator, uri_cp);
 		return DSIO_NOMEM;
 	}
 
 	memset(*ws, 0, sizeof **ws);
 	(*ws)->userdata = context;
+	DSIO_FREE(allocator, uri_cp);
 
 	return 0;
 }
@@ -194,5 +185,5 @@ int dsio_libwebsockets_service(struct dsio_websocket *ws)
 		rc = lws_service(ws->userdata, 100);
 	} while (rc == 0);
 
-	return 0;
+	return rc;
 }

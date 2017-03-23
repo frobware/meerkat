@@ -12,7 +12,7 @@ struct dsio_websocket {
  	void *userdata;
 };
 
-typedef int (*DSIO_WEBSOCKET_FACTORY)(char *uri,
+typedef int (*DSIO_WEBSOCKET_FACTORY)(const char *uri,
 				      const struct dsio_allocator *a,
 				      struct dsio_websocket **out);
 
