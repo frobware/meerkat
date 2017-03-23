@@ -1,8 +1,7 @@
 #include <stdio.h>
-#include <libwebsockets.h>
 #include <dsio/dsio.h>
 
-#include "dsio-libwebsockets-impl.h"
+#include "../src/libwebsockets/dsio-libwebsockets-impl.h"
 
 int main(int argc, char *argv[])
 {

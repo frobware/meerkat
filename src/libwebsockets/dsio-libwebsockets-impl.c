@@ -1,3 +1,6 @@
+#include <pthread.h>
+#include <libwebsockets.h>
+
 #include <dsio/dsio.h>
 #include <dsio/allocator.h>
 #include <dsio/websocket.h>
@@ -5,8 +8,6 @@
 #include "dsio-libwebsockets-impl.h"
 
 #include <assert.h>
-
-#include <libwebsockets.h>
 
 static int client_recv;
 
@@ -180,6 +181,7 @@ int dsio_libwebsockets_connect(char *uri,
 int dsio_libwebsockets_service(struct dsio_websocket *ws)
 {
 	int rc;
+
 	do {
 		rc = lws_service(ws->userdata, 100);
 	} while (rc == 0);
