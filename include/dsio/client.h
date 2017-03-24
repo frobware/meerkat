@@ -15,14 +15,19 @@ struct dsio_client_cfg {
 	const char *uri;
 	const char *username;
 	const char *password;
-	DSIO_WEBSOCKET_FACTORY wsk_factory;
+	DSIO_WEBSOCKET_BROKER websocket_broker;
 };
 
 struct dsio_client {
+	char *buf;
 	enum dsio_client_state state;
 	const struct dsio_client_cfg *cfg;
-	struct dsio_websocket *ws;
+	void (*on_open)(struct dsio_client *client);
+	void (*on_close)(struct dsio_client *client);
+	void (*on_error)(struct dsio_client *client);
+	void (*on_message)(struct dsio_client *client);
+	void *userdata;
 };
 
-extern struct dsio_client *dsio_login(const struct dsio_client_cfg *cfg);
+extern int dsio_login(struct dsio_client *c, const struct dsio_client_cfg *cfg);
 extern void dsio_logout(struct dsio_client *c);

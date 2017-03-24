@@ -6,26 +6,31 @@
 #include <dsio/message.h>
 #include "../src/core/mprintf.h"
 
+#include <assert.h>
+
 static int client_recv;
 
-static int ws_callback(struct lws *wsi,
-		       enum lws_callback_reasons reason,
-		       void *userdata, void *in, size_t len)
+static int callback(struct lws *wsi,
+		    enum lws_callback_reasons reason,
+		    void *userdata, void *in, size_t len)
 {
 	unsigned char buf[LWS_PRE + 4096];
 	int l = 0;
 	int n;
 
+	printf("userdata: %p\n", userdata);
 	switch (reason) {
 	case LWS_CALLBACK_CLIENT_ESTABLISHED:
 		lwsl_notice("dumb: LWS_CALLBACK_CLIENT_ESTABLISHED\n");
 		lws_callback_on_writable(wsi);
+		((struct dsio_client *)userdata)->on_open(userdata);
 		break;
 	case LWS_CALLBACK_CLOSED:
 		lwsl_notice("dumb: LWS_CALLBACK_CLOSED\n");
 		break;
 	case LWS_CALLBACK_CLIENT_RECEIVE:
 		((char *)in)[len] = '\0';
+		printf("userdata: %p\n", userdata);
 		lwsl_notice("RECV %d '%s'\n", (int)len, (char *)in);
 		struct dsio_msg msg;
 		printf("msg rc = %d\n", dsio_msg_parse(dsio_stdlib_allocator, (char *const)in, &msg));
@@ -68,12 +73,12 @@ static int ws_callback(struct lws *wsi,
 	return 0;
 }
 
-static struct lws_protocols protocols[] = {
+static struct lws_protocols protocols[2] = {
 	{
-		"dsio",
-		ws_callback,
-		1000,		/* TODO */
-		2000,		/* TODO */
+		"dsio_libwebsockets",
+		callback,
+		0,		/* TODO */
+		128,		/* TODO */
 		0,
 		NULL
 	},
@@ -92,9 +97,19 @@ static int is_ssl_protocol(const char *proto)
 	return strcmp(proto, "https://") == 0 || strcmp(proto, "wss://") == 0;
 }
 
-int dsio_libwebsockets_factory(const char *uri,
-			       const struct dsio_allocator *allocator,
-			       struct dsio_websocket **ws)
+#if 0
+static void on_close(struct dsio_client *client)
+{
+	client->state = CLIENT_STATE_CLOSED;
+}
+
+static void on_open(struct client *client)
+{
+	client->state = CLIENT_STATE_OPEN;
+}
+#endif
+
+int dsio_libwebsockets_broker(struct dsio_client *client)
 {
 	struct lws *wsi;
 	struct lws_context *context;
@@ -104,11 +119,7 @@ int dsio_libwebsockets_factory(const char *uri,
 	char *uri_cp;
 	char path[1024];	/* FIXME */
 
-	if (allocator == NULL) {
-		allocator = dsio_stdlib_allocator;
-	}
-
-	if ((uri_cp = dsio_mprintf(allocator, "%s", uri)) == NULL)
+	if ((uri_cp = dsio_mprintf(client->cfg->allocator, "%s", client->cfg->uri)) == NULL)
 		return DSIO_NOMEM;
 
 	/*
@@ -123,7 +134,7 @@ int dsio_libwebsockets_factory(const char *uri,
 	ctx_info.gid = -1;
 	ctx_info.uid = -1;
 	ctx_info.options = 0;
-
+	
 	if ((context = lws_create_context(&ctx_info)) == NULL) {
 		fprintf(stderr, "Creating libwebsocket context failed\n");
 		return 1;
@@ -135,8 +146,8 @@ int dsio_libwebsockets_factory(const char *uri,
 			  &client_info.address,
 			  &client_info.port,
 			  &p)) {
-		fprintf(stderr, "cannot parse URI %s\n", uri);
-		DSIO_FREE(allocator, uri_cp);
+		fprintf(stderr, "cannot parse URI %s\n", client->cfg->uri);
+		DSIO_FREE(client->cfg->allocator, uri_cp);
 		return 1;
 	}
 
@@ -154,35 +165,29 @@ int dsio_libwebsockets_factory(const char *uri,
 	client_info.ietf_version_or_minus_one = -1;
 	client_info.client_exts = NULL;
 	client_info.protocol = protocols[0].name;
+	client_info.userdata = client;
 
 	printf("protocol: %s, path=%s\n", prot, client_info.path);
 
 	if ((wsi = lws_client_connect_via_info(&client_info)) == NULL) {
 		fprintf(stderr, "[Main] wsi create error.\n");
-		DSIO_FREE(allocator, uri_cp);
+		DSIO_FREE(client->cfg->allocator, uri_cp);
 		return -1;
 	}
 
-	*ws = DSIO_MALLOC(allocator, sizeof **ws);
-
-	if (ws == NULL) {
-		DSIO_FREE(allocator, uri_cp);
-		return DSIO_NOMEM;
-	}
-
-	memset(*ws, 0, sizeof **ws);
-	(*ws)->userdata = context;
-	DSIO_FREE(allocator, uri_cp);
-
+	client->userdata = context;
+	printf("%s:%d -- context = %p\n", __FILE__, __LINE__, client->userdata);
 	return 0;
 }
 
-int dsio_libwebsockets_service(struct dsio_websocket *ws)
+int dsio_libwebsockets_msgpump(struct dsio_client *client)
 {
 	int rc;
 
+	printf("context = %p\n", client->userdata);
+
 	do {
-		rc = lws_service(ws->userdata, 100);
+		rc = lws_service(client->userdata, 1000);
 	} while (rc == 0);
 
 	return rc;

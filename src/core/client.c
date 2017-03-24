@@ -1,21 +1,44 @@
+#include <stdio.h>
 #include <string.h>
 #include <dsio/client.h>
+#include "mprintf.h"
 
-struct dsio_client *dsio_login(const struct dsio_client_cfg *cfg)
+static void on_open(struct dsio_client *client)
 {
-	struct dsio_client *c;
+	printf("%s:%d\n", __FILE__, __LINE__);
+}
 
-	if ((c = DSIO_MALLOC(cfg->allocator, sizeof *c)) == NULL)
-		return NULL;
-	
-	memset(c, 0, sizeof *c);
- 	c->cfg = cfg;
+static void on_close(struct dsio_client *client)
+{
+	printf("%s:%d\n", __FILE__, __LINE__);
+}
 
-	return c;
+static void on_error(struct dsio_client *client)
+{
+	printf("%s:%d\n", __FILE__, __LINE__);
+}
+
+static void on_message(struct dsio_client *client)
+{
+	printf("%s:%d\n", __FILE__, __LINE__);
+}
+
+int dsio_login(struct dsio_client *client, const struct dsio_client_cfg *cfg)
+{
+	int rc;
+	memset(client, 0, sizeof *client);
+ 	client->cfg = cfg;
+	client->buf = dsio_mprintf(cfg->allocator, "client: %p", client);
+	client->on_open = on_open;
+	client->on_close = on_close;
+	client->on_error = on_error;
+	client->on_message = on_message;
+	rc = (*client->cfg->websocket_broker)(client);
+	printf("websocket_broker rc=%d\n", rc);
+	return rc;
 }
 
 void dsio_logout(struct dsio_client *c)
 {
-	DSIO_FREE(c->cfg->allocator, c);
 }
 

@@ -1,7 +1,4 @@
 #pragma once
 
-extern int dsio_libwebsockets_factory(const char *uri,
-				      const struct dsio_allocator *a,
-				      struct dsio_websocket **wsp);
-
-extern int dsio_libwebsockets_service(struct dsio_websocket *ws);
+extern int dsio_libwebsockets_broker(struct dsio_client *client);
+extern int dsio_libwebsockets_msgpump(struct dsio_client *client);
