@@ -24,8 +24,8 @@ typedef void (*LOG_EMITTER)(int level, const char *line);
 static int log_level = DSIO_LL_ERR | DSIO_LL_WARN | DSIO_LL_NOTICE;
 
 static const char *const log_level_names[] = {
-	"ERR",
-	"WARN",
+	"ERROR",
+	"WARNING",
 	"NOTICE",
 	"INFO",
 	"DEBUG",
@@ -38,21 +38,26 @@ static unsigned long long time_in_microseconds(void)
 	return ((unsigned long long)tv.tv_sec * 1000000LL) + tv.tv_usec;
 }
 
+static unsigned int msbit(unsigned int value) 
+{
+	unsigned int r = 0;
+
+	while (value >>= 1) {
+		r++;
+	}
+
+	return r;
+}
+
 static void log_emit_stderr(int level, const char *line)
 {
 	char buf[128] = "";
-	int n;
 	unsigned long long now = time_in_microseconds() / 100;
 
-	for (n = 0; n < DSIO_LL_COUNT; n++) {
-		if (level != (1 << n))
-			continue;
-		sprintf(buf, "[%llu:%04llu] %s: ",
-			now / 10000LL,
-			now % 10000LL,
-			log_level_names[n]);
-		break;
-	}
+	sprintf(buf, "[%llu:%04llu] %s: ",
+		now / 10000LL,
+		now % 10000LL,
+		log_level_names[msbit(level)]);
 
 	fprintf(stderr, "%s%s", buf, line);
 }
