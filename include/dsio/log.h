@@ -27,8 +27,11 @@ enum dsio_log_levels {
 	DSIO_LL_COUNT  = 5	/* NR of valid flags */
 };
 
-extern void _dsio_log(int filter, const char *format, ...);
-extern void _dsio_logv(int filter, const char *format, va_list ap);
+extern void _dsio_log(int filter, const char *format, ...)
+	__attribute__((format(printf, 2, 3)));
+
+extern void _dsio_logv(int filter, const char *format, va_list ap)
+	__attribute__((format(printf, 2, 0)));
 
 #define dsio_log_err(...) _dsio_log(DSIO_LL_ERR, __VA_ARGS__)
 #define dsio_log_warn(...) _dsio_log(DSIO_LL_WARN, __VA_ARGS__)

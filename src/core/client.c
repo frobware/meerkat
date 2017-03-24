@@ -53,8 +53,7 @@ static int on_message(struct dsio_client *client, void *buf, size_t len)
 
 	if (rc != DSIO_OK) {
 		char errmsg[256];
-		memset(errmsg, 0, sizeof(errmsg));
-		snprintf(errmsg, sizeof(errmsg) -1, "unknown message: %s", (char *)buf);
+		snprintf(errmsg, 255, "unknown message: %s", (char *)buf);
 		return client->on_error(client, errmsg);
 	}
 	
