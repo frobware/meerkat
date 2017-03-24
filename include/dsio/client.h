@@ -29,7 +29,7 @@ struct dsio_client {
 	void (*on_open)(struct dsio_client *client);
 	void (*on_close)(struct dsio_client *client);
 	void (*on_error)(struct dsio_client *client);
-	void (*on_message)(struct dsio_client *client);
+	void (*on_message)(struct dsio_client *client, void *p, size_t len);
 	void *userdata;
 };
 

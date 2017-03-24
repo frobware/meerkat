@@ -38,12 +38,10 @@ static int callback(struct lws *wsi,
 	printf("userdata: %p\n", userdata);
 	switch (reason) {
 	case LWS_CALLBACK_CLIENT_ESTABLISHED:
-		lwsl_notice("dumb: LWS_CALLBACK_CLIENT_ESTABLISHED\n");
-		lws_callback_on_writable(wsi);
 		client->on_open(client);
+		lws_callback_on_writable(wsi);
 		break;
 	case LWS_CALLBACK_CLOSED:
-		lwsl_notice("dumb: LWS_CALLBACK_CLOSED\n");
 		client->on_close(client);
 		break;
 	case LWS_CALLBACK_CLIENT_RECEIVE:

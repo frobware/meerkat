@@ -3,6 +3,7 @@
 #include <dsio/allocator.h>
 #include <dsio/client.h>
 #include <dsio/websocket.h>
+#include <dsio/log.h>
 
 /* Status codes. */
 

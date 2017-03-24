@@ -17,18 +17,21 @@
 #include <stdio.h>
 #include <string.h>
 #include <dsio/client.h>
+#include <dsio/log.h>
 #include "mprintf.h"
+
+#include <libwebsockets.h>
 
 static void on_open(struct dsio_client *client)
 {
+	dsio_log_notice("CLIENT_ESTABLISHED\n");
 	client->state = DSIO_CLIENT_OPEN;
-	printf("%s:%d\n", __FILE__, __LINE__);
 }
 
 static void on_close(struct dsio_client *client)
 {
-	client->state = DSIO_CLIENT_OPEN;
-	printf("%s:%d\n", __FILE__, __LINE__);
+	client->state = DSIO_CLIENT_CLOSED;
+	dsio_log_notice("CLOSED\n");
 }
 
 static void on_error(struct dsio_client *client)
@@ -36,7 +39,7 @@ static void on_error(struct dsio_client *client)
 	printf("%s:%d\n", __FILE__, __LINE__);
 }
 
-static void on_message(struct dsio_client *client)
+static void on_message(struct dsio_client *client, void *p, size_t n)
 {
 	printf("%s:%d\n", __FILE__, __LINE__);
 }
@@ -61,4 +64,3 @@ void dsio_logout(struct dsio_client *client)
 {
 	(*client->cfg->websocket_disconnect)(client);
 }
-
