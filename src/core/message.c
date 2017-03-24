@@ -60,13 +60,9 @@ static int parse_topic(struct scanner *s)
 		switch (*s->curr) {
 		case DSIO_MSG_PART_SEPARATOR:
 			*s->curr = '\0';
-			if ((s->msg->topic = dsio_topic_lookup(token)) == NULL) {
-				*s->curr = DSIO_MSG_PART_SEPARATOR;
-				return DSIO_ERROR;
-			}
-			*s->curr = DSIO_MSG_PART_SEPARATOR;
-			s->curr++;
-			return DSIO_OK;
+			s->msg->topic = dsio_topic_lookup(token);
+			*s->curr++ = DSIO_MSG_PART_SEPARATOR;
+			return s->msg->topic ? DSIO_OK : DSIO_ERROR;
 		}
 	}
 
@@ -78,19 +74,16 @@ static int parse_action(struct scanner *s)
 	char *token = s->curr;
 
 	for (; *s->curr != '\0'; s->curr++) {
-		switch (*s->curr) {
+		int c = *s->curr;
+		switch (c) {
 		case DSIO_MSG_RECORD_SEPARATOR:
 			s->parse_complete = 1;
-			/* fall through */
+			/* fallthrough */
 		case DSIO_MSG_PART_SEPARATOR:
 			*s->curr = '\0';
-			if ((s->msg->action = dsio_action_lookup(token)) == NULL) {
-				*s->curr = DSIO_MSG_PART_SEPARATOR;
-				return DSIO_ERROR;
-			}
-			*s->curr = DSIO_MSG_PART_SEPARATOR;
-			s->curr++;
-			return DSIO_OK;
+			s->msg->action = dsio_action_lookup(token);
+			*s->curr++ = c;
+			return s->msg->action ? DSIO_OK : DSIO_ERROR;
 		}
 	}
 
