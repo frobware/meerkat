@@ -161,7 +161,7 @@ static int test_topic_and_action_and_one_data(void)
 	CUT_ASSERT_EQUAL(DSIO_OK, rc);
 	CUT_ASSERT_NOT_NULL(msg.data);
 	CUT_ASSERT_EQUAL(1, msg.ndata);
-	CUT_ASSERT_EQUAL(strcmp(msg.data[0], "1"), 0);
+	CUT_ASSERT_EQUAL(strncmp(msg.data[0].start, "1", msg.data[0].len), 0);
 	return 0;
 }
 
@@ -210,9 +210,9 @@ static int test_topic_and_action_and_multiple_data(void)
 	CUT_ASSERT_EQUAL(DSIO_OK, rc);
 	CUT_ASSERT_NOT_NULL(msg.data);
 	CUT_ASSERT_EQUAL(3, msg.ndata);
-	CUT_ASSERT_EQUAL(strcmp(msg.data[0], "1"), 0);
-	CUT_ASSERT_EQUAL(strcmp(msg.data[1], "2"), 0);
-	CUT_ASSERT_EQUAL(strcmp(msg.data[2], "3"), 0);
+	CUT_ASSERT_EQUAL(strncmp(msg.data[0].start, "1", msg.data[0].len), 0);
+	CUT_ASSERT_EQUAL(strncmp(msg.data[1].start, "2", msg.data[1].len), 0);
+	CUT_ASSERT_EQUAL(strncmp(msg.data[2].start, "3", msg.data[2].len), 0);
 	return 0;
 }
 

@@ -104,11 +104,12 @@ static int parse_payload(struct scanner *s)
 			*s->curr = '\0';
 			s->msg->data = DSIO_REALLOC(s->allocator,
 						    s->msg->data,
-						    (1 + s->msg->ndata) * sizeof(char *));
+						    (1 + s->msg->ndata) * sizeof(*s->msg->data));
 			if (s->msg->data == NULL) {
 				return DSIO_NOMEM;
 			}
-			s->msg->data[s->msg->ndata++] = token;
+			s->msg->data[s->msg->ndata].start = token;
+			s->msg->data[s->msg->ndata++].len = s->curr - token;
 			token = s->curr + 1;
 			break;
 		}
