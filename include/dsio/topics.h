@@ -32,5 +32,5 @@ struct dsio_topic_type {
 	const dsio_topic_tag type;
 };
 
-extern struct dsio_topic_type topics[];
-extern struct dsio_topic_type *topic_lookup(const char *ident);
+extern struct dsio_topic_type dsio_topics[];
+extern struct dsio_topic_type *dsio_topic_lookup(const char *ident);

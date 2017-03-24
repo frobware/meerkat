@@ -60,7 +60,7 @@ static int parse_topic(struct scanner *s)
 		switch (*s->curr) {
 		case DSIO_MSG_PART_SEPARATOR:
 			*s->curr = '\0';
-			if ((s->msg->topic = topic_lookup(token)) == NULL)
+			if ((s->msg->topic = dsio_topic_lookup(token)) == NULL)
 				return DSIO_ERROR;
 			s->curr++;
 			return DSIO_OK;

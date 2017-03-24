@@ -18,7 +18,7 @@
 #include <string.h>
 #include <dsio/topics.h>
 
-struct dsio_topic_type topics[] = {
+struct dsio_topic_type dsio_topics[] = {
 	{"E",	"EVENT",	TOPIC_EVENT},
 	{"P",	"RPC",		TOPIC_RPC},
 	{"R",	"RECORD",	TOPIC_RECORD},
@@ -28,14 +28,14 @@ struct dsio_topic_type topics[] = {
 	{NULL,	NULL,		TOPIC_NR_TOPICS},
 };
 
-struct dsio_topic_type *topic_lookup(const char *ident)
+struct dsio_topic_type *dsio_topic_lookup(const char *ident)
 {
 	size_t i;
 	
 	/* Faster than bsearch given the table size. */
 	for (i = 0; i < TOPIC_NR_TOPICS; i++) {
-		if (strcmp(ident, topics[i].ident) == 0)
-			return &topics[i];
+		if (strcmp(ident, dsio_topics[i].ident) == 0)
+			return &dsio_topics[i];
 	}
 
 	return NULL;

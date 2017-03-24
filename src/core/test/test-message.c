@@ -273,7 +273,7 @@ static int test_all_topics_and_actions(int alloc_failure)
 	struct dsio_topic_type *t;
 	struct dsio_action_type *a;
 	
-	for (t = topics; t->ident; t++, i++) {
+	for (t = dsio_topics; t->ident; t++, i++) {
 		size_t j = 0;
 		for (a = dsio_actions; a->ident; a++, j++) {
 			struct dsio_msg msg;
@@ -290,7 +290,7 @@ static int test_all_topics_and_actions(int alloc_failure)
 			CUT_ASSERT_NOT_NULL(input);
 			rc = dsio_msg_parse(test_allocator, input, &msg);
 			CUT_ASSERT_EQUAL(DSIO_OK, rc);
-			CUT_ASSERT_EQUAL(topics[i].type, msg.topic->type);
+			CUT_ASSERT_EQUAL(dsio_topics[i].type, msg.topic->type);
 			CUT_ASSERT_EQUAL(dsio_actions[j].type, msg.action->type);
 			CUT_ASSERT_EQUAL(strcmp(t->ident, msg.topic->ident), 0);
 			CUT_ASSERT_EQUAL(strcmp(a->ident, msg.action->ident), 0);
