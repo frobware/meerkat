@@ -60,8 +60,11 @@ static int parse_topic(struct scanner *s)
 		switch (*s->curr) {
 		case DSIO_MSG_PART_SEPARATOR:
 			*s->curr = '\0';
-			if ((s->msg->topic = dsio_topic_lookup(token)) == NULL)
+			if ((s->msg->topic = dsio_topic_lookup(token)) == NULL) {
+				*s->curr = DSIO_MSG_PART_SEPARATOR;
 				return DSIO_ERROR;
+			}
+			*s->curr = DSIO_MSG_PART_SEPARATOR;
 			s->curr++;
 			return DSIO_OK;
 		}
@@ -81,8 +84,11 @@ static int parse_action(struct scanner *s)
 			/* fall through */
 		case DSIO_MSG_PART_SEPARATOR:
 			*s->curr = '\0';
-			if ((s->msg->action = dsio_action_lookup(token)) == NULL)
+			if ((s->msg->action = dsio_action_lookup(token)) == NULL) {
+				*s->curr = DSIO_MSG_PART_SEPARATOR;
 				return DSIO_ERROR;
+			}
+			*s->curr = DSIO_MSG_PART_SEPARATOR;
 			s->curr++;
 			return DSIO_OK;
 		}
