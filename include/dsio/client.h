@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include <dsio/message.h>
 #include <dsio/websocket.h>
 
 #define DSIO_CLIENT_OK 0
@@ -44,8 +45,8 @@ struct dsio_client {
 	const struct dsio_client_cfg *cfg;
 	void (*on_open)(struct dsio_client *client);
 	void (*on_close)(struct dsio_client *client);
-	void (*on_error)(struct dsio_client *client);
-	void (*on_message)(struct dsio_client *client, void *p, size_t len);
+	void (*on_error)(struct dsio_client *client, const char *msg);
+	void (*on_message)(struct dsio_client *client, const struct dsio_msg *msg);
 	void *userdata;
 };
 

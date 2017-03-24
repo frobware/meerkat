@@ -29,7 +29,7 @@ struct dsio_msg {
 	char *raw;
 	const struct dsio_topic_type *topic;
 	const struct dsio_action_type *action;
-	char **data;
+	void **data;
 	size_t ndata;
 };
 

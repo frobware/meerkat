@@ -35,7 +35,6 @@ static int callback(struct lws *wsi,
 	int n;
 	struct dsio_client *client = (struct dsio_client *)userdata;
 	
-	printf("userdata: %p\n", userdata);
 	switch (reason) {
 	case LWS_CALLBACK_CLIENT_ESTABLISHED:
 		client->on_open(client);
@@ -44,14 +43,21 @@ static int callback(struct lws *wsi,
 	case LWS_CALLBACK_CLOSED:
 		client->on_close(client);
 		break;
-	case LWS_CALLBACK_CLIENT_RECEIVE:
-		((char *)in)[len] = '\0';
-		printf("userdata: %p\n", userdata);
-		lwsl_notice("RECV %d '%s'\n", (int)len, (char *)in);
+	case LWS_CALLBACK_CLIENT_RECEIVE: {
+		int rc;
 		struct dsio_msg msg;
-		printf("msg rc = %d\n", dsio_msg_parse(dsio_stdlib_allocator, (char *const)in, &msg));
-		client_recv = 1;
+		char *s = (char *)in;
+		s[len] = '\0';
+		rc = dsio_msg_parse(client->cfg->allocator, s, &msg);
+		if (rc != DSIO_OK) {
+			char buf[256];
+			snprintf(buf, sizeof buf, "unknown message: %s", s);
+			client->on_error(client, buf);
+		} else {
+			client->on_message(client, &msg);
+		}
 		break;
+	}
 	case LWS_CALLBACK_CLIENT_WRITEABLE:
 		if (!client_recv) {
 			lws_callback_on_writable(wsi);
