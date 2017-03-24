@@ -46,7 +46,7 @@ static int callback(struct lws *wsi,
 	case LWS_CALLBACK_CLIENT_RECEIVE: {
 		int rc;
 		struct dsio_msg msg;
-		char *s = (char *)in;
+		char *s = in;
 		s[len] = '\0';
 		rc = dsio_msg_parse(client->cfg->allocator, s, &msg);
 		if (rc != DSIO_OK) {
@@ -129,7 +129,9 @@ int dsio_libwebsockets_connect(struct dsio_client *client)
 	char *uri_cp;
 	char path[1024];	/* FIXME */
 
-	if ((uri_cp = dsio_mprintf(client->cfg->allocator, "%s", client->cfg->uri)) == NULL)
+	uri_cp = dsio_mprintf(client->cfg->allocator, "%s", client->cfg->uri);
+
+	if (uri_cp == NULL)
 		return DSIO_NOMEM;
 
 	/*
@@ -152,7 +154,7 @@ int dsio_libwebsockets_connect(struct dsio_client *client)
 
 	memset(&client_info, 0, sizeof client_info);
 
-	if (lws_parse_uri(strdup(uri_cp), &prot,
+	if (lws_parse_uri(uri_cp, &prot,
 			  &client_info.address,
 			  &client_info.port,
 			  &p)) {
@@ -185,6 +187,7 @@ int dsio_libwebsockets_connect(struct dsio_client *client)
 		return -1;
 	}
 
+	DSIO_FREE(client->cfg->allocator, uri_cp);
 	client->userdata = context;
 	printf("%s:%d -- context = %p\n", __FILE__, __LINE__, client->userdata);
 	return 0;
