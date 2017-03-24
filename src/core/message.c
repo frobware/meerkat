@@ -81,7 +81,7 @@ static int parse_action(struct scanner *s)
 			/* fall through */
 		case DSIO_MSG_PART_SEPARATOR:
 			*s->curr = '\0';
-			if ((s->msg->action = action_lookup(token)) == NULL)
+			if ((s->msg->action = dsio_action_lookup(token)) == NULL)
 				return DSIO_ERROR;
 			s->curr++;
 			return DSIO_OK;

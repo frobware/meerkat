@@ -53,5 +53,5 @@ struct dsio_action_type {
 	const dsio_action_tag type;
 };
 
-extern struct dsio_action_type actions[];
-extern struct dsio_action_type *action_lookup(const char *ident);
+extern struct dsio_action_type dsio_actions[];
+extern struct dsio_action_type *dsio_action_lookup(const char *ident);

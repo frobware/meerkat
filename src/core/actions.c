@@ -18,7 +18,7 @@
 #include <string.h>
 #include <dsio/actions.h>
 
-struct dsio_action_type actions[] = {
+struct dsio_action_type dsio_actions[] = {
 	{"A",	"ACK",				ACTION_ACK},
 	{"C",	"CREATE",			ACTION_CREATE},
 	{"CH",	"CHALLENGE",			ACTION_CHALLENGE},
@@ -54,11 +54,11 @@ static int bsearch_comparator(const void *a, const void *b)
 		      ((const struct dsio_action_type *)b)->ident);
 }
 
-struct dsio_action_type *action_lookup(const char *ident)
+struct dsio_action_type *dsio_action_lookup(const char *ident)
 {
 	struct dsio_action_type key = {.ident = ident };
 
-	return bsearch(&key, actions, ACTION_NR_ACTIONS,
+	return bsearch(&key, dsio_actions, ACTION_NR_ACTIONS,
 		       sizeof key,
 		       bsearch_comparator);
 }
