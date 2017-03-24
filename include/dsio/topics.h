@@ -27,8 +27,8 @@ typedef enum {
 } dsio_topic_tag;
 
 struct dsio_topic_type {
-	const char *ident;
-	const char *descr;
+	const char *const ident;
+	const char *const descr;
 	const dsio_topic_tag type;
 };
 

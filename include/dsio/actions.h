@@ -48,8 +48,8 @@ typedef enum {
 } dsio_action_tag;
 
 struct dsio_action_type {
-	const char *ident;
-	const char *descr;
+	const char *const ident;
+	const char *const descr;
 	const dsio_action_tag type;
 };
 
