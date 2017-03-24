@@ -38,13 +38,15 @@ static unsigned long long time_in_microseconds(void)
 	return ((unsigned long long)tv.tv_sec * 1000000LL) + tv.tv_usec;
 }
 
-static unsigned int msbit(unsigned int value) 
+static unsigned int msbit(unsigned int value)
 {
 	unsigned int r = 0;
-
-	while (value >>= 1) {
+	/* 
+	 * The log base 2 of an integer is the same as the position of
+	 * the highest bit set (or most significant bit set, MSB).
+	 */
+	while (value >>= 1)
 		r++;
-	}
 
 	return r;
 }
