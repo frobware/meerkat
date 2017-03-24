@@ -17,16 +17,18 @@ static int callback(struct lws *wsi,
 	unsigned char buf[LWS_PRE + 4096];
 	int l = 0;
 	int n;
-
+	struct dsio_client *client = (struct dsio_client *)userdata;
+	
 	printf("userdata: %p\n", userdata);
 	switch (reason) {
 	case LWS_CALLBACK_CLIENT_ESTABLISHED:
 		lwsl_notice("dumb: LWS_CALLBACK_CLIENT_ESTABLISHED\n");
 		lws_callback_on_writable(wsi);
-		((struct dsio_client *)userdata)->on_open(userdata);
+		client->on_open(client);
 		break;
 	case LWS_CALLBACK_CLOSED:
 		lwsl_notice("dumb: LWS_CALLBACK_CLOSED\n");
+		client->on_close(client);
 		break;
 	case LWS_CALLBACK_CLIENT_RECEIVE:
 		((char *)in)[len] = '\0';
@@ -97,19 +99,7 @@ static int is_ssl_protocol(const char *proto)
 	return strcmp(proto, "https://") == 0 || strcmp(proto, "wss://") == 0;
 }
 
-#if 0
-static void on_close(struct dsio_client *client)
-{
-	client->state = CLIENT_STATE_CLOSED;
-}
-
-static void on_open(struct client *client)
-{
-	client->state = CLIENT_STATE_OPEN;
-}
-#endif
-
-int dsio_libwebsockets_broker(struct dsio_client *client)
+int dsio_libwebsockets_connect(struct dsio_client *client)
 {
 	struct lws *wsi;
 	struct lws_context *context;
@@ -180,6 +170,10 @@ int dsio_libwebsockets_broker(struct dsio_client *client)
 	return 0;
 }
 
+void dsio_libwebsockets_disconnect(struct dsio_client *client)
+{
+}
+
 int dsio_libwebsockets_msgpump(struct dsio_client *client)
 {
 	int rc;
@@ -192,3 +186,4 @@ int dsio_libwebsockets_msgpump(struct dsio_client *client)
 
 	return rc;
 }
+

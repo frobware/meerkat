@@ -15,7 +15,11 @@ struct dsio_client_cfg {
 	const char *uri;
 	const char *username;
 	const char *password;
-	DSIO_WEBSOCKET_BROKER websocket_broker;
+	const char *ssl_cert_filepath;
+	const char *ssl_private_key_filepath;
+	int allow_self_signed_certs;
+	DSIO_WEBSOCKET_CONNECT websocket_connect;
+	DSIO_WEBSOCKET_DISCONNECT websocket_disconnect;
 };
 
 struct dsio_client {

@@ -19,7 +19,8 @@ int main(int argc, char *argv[])
 	client_cfg.uri = argv[1];
 	client_cfg.username = NULL;
 	client_cfg.password = NULL;
-	client_cfg.websocket_broker = dsio_libwebsockets_broker;
+	client_cfg.websocket_connect = dsio_libwebsockets_connect;
+	client_cfg.websocket_disconnect = dsio_libwebsockets_disconnect;
 	
 	rc = dsio_login(&client, &client_cfg);
 	printf("login rc = %d\n", rc);
