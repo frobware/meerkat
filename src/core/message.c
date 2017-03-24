@@ -97,11 +97,9 @@ static int parse_payload(struct scanner *s)
 	for (; *s->curr != '\0'; s->curr++) {
 		switch (*s->curr) {
 		case DSIO_MSG_RECORD_SEPARATOR:
-			*s->curr = '\0';
 			s->parse_complete = 1;
 			return DSIO_OK;
 		case DSIO_MSG_PART_SEPARATOR:
-			*s->curr = '\0';
 			s->msg->data = DSIO_REALLOC(s->allocator,
 						    s->msg->data,
 						    (1 + s->msg->ndata) * sizeof(*s->msg->data));
