@@ -24,41 +24,28 @@
 
 #include <assert.h>
 
-static int client_recv;
-
 static int callback(struct lws *wsi,
 		    enum lws_callback_reasons reason,
-		    void *userdata, void *in, size_t len)
+		    void *userdata, void *buf, size_t len)
 {
-	unsigned char buf[LWS_PRE + 4096];
-	int l = 0;
-	int n;
 	struct dsio_client *client = (struct dsio_client *)userdata;
 	
 	switch (reason) {
-	case LWS_CALLBACK_CLIENT_ESTABLISHED:
-		client->on_open(client);
-		lws_callback_on_writable(wsi);
-		break;
-	case LWS_CALLBACK_CLOSED:
-		client->on_close(client);
-		break;
-	case LWS_CALLBACK_CLIENT_RECEIVE: {
-		int rc;
-		struct dsio_msg msg;
-		char *s = in;
-		s[len] = '\0';
-		rc = dsio_msg_parse(client->cfg->allocator, s, &msg);
-		if (rc != DSIO_OK) {
-			char buf[256];
-			snprintf(buf, sizeof buf, "unknown message: %s", s);
-			client->on_error(client, buf);
-		} else {
-			client->on_message(client, &msg);
+	case LWS_CALLBACK_CLIENT_ESTABLISHED: {
+		int rc = client->on_open(client);
+		if (rc != 0) {
+			return rc;
 		}
-		break;
+		lws_callback_on_writable(wsi);
+		return 0;
 	}
+	case LWS_CALLBACK_CLOSED:
+		return client->on_close(client);
+	case LWS_CALLBACK_CLIENT_RECEIVE:
+		((char *)buf)[len] = '\0';
+		return client->on_message(client, buf, len);
 	case LWS_CALLBACK_CLIENT_WRITEABLE:
+#if 0
 		if (!client_recv) {
 			lws_callback_on_writable(wsi);
 			return 0;
@@ -84,14 +71,13 @@ static int callback(struct lws *wsi,
 		printf("n=%d\n", n);
 		/* get notified as soon as we can write again */
 		/* lws_callback_on_writable(wsi); */
+#endif
 		break;
 	case LWS_CALLBACK_CLIENT_CONNECTION_ERROR:
-		lwsl_err("dumb: LWS_CALLBACK_CLIENT_CONNECTION_ERROR\n");
-		break;
+		return client->on_error(client, "connection error");
 	default:
 		break;
 	}
-
 	return 0;
 }
 

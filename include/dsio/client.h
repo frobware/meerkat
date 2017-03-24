@@ -43,10 +43,10 @@ struct dsio_client {
 	char *buf;
 	enum dsio_client_state state;
 	const struct dsio_client_cfg *cfg;
-	void (*on_open)(struct dsio_client *client);
-	void (*on_close)(struct dsio_client *client);
-	void (*on_error)(struct dsio_client *client, const char *msg);
-	void (*on_message)(struct dsio_client *client, const struct dsio_msg *msg);
+	int (*on_open)(struct dsio_client *client);
+	int (*on_close)(struct dsio_client *client);
+	int (*on_error)(struct dsio_client *client, const char *msg);
+	int (*on_message)(struct dsio_client *client, void *buffer, size_t len);
 	void *userdata;
 };
 

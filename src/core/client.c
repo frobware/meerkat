@@ -16,34 +16,49 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <dsio/dsio.h>
 #include <dsio/client.h>
 #include <dsio/log.h>
 #include "mprintf.h"
 
 #include <libwebsockets.h>
 
-static void on_open(struct dsio_client *client)
+static int on_open(struct dsio_client *client)
 {
 	dsio_log_notice("CLIENT_ESTABLISHED\n");
 	client->state = DSIO_CLIENT_OPEN;
+	return 0;
 }
 
-static void on_close(struct dsio_client *client)
+static int on_close(struct dsio_client *client)
 {
 	client->state = DSIO_CLIENT_CLOSED;
 	dsio_log_notice("CLOSED\n");
+	return 0;
 }
 
-static void on_error(struct dsio_client *client, const char *msg)
+static int on_error(struct dsio_client *client, const char *msg)
 {
 	dsio_log_notice("ERROR %s\n", msg);
+	return 0;
 }
 
-static void on_message(struct dsio_client *client, const struct dsio_msg *msg)
+static int on_message(struct dsio_client *client, void *buf, size_t len)
 {
-	dsio_log_notice("MESSAGE topic=%s, action=%s\n",
-			msg->topic->descr,
-			msg->action->descr);
+	int rc;
+	struct dsio_msg msg;
+
+	dsio_log_notice("MESSAGE %zd, '%s'\n", len, (char *)buf);
+	rc = dsio_msg_parse(client->cfg->allocator, buf, &msg);
+
+	if (rc != DSIO_OK) {
+		char errmsg[256];
+		memset(errmsg, 0, sizeof(errmsg));
+		snprintf(errmsg, sizeof(errmsg) -1, "unknown message: %s", (char *)buf);
+		return client->on_error(client, errmsg);
+	}
+	
+	return 0;
 }
 
 int dsio_login(struct dsio_client *client, const struct dsio_client_cfg *cfg)
