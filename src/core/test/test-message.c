@@ -25,11 +25,10 @@
 static char *make_msg(const char *topic, const char *action)
 {
 	return dsio_mprintf(test_allocator,
-			    "%s%c%s%c%c",
+			    "%s%c%s%c",
 			    topic,
 			    DSIO_MSG_PART_SEPARATOR,
 			    action,
-			    DSIO_MSG_PART_SEPARATOR,
 			    DSIO_MSG_RECORD_SEPARATOR);
 }
 

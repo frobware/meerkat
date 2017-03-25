@@ -26,17 +26,17 @@ enum {
 };
 
 struct dsio_msg_data {
-	char *start;
+	const char *start;
 	size_t len;
 };
 
 struct dsio_msg {
-	char *raw;
+	const char *raw;
 	const struct dsio_topic_type *topic;
 	const struct dsio_action_type *action;
 	struct dsio_msg_data *data;
 	size_t ndata;
 };
 
-extern int dsio_msg_parse(const struct dsio_allocator *a, char *const input, struct dsio_msg *msg);
+extern int dsio_msg_parse(const struct dsio_allocator *a, const char *const input, struct dsio_msg *msg);
 extern int dsio_msg_release(struct dsio_msg *msg);

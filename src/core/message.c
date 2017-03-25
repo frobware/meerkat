@@ -45,8 +45,8 @@
  */
 
 struct scanner {
-	char *input;
-	char *curr;
+	const char *input;
+	const char *curr;
 	struct dsio_msg *msg;
 	const struct dsio_allocator *allocator;
 	int parse_complete;
@@ -54,14 +54,13 @@ struct scanner {
 
 static int parse_topic(struct scanner *s)
 {
-	char *token = s->curr;
+	const char *token = s->curr;
 
 	for (; *s->curr != '\0'; s->curr++) {
 		switch (*s->curr) {
 		case DSIO_MSG_PART_SEPARATOR:
-			*s->curr = '\0';
-			s->msg->topic = dsio_topic_lookup(token);
-			*s->curr++ = DSIO_MSG_PART_SEPARATOR;
+			s->msg->topic = dsio_topic_lookup(token, s->curr - token);
+			s->curr++;
 			return s->msg->topic ? DSIO_OK : DSIO_ERROR;
 		}
 	}
@@ -71,7 +70,7 @@ static int parse_topic(struct scanner *s)
 
 static int parse_action(struct scanner *s)
 {
-	char *token = s->curr;
+	const char *token = s->curr;
 
 	for (; *s->curr != '\0'; s->curr++) {
 		int c = *s->curr;
@@ -80,9 +79,8 @@ static int parse_action(struct scanner *s)
 			s->parse_complete = 1;
 			/* fallthrough */
 		case DSIO_MSG_PART_SEPARATOR:
-			*s->curr = '\0';
-			s->msg->action = dsio_action_lookup(token);
-			*s->curr++ = c;
+			s->msg->action = dsio_action_lookup(token, s->curr - token);
+			s->curr++;
 			return s->msg->action ? DSIO_OK : DSIO_ERROR;
 		}
 	}
@@ -92,7 +90,7 @@ static int parse_action(struct scanner *s)
 
 static int parse_payload(struct scanner *s)
 {
-	char *token = s->curr;
+	const char *token = s->curr;
 
 	for (; *s->curr != '\0'; s->curr++) {
 		switch (*s->curr) {
@@ -116,7 +114,7 @@ static int parse_payload(struct scanner *s)
 	return DSIO_OK;
 }
 
-int dsio_msg_parse(const struct dsio_allocator *a, char *const input, struct dsio_msg *msg)
+int dsio_msg_parse(const struct dsio_allocator *a, const char *input, struct dsio_msg *msg)
 {
 	int rc;
 	struct scanner s;
@@ -138,7 +136,7 @@ int dsio_msg_parse(const struct dsio_allocator *a, char *const input, struct dsi
 	if ((rc = parse_action(&s)) != DSIO_OK)
 		return rc;
 
-	if (!s.parse_complete) { /* payload is optional */
+	if (!s.parse_complete) {
 		if ((rc = parse_payload(&s)) != DSIO_OK)
 			return rc;
 	}

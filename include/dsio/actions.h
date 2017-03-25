@@ -48,9 +48,10 @@ typedef enum {
 
 struct dsio_action_type {
 	const char *const ident;
+	size_t ident_len;
 	const char *const descr;
 	const dsio_action_tag type;
 };
 
 extern struct dsio_action_type dsio_actions[];
-extern struct dsio_action_type *dsio_action_lookup(const char *ident);
+extern struct dsio_action_type *dsio_action_lookup(const void *p, size_t len);

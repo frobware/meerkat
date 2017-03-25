@@ -19,46 +19,49 @@
 #include <dsio/actions.h>
 
 struct dsio_action_type dsio_actions[] = {
-	{"A",	"ACK",				DSIO_ACTION_ACK},
-	{"C",	"CREATE",			DSIO_ACTION_CREATE},
-	{"CH",	"CHALLENGE",			DSIO_ACTION_CHALLENGE},
-	{"CHR", "CHALLENGE_RESPONSE",		DSIO_ACTION_CHALLENGE_RESPONSE},
-	{"CR",	"CREATEORREAD",			DSIO_ACTION_CREATEORREAD},
-	{"D",	"DELETE",			DSIO_ACTION_DELETE},
-	{"E",	"ERROR",			DSIO_ACTION_ERROR},
-	{"EVT", "EVENT",			DSIO_ACTION_EVENT},
-	{"H",	"HAS",				DSIO_ACTION_HAS},
-	{"L",	"LISTEN",			DSIO_ACTION_LISTEN},
-	{"LA",	"LISTEN_ACCEPT",		DSIO_ACTION_LISTEN_ACCEPT},
-	{"LR",	"LISTEN_REJECT",		DSIO_ACTION_LISTEN_REJECT},
-	{"P",	"PATCH",			DSIO_ACTION_PATCH},
-	{"PU",	"PROVIDER_UPDATE",		DSIO_ACTION_PROVIDER_UPDATE},
-	{"Q",	"QUERY",			DSIO_ACTION_QUERY},
-	{"R",	"READ",				DSIO_ACTION_READ},
-	{"RED", "REDIRECT",			DSIO_ACTION_REDIRECT},
-	{"REJ", "REJECTION",			DSIO_ACTION_REJECTION},
-	{"REQ", "REQUEST",			DSIO_ACTION_REQUEST},
-	{"RES", "RESPONSE",			DSIO_ACTION_RESPONSE},
-	{"S",	"SUBSCRIBE",			DSIO_ACTION_SUBSCRIBE},
-	{"SH",	"SUBSCRIPTION_HAS_PROVIDER",	DSIO_ACTION_SUBSCRIPTION_HAS_PROVIDER},
-	{"SN",	"SNAPSHOT",			DSIO_ACTION_SNAPSHOT},
-	{"U",	"UPDATE",			DSIO_ACTION_UPDATE},
-	{"UL",	"UNLISTEN",			DSIO_ACTION_UNLISTEN},
-	{"US",	"UNSUBSCRIBE",			DSIO_ACTION_UNSUBSCRIBE},
-	{NULL,	NULL,				DSIO_ACTION_NR_ACTIONS},
+	{"A",	1,	"ACK",				DSIO_ACTION_ACK},
+	{"C",	1,	"CREATE",			DSIO_ACTION_CREATE},
+	{"CH",	2,	"CHALLENGE",			DSIO_ACTION_CHALLENGE},
+	{"CHR",	3,	"CHALLENGE_RESPONSE",		DSIO_ACTION_CHALLENGE_RESPONSE},
+	{"CR",	2,	"CREATEORREAD",			DSIO_ACTION_CREATEORREAD},
+	{"D",	1,	"DELETE",			DSIO_ACTION_DELETE},
+	{"E",	1,	"ERROR",			DSIO_ACTION_ERROR},
+	{"EVT",	3,	"EVENT",			DSIO_ACTION_EVENT},
+	{"H",	1,	"HAS",				DSIO_ACTION_HAS},
+	{"L",	1,	"LISTEN",			DSIO_ACTION_LISTEN},
+	{"LA",	2,	"LISTEN_ACCEPT",		DSIO_ACTION_LISTEN_ACCEPT},
+	{"LR",	2,	"LISTEN_REJECT",		DSIO_ACTION_LISTEN_REJECT},
+	{"P",	1,	"PATCH",			DSIO_ACTION_PATCH},
+	{"PU",	2,	"PROVIDER_UPDATE",		DSIO_ACTION_PROVIDER_UPDATE},
+	{"Q",	1,	"QUERY",			DSIO_ACTION_QUERY},
+	{"R",	1,	"READ",				DSIO_ACTION_READ},
+	{"RED", 3,	"REDIRECT",			DSIO_ACTION_REDIRECT},
+	{"REJ",	3,	"REJECTION",			DSIO_ACTION_REJECTION},
+	{"REQ",	3,	"REQUEST",			DSIO_ACTION_REQUEST},
+	{"RES", 3,	"RESPONSE",			DSIO_ACTION_RESPONSE},
+	{"S",	1,	"SUBSCRIBE",			DSIO_ACTION_SUBSCRIBE},
+	{"SH",	2,	"SUBSCRIPTION_HAS_PROVIDER",	DSIO_ACTION_SUBSCRIPTION_HAS_PROVIDER},
+	{"SN",	2,	"SNAPSHOT",			DSIO_ACTION_SNAPSHOT},
+	{"U",	1,	"UPDATE",			DSIO_ACTION_UPDATE},
+	{"UL",	2,	"UNLISTEN",			DSIO_ACTION_UNLISTEN},
+	{"US",	2,	"UNSUBSCRIBE",			DSIO_ACTION_UNSUBSCRIBE},
+	{NULL,	0,	NULL,				DSIO_ACTION_NR_ACTIONS},
 };
+
+#define DSIO_MAX(A, B) ((A) > (B) ? (A) : (B))
 
 static int bsearch_comparator(const void *a, const void *b)
 {
-	return strcmp(((const struct dsio_action_type *)a)->ident,
-		      ((const struct dsio_action_type *)b)->ident);
+	const struct dsio_action_type *x = a;
+	const struct dsio_action_type *y = b;
+	return strncmp(x->ident, y->ident, DSIO_MAX(x->ident_len, y->ident_len));
 }
 
-struct dsio_action_type *dsio_action_lookup(const char *ident)
+struct dsio_action_type *dsio_action_lookup(const void *p, size_t len)
 {
-	struct dsio_action_type key = {.ident = ident };
+	const struct dsio_action_type key = { .ident = p, .ident_len = len };
 
-	return bsearch(&key, dsio_actions, 
+	return bsearch(&key, dsio_actions,
 		       DSIO_ACTION_NR_ACTIONS,
 		       sizeof key,
 		       bsearch_comparator);

@@ -19,22 +19,27 @@
 #include <dsio/topics.h>
 
 struct dsio_topic_type dsio_topics[] = {
-	{"E",	"EVENT",	DSIO_TOPIC_EVENT},
-	{"P",	"RPC",		DSIO_TOPIC_RPC},
-	{"R",	"RECORD",	DSIO_TOPIC_RECORD},
-	{"A",	"AUTH",		DSIO_TOPIC_AUTH},
-	{"C",	"CONNECTION",	DSIO_TOPIC_CONNECTION},
-	{"X",	"ERROR",	DSIO_TOPIC_ERROR},
-	{NULL,	NULL,		DSIO_TOPIC_NR_TOPICS},
+	{"E",	1,	"EVENT",	DSIO_TOPIC_EVENT},
+	{"P",	1,	"RPC",		DSIO_TOPIC_RPC},
+	{"R",	1,	"RECORD",	DSIO_TOPIC_RECORD},
+	{"A",	1,	"AUTH",		DSIO_TOPIC_AUTH},
+	{"C",	1,	"CONNECTION",	DSIO_TOPIC_CONNECTION},
+	{"X",	1,	"ERROR",	DSIO_TOPIC_ERROR},
+	{NULL,	0,	NULL,		DSIO_TOPIC_NR_TOPICS},
 };
 
-struct dsio_topic_type *dsio_topic_lookup(const char *ident)
+#define DSIO_MAX(A, B) ((A) > (B) ? (A) : (B))
+
+struct dsio_topic_type *dsio_topic_lookup(const void *p, size_t len)
 {
 	size_t i;
 	
-	/* Faster than bsearch given the table size. */
+	/* Faster than bsearch given the table size and the expected
+	 * frequency of topic types. */
+
 	for (i = 0; i < DSIO_TOPIC_NR_TOPICS; i++) {
-		if (strcmp(ident, dsio_topics[i].ident) == 0)
+		size_t n = DSIO_MAX(len, dsio_topics[i].ident_len);
+		if (strncmp(p, dsio_topics[i].ident, n) == 0)
 			return &dsio_topics[i];
 	}
 

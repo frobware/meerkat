@@ -28,9 +28,10 @@ typedef enum {
 
 struct dsio_topic_type {
 	const char *const ident;
+	size_t ident_len;
 	const char *const descr;
 	const dsio_topic_tag type;
 };
 
 extern struct dsio_topic_type dsio_topics[];
-extern struct dsio_topic_type *dsio_topic_lookup(const char *ident);
+extern struct dsio_topic_type *dsio_topic_lookup(const void *p, size_t len);
