@@ -54,4 +54,4 @@ struct dsio_action_type {
 };
 
 extern struct dsio_action_type dsio_actions[];
-extern struct dsio_action_type *dsio_action_lookup(const void *p, size_t len);
+extern struct dsio_action_type *dsio_action_lookup(const char *p, size_t len);

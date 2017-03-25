@@ -34,4 +34,4 @@ struct dsio_topic_type {
 };
 
 extern struct dsio_topic_type dsio_topics[];
-extern struct dsio_topic_type *dsio_topic_lookup(const void *p, size_t len);
+extern struct dsio_topic_type *dsio_topic_lookup(const char *s, size_t len);

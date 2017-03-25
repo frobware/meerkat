@@ -30,7 +30,7 @@ struct dsio_topic_type dsio_topics[] = {
 
 #define DSIO_MAX(A, B) ((A) > (B) ? (A) : (B))
 
-struct dsio_topic_type *dsio_topic_lookup(const void *p, size_t len)
+struct dsio_topic_type *dsio_topic_lookup(const char *s, size_t len)
 {
 	size_t i;
 	
@@ -39,7 +39,7 @@ struct dsio_topic_type *dsio_topic_lookup(const void *p, size_t len)
 
 	for (i = 0; i < DSIO_TOPIC_NR_TOPICS; i++) {
 		size_t n = DSIO_MAX(len, dsio_topics[i].ident_len);
-		if (strncmp(p, dsio_topics[i].ident, n) == 0)
+		if (strncmp(s, dsio_topics[i].ident, n) == 0)
 			return &dsio_topics[i];
 	}
 
