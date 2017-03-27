@@ -13,6 +13,7 @@ compiler:
   - clang
 
 script:
+  - cmake .
   - make
   - make test
 
