@@ -53,7 +53,7 @@ static unsigned int msbit(unsigned int value)
 
 static void log_emit_stderr(int level, const char *line)
 {
-	char buf[128] = "";
+	char buf[128];
 	unsigned long long now = time_in_microseconds() / 100;
 
 	sprintf(buf, "[%llu:%04llu] %s: ",
@@ -66,7 +66,7 @@ static void log_emit_stderr(int level, const char *line)
 
 LOG_EMITTER log_emit = log_emit_stderr;
 
-void _dsio_log_logv(int filter, const char *format, va_list ap)
+void dsio_log_logv(int filter, const char *format, va_list ap)
 {
 	char buf[256];
 
@@ -78,12 +78,12 @@ void _dsio_log_logv(int filter, const char *format, va_list ap)
 	log_emit(filter, buf);
 }
 
-void _dsio_log(int filter, const char *format, ...)
+void dsio_log(int filter, const char *format, ...)
 {
 	va_list ap;
 
 	va_start(ap, format);
-	_dsio_log_logv(filter, format, ap);
+	dsio_log_logv(filter, format, ap);
 	va_end(ap);
 }
 
