@@ -24,7 +24,7 @@ struct dsio_client;
 struct dsio_websocket {
 	int (*close)();
 	int (*send)(void *buffer, size_t length);
-	struct dsio_client *client;
+//	struct dsio_client *client;
 };
 
 typedef int (*DSIO_WEBSOCKET_CONNECT)(struct dsio_client *client);
