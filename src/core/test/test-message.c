@@ -29,7 +29,7 @@ static char *make_msg(const char *topic, const char *action)
 			    topic,
 			    DSIO_MSG_PART_SEPARATOR,
 			    action,
-			    DSIO_MSG_RECORD_SEPARATOR);
+			    DSIO_MSG_SEPARATOR);
 }
 
 static int test_topic_null_ident(void)
@@ -112,7 +112,7 @@ static int test_topic_good_topic_bad_action(void)
 		DSIO_MSG_PART_SEPARATOR,
 		'!',
 		DSIO_MSG_PART_SEPARATOR,
-		DSIO_MSG_RECORD_SEPARATOR,
+		DSIO_MSG_SEPARATOR,
 		'\0',
 	};
 	test_allocator_reset();
@@ -152,7 +152,7 @@ static int test_topic_and_action_and_one_data(void)
 		DSIO_MSG_PART_SEPARATOR,
 		'1',
 		DSIO_MSG_PART_SEPARATOR,
-		DSIO_MSG_RECORD_SEPARATOR,
+		DSIO_MSG_SEPARATOR,
 		'\0',
 	};
 	test_allocator_reset();
@@ -174,7 +174,7 @@ static int test_topic_connection_and_action_challenge(void)
 		DSIO_MSG_PART_SEPARATOR,
 		'C',
 		'H',
-		DSIO_MSG_RECORD_SEPARATOR,
+		DSIO_MSG_SEPARATOR,
 		'\0',
 	};
 	test_allocator_reset();
@@ -202,7 +202,7 @@ static int test_topic_and_action_and_multiple_data(void)
 		DSIO_MSG_PART_SEPARATOR,
 		'3',
 		DSIO_MSG_PART_SEPARATOR,
-		DSIO_MSG_RECORD_SEPARATOR,
+		DSIO_MSG_SEPARATOR,
 		'\0',
 	};
 	test_allocator_reset();
@@ -256,7 +256,7 @@ static int test_payload_data_alloc_fails(void)
 		DSIO_MSG_PART_SEPARATOR,
 		'1',
 		DSIO_MSG_PART_SEPARATOR,
-		DSIO_MSG_RECORD_SEPARATOR,
+		DSIO_MSG_SEPARATOR,
 		'\0',
 	};
 	test_allocator_reset();

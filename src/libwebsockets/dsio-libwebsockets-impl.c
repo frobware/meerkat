@@ -56,7 +56,7 @@ static int callback(struct lws *wsi,
 			    DSIO_MSG_PART_SEPARATOR,
 			    DSIO_MSG_PART_SEPARATOR,
 			    "ws://deepstream:6020/deepstream",
-			    DSIO_MSG_RECORD_SEPARATOR);
+			    DSIO_MSG_SEPARATOR);
 		printf("l=%d\n", l);
 		printf("s=%s\n", &buf[LWS_PRE]);
 		n = lws_write(wsi, &buf[LWS_PRE], l, LWS_WRITE_TEXT);

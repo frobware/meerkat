@@ -75,7 +75,7 @@ static int parse_action(struct scanner *s)
 	for (; *s->curr != '\0'; s->curr++) {
 		int c = *s->curr;
 		switch (c) {
-		case DSIO_MSG_RECORD_SEPARATOR:
+		case DSIO_MSG_SEPARATOR:
 			s->parse_complete = 1;
 			/* fallthrough */
 		case DSIO_MSG_PART_SEPARATOR:
@@ -94,7 +94,7 @@ static int parse_payload(struct scanner *s)
 
 	for (; *s->curr != '\0'; s->curr++) {
 		switch (*s->curr) {
-		case DSIO_MSG_RECORD_SEPARATOR:
+		case DSIO_MSG_SEPARATOR:
 			s->parse_complete = 1;
 			return DSIO_OK;
 		case DSIO_MSG_PART_SEPARATOR:
