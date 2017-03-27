@@ -2,8 +2,6 @@ language: c
 
 dist: trusty
 
-cache: ccache
-
 addons:
   apt:
     packages:
