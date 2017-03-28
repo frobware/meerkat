@@ -78,5 +78,7 @@ int dsio_conn_init(struct dsio_connection *conn, struct dsio_client *client)
 	conn->on_close = on_close;
 	conn->on_message = on_message;
 	conn->on_error = on_error;
-	return (*client->cfg->websocket_connect)(conn);
+	conn->endpoint = NULL;
+	return client->cfg->websocket_connect(conn);
+	//(*client->cfg->websocket_connect)(conn);
 }

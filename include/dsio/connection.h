@@ -18,7 +18,7 @@
 
 #include <stdlib.h>
 
-enum dsio_conn_state {
+enum dsio_connection_state {
 	DSIO_CONNECTION_CLOSED = 0,
 	DSIO_CONNECTION_AWAITING_CONNECTION,
 	DSIO_CONNECTION_CHALLENGING,
@@ -34,7 +34,23 @@ struct dsio_client;
 
 struct dsio_connection {
 	struct dsio_client *client;
-	enum dsio_conn_state state;
+	enum dsio_connection_state state;
+	int options;
+	int authParams;
+	int authCallback;
+	int deliberateClose;
+	int redirecting;
+	int tooManyAuthAttempts;
+	int connectionAuthenticationTimeout;
+	int challengeDenied;
+	int queuedMessages;
+	int reconnectTimeout;
+	int reconnectionAttempt;
+	int currentPacketMessageCount;
+	int sendNextPacketTimeout;
+	int currentMessageResetTimeout;
+	int lastHeartBeat;
+	int heartbeatInterval;
 	int (*on_open)(struct dsio_connection *conn);
 	int (*on_close)(struct dsio_connection *conn);
 	int (*on_error)(struct dsio_connection *conn, const char *msg);

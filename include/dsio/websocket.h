@@ -18,17 +18,32 @@
 
 #include <stdlib.h>
 
+struct dsio_websocket;
 struct dsio_connection;
 
+enum dsio_websocket_readystate {
+	/* The connection is not yet open. */
+	DSIO_WEBSOCKET_READYSTATE_CONNECTING = 0,
+	/* The connection is open and ready to communicate. */
+	DSIO_WEBSOCKET_READYSTATE_OPEN,
+	/* The connection is in the process of closing. */
+	DSIO_WEBSOCKET_READYSTATE_CLOSING,
+	/* The connection is closed or couldn't be opened. */
+	DSIO_WEBSOCKET_READYSTATE_CLOSED
+};
+
 struct dsio_websocket {
+	struct dsio_connection *conn;
+	enum dsio_websocket_readystate state;
+	void *userdata;
 	int (*close)();
 	int (*send)(void *buffer, size_t length);
-	int (*on_open)(struct dsio_connection *conn);
-	int (*on_close)(struct dsio_connection *conn);
-	int (*on_error)(struct dsio_connection *conn, const char *msg);
-	int (*on_message)(struct dsio_connection *conn, void *buffer, size_t len);
-	struct dsio_connection *conn;
-	void *userdata;
+#if 0
+	int (*on_open)(struct dsio_websocket *ws);
+	int (*on_close)(struct dsio_websocket *ws);
+	int (*on_error)(struct dsio_websocket *ws, const char *msg);
+	int (*on_message)(struct dsio_websocket *ws, void *buffer, size_t len);
+#endif
 };
 
 typedef int (*DSIO_WEBSOCKET_CONNECT)(struct dsio_connection *conn);
