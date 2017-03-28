@@ -28,7 +28,7 @@ int dsio_login(struct dsio_client *client, const struct dsio_client_cfg *cfg)
 	client->cfg = cfg;
 	client->state = DSIO_CLIENT_CLOSED;
 	client->conn.client = client;
-	return dsio_conn_init(&client->conn, NULL);
+	return dsio_conn_init(&client->conn, client);
 }
 
 void dsio_logout(struct dsio_client *client)

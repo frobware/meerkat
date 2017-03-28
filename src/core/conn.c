@@ -14,53 +14,57 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdio.h>
 #include <string.h>
 
+#include <dsio/dsio.h>
 #include <dsio/conn.h>
 #include <dsio/client.h>
+#include <dsio/log.h>
 
-int dsio_conn_init(struct dsio_conn *conn, struct dsio_client *client)
+static int on_open(struct dsio_conn *conn)
 {
-	memset(conn, 0, sizeof *conn);
-	conn->client = client;
-	return (*client->cfg->websocket_connect)(conn);
-}
-
-#if 0
-static int on_open(struct dsio_client *client)
-{
-	dsio_log_notice("CLIENT_ESTABLISHED\n");
-	client->state = DSIO_CLIENT_OPEN;
+	dsio_log_notice("CONNECTION_ESTABLISHED\n");
 	return 0;
 }
 
-static int on_close(struct dsio_client *client)
+static int on_close(struct dsio_conn *conn)
 {
-	client->state = DSIO_CLIENT_CLOSED;
 	dsio_log_notice("CLOSED\n");
 	return 0;
 }
 
-static int on_error(struct dsio_client *client, const char *msg)
-{
-	dsio_log_notice("ERROR %s\n", msg);
-	return 0;
-}
-
-static int on_message(struct dsio_client *client, void *buf, size_t len)
+static int on_message(struct dsio_conn *conn, void *buf, size_t len)
 {
 	int rc;
 	struct dsio_msg msg;
 
 	dsio_log_notice("MESSAGE %zd, '%s'\n", len, (char *)buf);
-	rc = dsio_msg_parse(client->cfg->allocator, buf, &msg);
+	rc = dsio_msg_parse(conn->client->cfg->allocator, buf, &msg);
 
 	if (rc != DSIO_OK) {
 		char errmsg[256];
 		snprintf(errmsg, 255, "unknown message: %s", (char *)buf);
-		return client->on_error(client, errmsg);
+		return conn->on_error(conn, errmsg);
 	}
 	
 	return 0;
 }
-#endif
+
+static int on_error(struct dsio_conn *conn, const char *msg)
+{
+	dsio_log_notice("ERROR %s\n", msg);
+	return 0;
+}
+
+int dsio_conn_init(struct dsio_conn *conn, struct dsio_client *client)
+{
+	memset(conn, 0, sizeof *conn);
+	conn->client = client;
+	conn->on_open = on_open;
+	conn->on_close = on_close;
+	conn->on_message = on_message;
+	conn->on_error = on_error;
+	return (*client->cfg->websocket_connect)(conn);
+}
+
