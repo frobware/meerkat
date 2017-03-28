@@ -18,21 +18,22 @@
 
 #include <stdlib.h>
 
-typedef enum dsio_connection_state {
-	CONNECTION_STATE_CLOSED,
-	CONNECTION_STATE_AWAITING_CONNECTION,
-	CONNECTION_STATE_CHALLENGING,
-	CONNECTION_STATE_AWAITING_AUTHENTICATION,
-	CONNECTION_STATE_AUTHENTICATING,
-	CONNECTION_STATE_OPEN,
-	CONNECTION_STATE_ERROR,
-	CONNECTION_STATE_RECONNECTING
-} dsio_connection_state_t;
+enum dsio_conn_state {
+	DSIO_CONNECTION_CLOSED,
+	DSIO_CONNECTION_AWAITING_CONNECTION,
+	DSIO_CONNECTION_CHALLENGING,
+	DSIO_CONNECTION_AWAITING_AUTHENTICATION,
+	DSIO_CONNECTION_AUTHENTICATING,
+	DSIO_CONNECTION_OPEN,
+	DSIO_CONNECTION_ERROR,
+	DSIO_CONNECTION_RECONNECTING
+};
 
 struct dsio_client;
 
 struct dsio_conn {
 	struct dsio_client *client;
+	enum dsio_conn_state state;
 	int (*on_open)(struct dsio_conn *conn);
 	int (*on_close)(struct dsio_conn *conn);
 	int (*on_error)(struct dsio_conn *conn, const char *msg);
