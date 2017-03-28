@@ -1,15 +1,15 @@
 /* Copyright (C) 2017 Andrew McDermott
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -34,7 +34,7 @@ static int callback(struct lws *wsi,
 		    void *userdata, void *buf, size_t len)
 {
 	struct dsio_conn *conn = userdata;
-	
+
 	switch (reason) {
 	case LWS_CALLBACK_CLIENT_ESTABLISHED: {
 		int rc = conn->on_open(conn);
@@ -96,9 +96,9 @@ static struct lws_protocols protocols[2] = {
 		NULL
 	},
 	{
-		NULL, 		/* name */
-		NULL, 		/* callback */
-		0, 		/* per_session_data_size */
+		NULL,		/* name */
+		NULL,		/* callback */
+		0,		/* per_session_data_size */
 		0,		/* rx_buffer_size */
 		0,		/* id */
 		NULL		/* userdata */
@@ -120,7 +120,7 @@ int dsio_libwebsockets_connect(struct dsio_conn *conn)
 	char *uri_cp;
 	char path[1024];	/* FIXME */
 
-	uri_cp = dsio_mprintf(conn->client->cfg->allocator, "%s", 
+	uri_cp = dsio_mprintf(conn->client->cfg->allocator, "%s",
 			      conn->client->cfg->uri);
 
 	if (uri_cp == NULL)
@@ -138,7 +138,7 @@ int dsio_libwebsockets_connect(struct dsio_conn *conn)
 	ctx_info.gid = -1;
 	ctx_info.uid = -1;
 	ctx_info.options = 0;
-	
+
 	if ((context = lws_create_context(&ctx_info)) == NULL) {
 		fprintf(stderr, "Creating libwebsocket context failed\n");
 		return 1;
@@ -201,4 +201,3 @@ int dsio_libwebsockets_msgpump(struct dsio_conn *conn)
 
 	return rc;
 }
-

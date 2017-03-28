@@ -44,4 +44,3 @@ struct dsio_conn {
 };
 
 extern int dsio_conn_init(struct dsio_conn *conn, struct dsio_client *client);
-

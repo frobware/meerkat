@@ -41,7 +41,7 @@ static unsigned long long time_in_microseconds(void)
 static unsigned int msbit(unsigned int value)
 {
 	unsigned int r = 0;
-	/* 
+	/*
 	 * The log base 2 of an integer is the same as the position of
 	 * the highest bit set (or most significant bit set, MSB).
 	 */
