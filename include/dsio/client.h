@@ -43,10 +43,8 @@ struct dsio_client_cfg {
 struct dsio_client {
 	enum dsio_client_state state;
 	const struct dsio_client_cfg *cfg;
-	int (*on_open)(struct dsio_client *client);
-	int (*on_close)(struct dsio_client *client);
-	int (*on_error)(struct dsio_client *client, const char *msg);
-	int (*on_message)(struct dsio_client *client, void *buffer, size_t len);
+	int (*on_error)(struct dsio_client *client, const char *errmsg);
+	int (*on_message)(struct dsio_client *client, struct dsio_msg *msg);
 	struct dsio_conn conn;
 	void *userdata;
 };
