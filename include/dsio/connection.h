@@ -19,7 +19,7 @@
 #include <stdlib.h>
 
 enum dsio_conn_state {
-	DSIO_CONNECTION_CLOSED,
+	DSIO_CONNECTION_CLOSED = 0,
 	DSIO_CONNECTION_AWAITING_CONNECTION,
 	DSIO_CONNECTION_CHALLENGING,
 	DSIO_CONNECTION_AWAITING_AUTHENTICATION,
@@ -28,6 +28,8 @@ enum dsio_conn_state {
 	DSIO_CONNECTION_ERROR,
 	DSIO_CONNECTION_RECONNECTING
 };
+
+extern const char *const dsio_conn_state_names[];
 
 struct dsio_client;
 
