@@ -19,7 +19,7 @@
 #include <dsio/dsio.h>
 #include <dsio/client.h>
 #include <dsio/log.h>
-#include <dsio/conn.h>
+#include <dsio/connection.h>
 #include "mprintf.h"
 
 int dsio_login(struct dsio_client *client, const struct dsio_client_cfg *cfg)

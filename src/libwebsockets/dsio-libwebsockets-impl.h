@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include <dsio/conn.h>
+#include <dsio/connection.h>
 
 extern int dsio_libwebsockets_connect(struct dsio_conn *conn);
 extern void dsio_libwebsockets_disconnect(struct dsio_conn *conn);

@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include <dsio/conn.h>
+#include <dsio/connection.h>
 #include <dsio/message.h>
 #include <dsio/websocket.h>
 

@@ -22,7 +22,7 @@
 #include <dsio/allocator.h>
 #include <dsio/websocket.h>
 #include <dsio/message.h>
-#include <dsio/conn.h>
+#include <dsio/connection.h>
 #include <dsio/client.h>
 #include <dsio/websocket.h>
 #include "../src/core/mprintf.h"

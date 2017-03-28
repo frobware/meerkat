@@ -18,7 +18,7 @@
 #include <string.h>
 
 #include <dsio/dsio.h>
-#include <dsio/conn.h>
+#include <dsio/connection.h>
 #include <dsio/client.h>
 #include <dsio/log.h>
 
