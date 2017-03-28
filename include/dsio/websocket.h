@@ -18,19 +18,19 @@
 
 #include <stdlib.h>
 
-struct dsio_conn;
+struct dsio_connection;
 
 struct dsio_websocket {
 	int (*close)();
 	int (*send)(void *buffer, size_t length);
-	int (*on_open)(struct dsio_conn *conn);
-	int (*on_close)(struct dsio_conn *conn);
-	int (*on_error)(struct dsio_conn *conn, const char *msg);
-	int (*on_message)(struct dsio_conn *conn, void *buffer, size_t len);
-	struct dsio_conn *conn;
+	int (*on_open)(struct dsio_connection *conn);
+	int (*on_close)(struct dsio_connection *conn);
+	int (*on_error)(struct dsio_connection *conn, const char *msg);
+	int (*on_message)(struct dsio_connection *conn, void *buffer, size_t len);
+	struct dsio_connection *conn;
 	void *userdata;
 };
 
-typedef int (*DSIO_WEBSOCKET_CONNECT)(struct dsio_conn *conn);
-typedef void (*DSIO_WEBSOCKET_DISCONNECT)(struct dsio_conn *conn);
-typedef int (*DSIO_WEBSOCKET_MSGPUMP)(struct dsio_conn *conn);
+typedef int (*DSIO_WEBSOCKET_CONNECT)(struct dsio_connection *conn);
+typedef void (*DSIO_WEBSOCKET_DISCONNECT)(struct dsio_connection *conn);
+typedef int (*DSIO_WEBSOCKET_MSGPUMP)(struct dsio_connection *conn);

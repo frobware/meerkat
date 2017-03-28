@@ -22,7 +22,7 @@
 #include <dsio/client.h>
 #include <dsio/log.h>
 
-const char *const dsio_conn_state_names[] = {
+const char *const dsio_connection_state_names[] = {
 	"CLOSED",
 	"AWAITING_CONNECTION",
 	"CHALLENGING",
@@ -31,21 +31,22 @@ const char *const dsio_conn_state_names[] = {
 	"OPEN",
 	"ERROR",
 	"RECONNECTING",
+	NULL
 };
 
-static int on_open(struct dsio_conn *conn)
+static int on_open(struct dsio_connection *conn)
 {
 	dsio_log_notice("CONNECTION_ESTABLISHED\n");
 	return 0;
 }
 
-static int on_close(struct dsio_conn *conn)
+static int on_close(struct dsio_connection *conn)
 {
 	dsio_log_notice("CLOSED\n");
 	return 0;
 }
 
-static int on_message(struct dsio_conn *conn, void *buf, size_t len)
+static int on_message(struct dsio_connection *conn, void *buf, size_t len)
 {
 	int rc;
 	struct dsio_msg msg;
@@ -62,13 +63,13 @@ static int on_message(struct dsio_conn *conn, void *buf, size_t len)
 	return 0;
 }
 
-static int on_error(struct dsio_conn *conn, const char *msg)
+static int on_error(struct dsio_connection *conn, const char *msg)
 {
 	dsio_log_notice("ERROR %s\n", msg);
 	return 0;
 }
 
-int dsio_conn_init(struct dsio_conn *conn, struct dsio_client *client)
+int dsio_conn_init(struct dsio_connection *conn, struct dsio_client *client)
 {
 	memset(conn, 0, sizeof *conn);
 	conn->client = client;

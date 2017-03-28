@@ -33,7 +33,7 @@ static int callback(struct lws *wsi,
 		    enum lws_callback_reasons reason,
 		    void *userdata, void *buf, size_t len)
 {
-	struct dsio_conn *conn = userdata;
+	struct dsio_connection *conn = userdata;
 
 	switch (reason) {
 	case LWS_CALLBACK_CLIENT_ESTABLISHED: {
@@ -110,7 +110,7 @@ static int is_ssl_protocol(const char *proto)
 	return strcmp(proto, "https://") == 0 || strcmp(proto, "wss://") == 0;
 }
 
-int dsio_libwebsockets_connect(struct dsio_conn *conn)
+int dsio_libwebsockets_connect(struct dsio_connection *conn)
 {
 	struct lws *wsi;
 	struct lws_context *context;
@@ -185,11 +185,11 @@ int dsio_libwebsockets_connect(struct dsio_conn *conn)
 	return 0;
 }
 
-void dsio_libwebsockets_disconnect(struct dsio_conn *conn)
+void dsio_libwebsockets_disconnect(struct dsio_connection *conn)
 {
 }
 
-int dsio_libwebsockets_msgpump(struct dsio_conn *conn)
+int dsio_libwebsockets_msgpump(struct dsio_connection *conn)
 {
 	int rc;
 

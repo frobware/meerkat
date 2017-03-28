@@ -26,22 +26,22 @@ enum dsio_conn_state {
 	DSIO_CONNECTION_AUTHENTICATING,
 	DSIO_CONNECTION_OPEN,
 	DSIO_CONNECTION_ERROR,
-	DSIO_CONNECTION_RECONNECTING
+	DSIO_CONNECTION_RECONNECTING,
+	DSIO_CONNECTION_NR_STATES
 };
-
-extern const char *const dsio_conn_state_names[];
 
 struct dsio_client;
 
-struct dsio_conn {
+struct dsio_connection {
 	struct dsio_client *client;
 	enum dsio_conn_state state;
-	int (*on_open)(struct dsio_conn *conn);
-	int (*on_close)(struct dsio_conn *conn);
-	int (*on_error)(struct dsio_conn *conn, const char *msg);
-	int (*on_message)(struct dsio_conn *conn, void *buffer, size_t len);
+	int (*on_open)(struct dsio_connection *conn);
+	int (*on_close)(struct dsio_connection *conn);
+	int (*on_error)(struct dsio_connection *conn, const char *msg);
+	int (*on_message)(struct dsio_connection *conn, void *buffer, size_t len);
 	struct dsio_websocket *endpoint;
 	void *userdata;
 };
 
-extern int dsio_conn_init(struct dsio_conn *conn, struct dsio_client *client);
+extern int dsio_conn_init(struct dsio_connection *conn, struct dsio_client *client);
+extern const char *const dsio_connection_state_names[DSIO_CONNECTION_NR_STATES];
