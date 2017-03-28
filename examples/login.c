@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
 
 	rc = dsio_login(&client, &client_cfg);
 	printf("login rc = %d\n", rc);
-	dsio_libwebsockets_msgpump(&client.conn);
+	dsio_libwebsockets_msgpump(&client.connection);
 
 	return 0;
 }

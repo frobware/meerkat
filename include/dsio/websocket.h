@@ -38,12 +38,10 @@ struct dsio_websocket {
 	void *userdata;
 	int (*close)();
 	int (*send)(void *buffer, size_t length);
-#if 0
 	int (*on_open)(struct dsio_websocket *ws);
 	int (*on_close)(struct dsio_websocket *ws);
 	int (*on_error)(struct dsio_websocket *ws, const char *msg);
 	int (*on_message)(struct dsio_websocket *ws, void *buffer, size_t len);
-#endif
 };
 
 typedef int (*DSIO_WEBSOCKET_CONNECT)(struct dsio_connection *conn);

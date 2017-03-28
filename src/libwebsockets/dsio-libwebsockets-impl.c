@@ -185,18 +185,18 @@ int dsio_libwebsockets_connect(struct dsio_connection *conn)
 	return 0;
 }
 
-void dsio_libwebsockets_disconnect(struct dsio_connection *conn)
+void dsio_libwebsockets_disconnect(struct dsio_connection *connection)
 {
 }
 
-int dsio_libwebsockets_msgpump(struct dsio_connection *conn)
+int dsio_libwebsockets_msgpump(struct dsio_connection *connection)
 {
 	int rc;
 
-	printf("context = %p\n", conn->userdata);
+	printf("context = %p\n", connection->userdata);
 
 	do {
-		rc = lws_service(conn->userdata, 1000);
+		rc = lws_service(connection->userdata, 1000);
 	} while (rc == 0);
 
 	return rc;

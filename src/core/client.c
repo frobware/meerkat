@@ -26,11 +26,11 @@ int dsio_login(struct dsio_client *client, const struct dsio_client_cfg *cfg)
 {
 	memset(client, 0, sizeof *client);
 	client->cfg = cfg;
-	client->conn.client = client;
-	return dsio_conn_init(&client->conn, client);
+	client->connection.client = client;
+	return dsio_conn_init(&client->connection, client);
 }
 
 void dsio_logout(struct dsio_client *client)
 {
-	(*client->cfg->websocket_disconnect)(&client->conn);
+	(*client->cfg->websocket_disconnect)(&client->connection);
 }

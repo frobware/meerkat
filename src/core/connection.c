@@ -34,51 +34,50 @@ const char *const dsio_connection_state_names[] = {
 	NULL
 };
 
-static int on_open(struct dsio_connection *conn)
+static int on_open(struct dsio_connection *connection)
 {
 	dsio_log_notice("CONNECTION_ESTABLISHED\n");
 	return 0;
 }
 
-static int on_close(struct dsio_connection *conn)
+static int on_close(struct dsio_connection *connection)
 {
 	dsio_log_notice("CLOSED\n");
 	return 0;
 }
 
-static int on_message(struct dsio_connection *conn, void *buf, size_t len)
+static int on_message(struct dsio_connection *connection, void *buf, size_t len)
 {
 	int rc;
 	struct dsio_msg msg;
 
 	dsio_log_notice("MESSAGE %zd, '%s'\n", len, (char *)buf);
-	rc = dsio_msg_parse(conn->client->cfg->allocator, buf, &msg);
+	rc = dsio_msg_parse(connection->client->cfg->allocator, buf, &msg);
 
 	if (rc != DSIO_OK) {
 		char errmsg[256];
 		snprintf(errmsg, 255, "unknown message: %s", (char *)buf);
-		return conn->on_error(conn, errmsg);
+		return connection->on_error(connection, errmsg);
 	}
 
 	return 0;
 }
 
-static int on_error(struct dsio_connection *conn, const char *msg)
+static int on_error(struct dsio_connection *connection, const char *msg)
 {
 	dsio_log_notice("ERROR %s\n", msg);
 	return 0;
 }
 
-int dsio_conn_init(struct dsio_connection *conn, struct dsio_client *client)
+int dsio_conn_init(struct dsio_connection *connection, struct dsio_client *client)
 {
-	memset(conn, 0, sizeof *conn);
-	conn->client = client;
-	conn->state = DSIO_CONNECTION_CLOSED;
-	conn->on_open = on_open;
-	conn->on_close = on_close;
-	conn->on_message = on_message;
-	conn->on_error = on_error;
-	conn->endpoint = NULL;
-	return client->cfg->websocket_connect(conn);
+	memset(connection, 0, sizeof *connection);
+	connection->client = client;
+	connection->state = DSIO_CONNECTION_CLOSED;
+	connection->on_open = on_open;
+	connection->on_close = on_close;
+	connection->on_message = on_message;
+	connection->on_error = on_error;
+	return client->cfg->websocket_connect(connection);
 	//(*client->cfg->websocket_connect)(conn);
 }

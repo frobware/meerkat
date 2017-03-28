@@ -36,7 +36,7 @@ struct dsio_client {
 	const struct dsio_client_cfg *cfg;
 	int (*on_error)(struct dsio_client *client, const char *errmsg);
 	int (*on_message)(struct dsio_client *client, struct dsio_msg *msg);
-	struct dsio_connection conn;
+	struct dsio_connection connection;
 	void *userdata;
 };
 

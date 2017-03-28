@@ -17,6 +17,8 @@
 #pragma once
 
 #include <stdlib.h>
+#include <dsio/client.h>
+#include <dsio/websocket.h>
 
 enum dsio_connection_state {
 	DSIO_CONNECTION_CLOSED = 0,
@@ -51,12 +53,12 @@ struct dsio_connection {
 	int currentMessageResetTimeout;
 	int lastHeartBeat;
 	int heartbeatInterval;
+	struct dsio_websocket endpoint;
+	void *userdata;
 	int (*on_open)(struct dsio_connection *conn);
 	int (*on_close)(struct dsio_connection *conn);
 	int (*on_error)(struct dsio_connection *conn, const char *msg);
 	int (*on_message)(struct dsio_connection *conn, void *buffer, size_t len);
-	struct dsio_websocket *endpoint;
-	void *userdata;
 };
 
 extern int dsio_conn_init(struct dsio_connection *conn, struct dsio_client *client);
