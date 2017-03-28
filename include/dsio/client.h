@@ -1,28 +1,27 @@
 /* Copyright (C) 2017 Andrew McDermott
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #pragma once
 
+#include <dsio/conn.h>
 #include <dsio/message.h>
 #include <dsio/websocket.h>
 
 #define DSIO_CLIENT_OK 0
 #define DSIO_CLIENT_CONNECT_ERROR 1
-
-struct dsio_conn;
 
 enum dsio_client_state {
 	DSIO_CLIENT_OPEN,
@@ -42,14 +41,13 @@ struct dsio_client_cfg {
 };
 
 struct dsio_client {
-	char *buf;
 	enum dsio_client_state state;
 	const struct dsio_client_cfg *cfg;
 	int (*on_open)(struct dsio_client *client);
 	int (*on_close)(struct dsio_client *client);
 	int (*on_error)(struct dsio_client *client, const char *msg);
 	int (*on_message)(struct dsio_client *client, void *buffer, size_t len);
-	struct dsio_conn *conn;
+	struct dsio_conn conn;
 	void *userdata;
 };
 

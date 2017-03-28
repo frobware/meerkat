@@ -17,21 +17,19 @@
 #pragma once
 
 #include <stdlib.h>
-#include <dsio/allocator.h>
 
 struct dsio_conn;
-struct dsio_client;
 
 struct dsio_websocket {
 	int (*close)();
 	int (*send)(void *buffer, size_t length);
-	int (*on_open)(struct dsio_client *client);
-	int (*on_close)(struct dsio_client *client);
-	int (*on_error)(struct dsio_client *client, const char *msg);
-	int (*on_message)(struct dsio_client *client, void *buffer, size_t len);
+	int (*on_open)(struct dsio_conn *conn);
+	int (*on_close)(struct dsio_conn *conn);
+	int (*on_error)(struct dsio_conn *conn, const char *msg);
+	int (*on_message)(struct dsio_conn *conn, void *buffer, size_t len);
 	void *userdata;
 };
 
-typedef int (*DSIO_WEBSOCKET_CONNECT)(struct dsio_client *client);
-typedef void (*DSIO_WEBSOCKET_DISCONNECT)(struct dsio_client *client);
-typedef int (*DSIO_WEBSOCKET_MSGPUMP)(struct dsio_websocket *ws);
+typedef int (*DSIO_WEBSOCKET_CONNECT)(struct dsio_conn *conn);
+typedef void (*DSIO_WEBSOCKET_DISCONNECT)(struct dsio_conn *conn);
+typedef int (*DSIO_WEBSOCKET_MSGPUMP)(struct dsio_conn *conn);

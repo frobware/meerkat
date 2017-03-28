@@ -22,6 +22,9 @@
 #include <dsio/allocator.h>
 #include <dsio/websocket.h>
 #include <dsio/message.h>
+#include <dsio/conn.h>
+#include <dsio/client.h>
+#include <dsio/websocket.h>
 #include "../src/core/mprintf.h"
 
 #include <assert.h>
@@ -30,11 +33,11 @@ static int callback(struct lws *wsi,
 		    enum lws_callback_reasons reason,
 		    void *userdata, void *buf, size_t len)
 {
-	struct dsio_client *client = (struct dsio_client *)userdata;
+	struct dsio_conn *conn = userdata;
 	
 	switch (reason) {
 	case LWS_CALLBACK_CLIENT_ESTABLISHED: {
-		int rc = client->on_open(client);
+		int rc = conn->on_open(conn);
 		if (rc != 0) {
 			return rc;
 		}
@@ -42,10 +45,10 @@ static int callback(struct lws *wsi,
 		return 0;
 	}
 	case LWS_CALLBACK_CLOSED:
-		return client->on_close(client);
+		return conn->on_close(conn);
 	case LWS_CALLBACK_CLIENT_RECEIVE:
 		((char *)buf)[len] = '\0';
-		return client->on_message(client, buf, len);
+		return conn->on_message(conn, buf, len);
 	case LWS_CALLBACK_CLIENT_WRITEABLE:
 #if 0
 		if (!client_recv) {
@@ -76,7 +79,7 @@ static int callback(struct lws *wsi,
 #endif
 		break;
 	case LWS_CALLBACK_CLIENT_CONNECTION_ERROR:
-		return client->on_error(client, "connection error");
+		return conn->on_error(conn, "connection error");
 	default:
 		break;
 	}
@@ -107,7 +110,7 @@ static int is_ssl_protocol(const char *proto)
 	return strcmp(proto, "https://") == 0 || strcmp(proto, "wss://") == 0;
 }
 
-int dsio_libwebsockets_connect(struct dsio_client *client)
+int dsio_libwebsockets_connect(struct dsio_conn *conn)
 {
 	struct lws *wsi;
 	struct lws_context *context;
@@ -117,7 +120,8 @@ int dsio_libwebsockets_connect(struct dsio_client *client)
 	char *uri_cp;
 	char path[1024];	/* FIXME */
 
-	uri_cp = dsio_mprintf(client->cfg->allocator, "%s", client->cfg->uri);
+	uri_cp = dsio_mprintf(conn->client->cfg->allocator, "%s", 
+			      conn->client->cfg->uri);
 
 	if (uri_cp == NULL)
 		return DSIO_NOMEM;
@@ -146,8 +150,8 @@ int dsio_libwebsockets_connect(struct dsio_client *client)
 			  &client_info.address,
 			  &client_info.port,
 			  &p)) {
-		fprintf(stderr, "cannot parse URI %s\n", client->cfg->uri);
-		DSIO_FREE(client->cfg->allocator, uri_cp);
+		fprintf(stderr, "cannot parse URI %s\n", conn->client->cfg->uri);
+		DSIO_FREE(conn->client->cfg->allocator, uri_cp);
 		return 1;
 	}
 
@@ -165,34 +169,34 @@ int dsio_libwebsockets_connect(struct dsio_client *client)
 	client_info.ietf_version_or_minus_one = -1;
 	client_info.client_exts = NULL;
 	client_info.protocol = protocols[0].name;
-	client_info.userdata = client;
+	client_info.userdata = conn;
 
 	printf("protocol: %s, path=%s\n", prot, client_info.path);
 
 	if ((wsi = lws_client_connect_via_info(&client_info)) == NULL) {
 		fprintf(stderr, "[Main] wsi create error.\n");
-		DSIO_FREE(client->cfg->allocator, uri_cp);
+		DSIO_FREE(conn->client->cfg->allocator, uri_cp);
 		return -1;
 	}
 
-	DSIO_FREE(client->cfg->allocator, uri_cp);
-	client->userdata = context;
-	printf("%s:%d -- context = %p\n", __FILE__, __LINE__, client->userdata);
+	DSIO_FREE(conn->client->cfg->allocator, uri_cp);
+	conn->userdata = context;
+	printf("%s:%d -- context = %p\n", __FILE__, __LINE__, conn->userdata);
 	return 0;
 }
 
-void dsio_libwebsockets_disconnect(struct dsio_client *client)
+void dsio_libwebsockets_disconnect(struct dsio_conn *conn)
 {
 }
 
-int dsio_libwebsockets_msgpump(struct dsio_client *client)
+int dsio_libwebsockets_msgpump(struct dsio_conn *conn)
 {
 	int rc;
 
-	printf("context = %p\n", client->userdata);
+	printf("context = %p\n", conn->userdata);
 
 	do {
-		rc = lws_service(client->userdata, 1000);
+		rc = lws_service(conn->userdata, 1000);
 	} while (rc == 0);
 
 	return rc;
