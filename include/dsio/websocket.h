@@ -27,6 +27,7 @@ struct dsio_websocket {
 	int (*on_close)(struct dsio_conn *conn);
 	int (*on_error)(struct dsio_conn *conn, const char *msg);
 	int (*on_message)(struct dsio_conn *conn, void *buffer, size_t len);
+	struct dsio_conn *conn;
 	void *userdata;
 };
 

@@ -22,6 +22,17 @@
 #include <dsio/client.h>
 #include <dsio/log.h>
 
+const char *const dsio_conn_state_names[] = {
+	"CLOSED",
+	"AWAITING_CONNECTION",
+	"CHALLENGING",
+	"AWAITING_AUTHENTICATION",
+	"AUTHENTICATING",
+	"OPEN",
+	"ERROR",
+	"RECONNECTING",
+};
+
 static int on_open(struct dsio_conn *conn)
 {
 	dsio_log_notice("CONNECTION_ESTABLISHED\n");
