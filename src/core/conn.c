@@ -14,24 +14,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include <string.h>
 
-#include <stdlib.h>
-#include <dsio/allocator.h>
+#include <dsio/client.h>
+#include "conn.h"
 
-struct dsio_conn;
-struct dsio_client;
+int dsio_conn_init(struct dsio_conn *conn, struct dsio_client *client)
+{
+	int rc;
+	memset(conn, 0, sizeof *conn);
+	conn->client = client;
+	rc = (*client->cfg->websocket_connect)(client);
+	return rc;
+}
 
-struct dsio_websocket {
-	int (*close)();
-	int (*send)(void *buffer, size_t length);
-	int (*on_open)(struct dsio_client *client);
-	int (*on_close)(struct dsio_client *client);
-	int (*on_error)(struct dsio_client *client, const char *msg);
-	int (*on_message)(struct dsio_client *client, void *buffer, size_t len);
-	void *userdata;
-};
-
-typedef int (*DSIO_WEBSOCKET_CONNECT)(struct dsio_client *client);
-typedef void (*DSIO_WEBSOCKET_DISCONNECT)(struct dsio_client *client);
-typedef int (*DSIO_WEBSOCKET_MSGPUMP)(struct dsio_websocket *ws);

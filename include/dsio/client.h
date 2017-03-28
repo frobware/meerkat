@@ -22,6 +22,8 @@
 #define DSIO_CLIENT_OK 0
 #define DSIO_CLIENT_CONNECT_ERROR 1
 
+struct dsio_conn;
+
 enum dsio_client_state {
 	DSIO_CLIENT_OPEN,
 	DSIO_CLIENT_CLOSED
@@ -47,6 +49,7 @@ struct dsio_client {
 	int (*on_close)(struct dsio_client *client);
 	int (*on_error)(struct dsio_client *client, const char *msg);
 	int (*on_message)(struct dsio_client *client, void *buffer, size_t len);
+	struct dsio_conn *conn;
 	void *userdata;
 };
 

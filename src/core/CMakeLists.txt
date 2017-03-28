@@ -2,6 +2,7 @@ set(LIBDSIO_SRCS
   actions.c
   allocator.c
   client.c
+  conn.c
   log.c
   message.c
   mprintf.c
