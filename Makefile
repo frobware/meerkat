@@ -4,6 +4,7 @@ BUILD_FILE              = build.ninja
 
 CMAKE_GENERATOR		= "Unix Makefiles"
 CMAKE_BUILDER           = make
+CMAKE_BUILDER_ARGS      = -j -Orecurse
 BUILD_FILE              = Makefile
 
 BUILD_DIR               := build
@@ -14,7 +15,7 @@ CMAKE_C_COMPILER        ?= gcc
 .PHONY: all rclean $(BUILD_DIR)
 
 all: $(BUILD_DIR)/$(BUILD_FILE)
-	@$(CMAKE_BUILDER) -C $(BUILD_DIR) all
+	@$(CMAKE_BUILDER) $(CMAKE_BUILDER_ARGS) -C $(BUILD_DIR) all
 
 # Argument 1 is the build directory.
 #
@@ -49,4 +50,4 @@ rclean:
 	$(RM) -r $(BUILD_DIR)
 
 .DEFAULT:
-	@$(CMAKE_BUILDER) -C $(BUILD_DIR) $@
+	@$(CMAKE_BUILDER) $(CMAKE_BUILDER_ARGS) -C $(BUILD_DIR) $@
