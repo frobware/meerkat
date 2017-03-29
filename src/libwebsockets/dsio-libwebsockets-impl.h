@@ -16,6 +16,6 @@
 
 #pragma once
 
-extern int dsio_libwebsockets_connect(struct dsio_connection *conn);
-extern void dsio_libwebsockets_disconnect(struct dsio_connection *conn);
-extern int dsio_libwebsockets_msgpump(struct dsio_connection *conn);
+extern int dsio_libwebsockets_connect(struct dsio_connection *connection);
+extern void dsio_libwebsockets_disconnect(struct dsio_connection *connection);
+extern int dsio_libwebsockets_msgpump(struct dsio_connection *connection);

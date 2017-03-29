@@ -22,15 +22,14 @@
 #include <dsio/connection.h>
 #include "mprintf.h"
 
-int dsio_login(struct dsio_client *client, const struct dsio_client_cfg *cfg)
+int dsio_login(struct dsio_client *client, struct dsio_connection_cfg *cfg)
 {
 	memset(client, 0, sizeof *client);
-	client->cfg = cfg;
 	client->connection.client = client;
-	return dsio_conn_init(&client->connection, client);
+	return dsio_conn_init(&client->connection, cfg);
 }
 
 void dsio_logout(struct dsio_client *client)
 {
-	(*client->cfg->websocket_disconnect)(&client->connection);
+  //(*client->cfg->websocket_disconnect)(&client->connection);
 }

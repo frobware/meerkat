@@ -24,10 +24,13 @@ struct dsio_connection;
 enum dsio_websocket_readystate {
 	/* The connection is not yet open. */
 	DSIO_WEBSOCKET_READYSTATE_CONNECTING = 0,
+
 	/* The connection is open and ready to communicate. */
 	DSIO_WEBSOCKET_READYSTATE_OPEN,
+
 	/* The connection is in the process of closing. */
 	DSIO_WEBSOCKET_READYSTATE_CLOSING,
+
 	/* The connection is closed or couldn't be opened. */
 	DSIO_WEBSOCKET_READYSTATE_CLOSED
 };

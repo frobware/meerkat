@@ -52,7 +52,7 @@ static int on_message(struct dsio_connection *connection, void *buf, size_t len)
 	struct dsio_msg msg;
 
 	dsio_log_notice("MESSAGE %zd, '%s'\n", len, (char *)buf);
-	rc = dsio_msg_parse(connection->client->cfg->allocator, buf, &msg);
+	rc = dsio_msg_parse(connection->cfg->allocator, buf, &msg);
 
 	if (rc != DSIO_OK) {
 		char errmsg[256];
@@ -69,15 +69,14 @@ static int on_error(struct dsio_connection *connection, const char *msg)
 	return 0;
 }
 
-int dsio_conn_init(struct dsio_connection *connection, struct dsio_client *client)
+int dsio_conn_init(struct dsio_connection *connection, struct dsio_connection_cfg *cfg)
 {
 	memset(connection, 0, sizeof *connection);
-	connection->client = client;
+	connection->cfg = cfg;
 	connection->state = DSIO_CONNECTION_CLOSED;
 	connection->on_open = on_open;
 	connection->on_close = on_close;
 	connection->on_message = on_message;
 	connection->on_error = on_error;
-	return client->cfg->websocket_connect(connection);
-	//(*client->cfg->websocket_connect)(conn);
+	return connection->cfg->websocket_connect(connection);
 }

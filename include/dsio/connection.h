@@ -34,7 +34,20 @@ enum dsio_connection_state {
 
 struct dsio_client;
 
+struct dsio_connection_cfg {
+	const struct dsio_allocator *allocator;
+	const char *uri;
+	const char *username;
+	const char *password;
+	const char *ssl_cert_filepath;
+	const char *ssl_private_key_filepath;
+	int allow_self_signed_certs;
+	DSIO_WEBSOCKET_CONNECT websocket_connect;
+	DSIO_WEBSOCKET_DISCONNECT websocket_disconnect;
+};
+
 struct dsio_connection {
+	struct dsio_connection_cfg *cfg;
 	struct dsio_client *client;
 	enum dsio_connection_state state;
 	int options;
@@ -61,5 +74,5 @@ struct dsio_connection {
 	int (*on_message)(struct dsio_connection *conn, void *buffer, size_t len);
 };
 
-extern int dsio_conn_init(struct dsio_connection *conn, struct dsio_client *client);
+extern int dsio_conn_init(struct dsio_connection *conn, struct dsio_connection_cfg *cfg);
 extern const char *const dsio_connection_state_names[DSIO_CONNECTION_NR_STATES];

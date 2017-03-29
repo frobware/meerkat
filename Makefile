@@ -1,10 +1,10 @@
-CMAKE_GENERATOR		= "Unix Makefiles"
-CMAKE_BUILDER           = make
-BUILD_FILE              = Makefile
-
 CMAKE_GENERATOR		= Ninja
 CMAKE_BUILDER           = ninja
 BUILD_FILE              = build.ninja
+
+CMAKE_GENERATOR		= "Unix Makefiles"
+CMAKE_BUILDER           = make
+BUILD_FILE              = Makefile
 
 BUILD_DIR               := build
 

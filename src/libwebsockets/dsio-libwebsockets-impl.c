@@ -120,8 +120,8 @@ int dsio_libwebsockets_connect(struct dsio_connection *connection)
 	char *uri_cp;
 	char path[1024];	/* FIXME */
 
-	uri_cp = dsio_mprintf(connection->client->cfg->allocator, "%s",
-			      connection->client->cfg->uri);
+	uri_cp = dsio_mprintf(connection->cfg->allocator, "%s",
+			      connection->cfg->uri);
 
 	if (uri_cp == NULL)
 		return DSIO_NOMEM;
@@ -150,8 +150,8 @@ int dsio_libwebsockets_connect(struct dsio_connection *connection)
 			  &client_info.address,
 			  &client_info.port,
 			  &p)) {
-		fprintf(stderr, "cannot parse URI %s\n", connection->client->cfg->uri);
-		DSIO_FREE(connection->client->cfg->allocator, uri_cp);
+		fprintf(stderr, "cannot parse URI %s\n", connection->cfg->uri);
+		DSIO_FREE(connection->cfg->allocator, uri_cp);
 		return 1;
 	}
 
@@ -175,11 +175,11 @@ int dsio_libwebsockets_connect(struct dsio_connection *connection)
 
 	if ((wsi = lws_client_connect_via_info(&client_info)) == NULL) {
 		fprintf(stderr, "[Main] wsi create error.\n");
-		DSIO_FREE(connection->client->cfg->allocator, uri_cp);
+		DSIO_FREE(connection->cfg->allocator, uri_cp);
 		return -1;
 	}
 
-	DSIO_FREE(connection->client->cfg->allocator, uri_cp);
+	DSIO_FREE(connection->cfg->allocator, uri_cp);
 	connection->userdata = context;
 	printf("%s:%d -- context = %p\n", __FILE__, __LINE__, connection->userdata);
 	return 0;

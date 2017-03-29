@@ -20,25 +20,12 @@
 #include <dsio/message.h>
 #include <dsio/websocket.h>
 
-struct dsio_client_cfg {
-	const struct dsio_allocator *allocator;
-	const char *uri;
-	const char *username;
-	const char *password;
-	const char *ssl_cert_filepath;
-	const char *ssl_private_key_filepath;
-	int allow_self_signed_certs;
-	DSIO_WEBSOCKET_CONNECT websocket_connect;
-	DSIO_WEBSOCKET_DISCONNECT websocket_disconnect;
-};
-
 struct dsio_client {
-	const struct dsio_client_cfg *cfg;
 	int (*on_error)(struct dsio_client *client, const char *errmsg);
 	int (*on_message)(struct dsio_client *client, struct dsio_msg *msg);
 	struct dsio_connection connection;
 	void *userdata;
 };
 
-extern int dsio_login(struct dsio_client *c, const struct dsio_client_cfg *cfg);
+extern int dsio_login(struct dsio_client *c, struct dsio_connection_cfg *cfg);
 extern void dsio_logout(struct dsio_client *c);
