@@ -193,7 +193,7 @@ int dsio_libwebsockets_service(struct dsio_websocket *ws)
 	printf("context = %p\n", ws->userdata);
 
 	do {
-		rc = lws_service(ws->userdata, 1000);
+		rc = lws_service(ws->userdata, 0);
 	} while (rc == 0);
 
 	return rc;
