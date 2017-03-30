@@ -16,8 +16,9 @@
 
 #pragma once
 
-#include <dsio/message.h>
 #include <dsio/websocket.h>
+
+#include "message.h"
 #include "connection.h"
 
 struct dsio_client {

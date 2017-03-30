@@ -16,7 +16,7 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <dsio/topics.h>
+#include "topics.h"
 
 struct dsio_topic_type dsio_topics[] = {
 	{"E",	1,	"EVENT",	DSIO_TOPIC_EVENT},

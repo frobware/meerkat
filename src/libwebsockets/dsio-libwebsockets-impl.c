@@ -20,7 +20,6 @@
 
 #include <dsio/dsio.h>
 #include <dsio/allocator.h>
-#include <dsio/message.h>
 #include <dsio/websocket.h>
 #include "../src/core/mprintf.h"
 
