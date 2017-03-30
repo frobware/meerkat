@@ -23,25 +23,27 @@
 int main(int argc, char *argv[])
 {
 	int rc;
-	struct dsio_client client;
-	struct dsio_connection_cfg connection_cfg;
+	struct dsio_client *client = NULL;
+	struct dsio_client_cfg client_cfg;
 
 	if (argc != 2) {
 		fprintf(stderr, "usage: <URI>\n");
 		return EXIT_FAILURE;
 	}
 
-	memset(&connection_cfg, 0, sizeof connection_cfg);
-	connection_cfg.allocator = dsio_stdlib_allocator;
-	connection_cfg.uri = argv[1];
-	connection_cfg.username = NULL;
-	connection_cfg.password = NULL;
-	connection_cfg.websocket_connect = dsio_libwebsockets_connect;
-	connection_cfg.websocket_disconnect = dsio_libwebsockets_disconnect;
+	memset(&client_cfg, 0, sizeof client_cfg);
+	client_cfg.allocator = dsio_stdlib_allocator;
+	client_cfg.uri = argv[1];
+	client_cfg.username = NULL;
+	client_cfg.password = NULL;
+	client_cfg.websocket_connect = dsio_libwebsockets_connect;
+	client_cfg.websocket_disconnect = dsio_libwebsockets_disconnect;
+	client_cfg.websocket_service = dsio_libwebsockets_service;
 
-	rc = dsio_login(&client, &connection_cfg);
-	printf("login rc = %d\n", rc);
-	dsio_libwebsockets_msgpump(&client.connection);
+	if ((rc = dsio_client_create(&client, &client_cfg)) != DSIO_OK) {
+		fprintf(stderr, "client create failed");
+		return EXIT_FAILURE;
+	}
 
-	return 0;
+	return dsio_client_service(client);
 }

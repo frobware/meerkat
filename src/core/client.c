@@ -17,19 +17,38 @@
 #include <stdio.h>
 #include <string.h>
 #include <dsio/dsio.h>
-#include <dsio/client.h>
 #include <dsio/log.h>
-#include <dsio/connection.h>
-#include "mprintf.h"
 
-int dsio_login(struct dsio_client *client, struct dsio_connection_cfg *cfg)
+#include "mprintf.h"
+#include "client.h"
+#include "connection.h"
+
+int dsio_client_create(struct dsio_client **clientp, struct dsio_client_cfg *cfg)
 {
+	int rc;
+	struct dsio_client *client;
+
+	*clientp = NULL;
+
+	if ((client = DSIO_MALLOC(cfg->allocator, sizeof *client)) == NULL) {
+		return DSIO_NOMEM;
+	}
+
 	memset(client, 0, sizeof *client);
+	client->cfg = cfg;
 	client->connection.client = client;
-	return dsio_conn_init(&client->connection, client, cfg);
+	rc = dsio_conn_init(&client->connection, client);
+
+	if (rc != DSIO_OK) {
+		DSIO_FREE(cfg->allocator, client);
+		return rc;
+	}
+
+	*clientp = client;
+	return DSIO_OK;
 }
 
-void dsio_logout(struct dsio_client *client)
+int dsio_client_service(struct dsio_client *client)
 {
-  //(*client->cfg->websocket_disconnect)(&client->connection);
+	return client->cfg->websocket_service(&client->connection.endpoint);
 }

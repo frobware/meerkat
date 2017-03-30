@@ -18,9 +18,9 @@
 #include <string.h>
 
 #include <dsio/dsio.h>
-#include <dsio/connection.h>
-#include <dsio/client.h>
 #include <dsio/log.h>
+#include "client.h"
+#include "connection.h"
 
 const char *const dsio_connection_state_names[] = {
 	"CLOSED",
@@ -52,12 +52,12 @@ static int on_message(struct dsio_websocket *ws, void *buf, size_t len)
 	struct dsio_msg msg;
 
 	dsio_log_notice("MESSAGE %zd, '%s'\n", len, (char *)buf);
-	rc = dsio_msg_parse(ws->connection->cfg->allocator, buf, &msg);
+	rc = dsio_msg_parse(ws->client->cfg->allocator, buf, &msg);
 
 	if (rc != DSIO_OK) {
 		char errmsg[256];
 		snprintf(errmsg, 255, "unknown message: %s", (char *)buf);
-		return ws->connection->client->on_error(ws->connection, errmsg);
+		//return ws->client->on_error(&ws->client->connection, errmsg);
 	}
 
 	return 0;
@@ -69,16 +69,15 @@ static int on_error(struct dsio_websocket *ws, const char *msg)
 	return 0;
 }
 
-int dsio_conn_init(struct dsio_connection *connection, struct dsio_client *client, struct dsio_connection_cfg *cfg)
+int dsio_conn_init(struct dsio_connection *connection, struct dsio_client *client)
 {
 	memset(connection, 0, sizeof *connection);
-	connection->cfg = cfg;
 	connection->client = client;
 	connection->state = DSIO_CONNECTION_CLOSED;
-	connection->endpoint.connection = connection;
+	connection->endpoint.client = client;
 	connection->endpoint.on_open = on_open;
 	connection->endpoint.on_close = on_close;
 	connection->endpoint.on_message = on_message;
 	connection->endpoint.on_error = on_error;
-	return connection->cfg->websocket_connect(&connection->endpoint);
+	return client->cfg->websocket_connect(client->cfg, &connection->endpoint);
 }

@@ -16,16 +16,12 @@
 
 #pragma once
 
-#include <dsio/connection.h>
 #include <dsio/message.h>
 #include <dsio/websocket.h>
+#include "connection.h"
 
 struct dsio_client {
-	int (*on_error)(struct dsio_connection *conn, const char *errmsg);
-	int (*on_message)(struct dsio_connection *conn, struct dsio_msg *msg);
+	struct dsio_client_cfg *cfg;
 	struct dsio_connection connection;
 	void *userdata;
 };
-
-extern int dsio_login(struct dsio_client *c, struct dsio_connection_cfg *cfg);
-extern void dsio_logout(struct dsio_client *c);
