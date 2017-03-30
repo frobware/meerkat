@@ -36,7 +36,7 @@ enum dsio_websocket_readystate {
 };
 
 struct dsio_websocket {
-	struct dsio_connection *conn;
+	struct dsio_connection *connection;
 	enum dsio_websocket_readystate state;
 	void *userdata;
 	int (*close)();
@@ -47,6 +47,6 @@ struct dsio_websocket {
 	int (*on_message)(struct dsio_websocket *ws, void *buffer, size_t len);
 };
 
-typedef int (*DSIO_WEBSOCKET_CONNECT)(struct dsio_connection *conn);
-typedef void (*DSIO_WEBSOCKET_DISCONNECT)(struct dsio_connection *conn);
+typedef int (*DSIO_WEBSOCKET_CONNECT)(struct dsio_websocket *ws);
+typedef void (*DSIO_WEBSOCKET_DISCONNECT)(struct dsio_websocket *ws);
 typedef int (*DSIO_WEBSOCKET_MSGPUMP)(struct dsio_connection *conn);

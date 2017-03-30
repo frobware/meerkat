@@ -21,8 +21,8 @@
 #include <dsio/websocket.h>
 
 struct dsio_client {
-	int (*on_error)(struct dsio_client *client, const char *errmsg);
-	int (*on_message)(struct dsio_client *client, struct dsio_msg *msg);
+	int (*on_error)(struct dsio_connection *conn, const char *errmsg);
+	int (*on_message)(struct dsio_connection *conn, struct dsio_msg *msg);
 	struct dsio_connection connection;
 	void *userdata;
 };

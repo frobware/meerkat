@@ -31,6 +31,7 @@ int main(int argc, char *argv[])
 		return EXIT_FAILURE;
 	}
 
+	memset(&connection_cfg, 0, sizeof connection_cfg);
 	connection_cfg.allocator = dsio_stdlib_allocator;
 	connection_cfg.uri = argv[1];
 	connection_cfg.username = NULL;

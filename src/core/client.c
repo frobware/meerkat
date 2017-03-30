@@ -26,7 +26,7 @@ int dsio_login(struct dsio_client *client, struct dsio_connection_cfg *cfg)
 {
 	memset(client, 0, sizeof *client);
 	client->connection.client = client;
-	return dsio_conn_init(&client->connection, cfg);
+	return dsio_conn_init(&client->connection, client, cfg);
 }
 
 void dsio_logout(struct dsio_client *client)
