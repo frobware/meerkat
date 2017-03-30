@@ -39,7 +39,6 @@ struct dsio_client_cfg {
 	DSIO_WEBSOCKET_CONNECT websocket_connect;
 	DSIO_WEBSOCKET_DISCONNECT websocket_disconnect;
 	DSIO_WEBSOCKET_SERVICE websocket_service;
-	void *userdata;
 };
 
 extern int dsio_client_create(struct dsio_client **result, struct dsio_client_cfg *cfg);
