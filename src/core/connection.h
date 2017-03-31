@@ -25,7 +25,7 @@ struct dsio_client;
 
 struct dsio_connection {
 	struct dsio_client *client;
-	struct connection_fsm sm;
+	struct connection_fsm state;
 	struct dsio_websocket endpoint;
 	int (*on_error)(struct dsio_connection *conn, const char *errmsg);
 	int (*on_message)(struct dsio_connection *conn, struct dsio_msg *msg);

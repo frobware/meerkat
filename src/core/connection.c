@@ -21,6 +21,7 @@
 #include <dsio/log.h>
 #include "client.h"
 #include "connection.h"
+#include "connection-state.h"
 
 const char *const dsio_connection_state_names[] = {
 	"CLOSED",
@@ -37,12 +38,15 @@ const char *const dsio_connection_state_names[] = {
 static int on_open(struct dsio_websocket *ws)
 {
 	dsio_log_notice("CONNECTION_ESTABLISHED\n");
+	connection_fsm_init(&ws->client->connection.state);
+	connection_fsm_exec(&ws->client->connection.state, EVENT_OPEN);
 	return 0;
 }
 
 static int on_close(struct dsio_websocket *ws)
 {
 	dsio_log_notice("CLOSED\n");
+	connection_fsm_exec(&ws->client->connection.state, EVENT_CLOSED);
 	return 0;
 }
 
@@ -50,6 +54,8 @@ static int on_message(struct dsio_websocket *ws, void *buf, size_t len)
 {
 	int rc;
 	struct dsio_msg msg;
+
+	connection_fsm_exec(&ws->client->connection.state, EVENT_MESSAGE);
 
 	dsio_log_notice("MESSAGE %zd, '%s'\n", len, (char *)buf);
 	rc = dsio_msg_parse(ws->client->cfg->allocator, buf, &msg);

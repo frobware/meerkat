@@ -21,7 +21,7 @@
 
 typedef void (*LOG_EMITTER)(int level, const char *line);
 
-static int log_level = DSIO_LL_ERR | DSIO_LL_WARN | DSIO_LL_NOTICE;
+static int log_level = DSIO_LL_ERR | DSIO_LL_WARN | DSIO_LL_NOTICE | DSIO_LL_CONNECTION;
 
 static const char *const log_level_names[] = {
 	"ERROR",
@@ -29,6 +29,7 @@ static const char *const log_level_names[] = {
 	"NOTICE",
 	"INFO",
 	"DEBUG",
+	"CONNECTION",
 };
 
 static unsigned long long time_in_microseconds(void)
@@ -87,7 +88,12 @@ void dsio_log(int filter, const char *format, ...)
 	va_end(ap);
 }
 
-void dsio_log_set_level(int level, void (*func)(int level, const char *line))
+int dsio_log_level_get(void)
+{
+	return log_level;
+}
+
+void dsio_log_level_set(int level, void (*func)(int level, const char *line))
 {
 	log_level = level;
 

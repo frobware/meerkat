@@ -17,15 +17,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <dsio/log.h>
 #include "connection-state.h"
 #include "connection.h"
 
 /* Debugging Trace Transitions. */
 
 #if 1
-#define TT(A,S,N) printf("%d -> %d : %s, '%c'",S, N, "" # A, *p)
+#define TraceT(A,S,N) dsio_log(DSIO_LL_CONNECTION, "event='%c', %d -> %d : %s\n", *p, S, N, "" # A)
 #else
-#define TT(A,S,N)
+#define TraceT(A,S,N)
 #endif
 
 %%{
@@ -53,17 +54,18 @@ main := Connection;
 
 %% write data;
 
+%% write exports;
+
 int connection_fsm_init(struct connection_fsm *state)
 {
 	assert(state->next == NULL && "attempt to init an active state");
-	state->cs = DSIO_CONNECTION_CLOSED;
 
 	%% write init;
 
 	return 1;
 }
 
-int connection_fsm_invariant(struct connection_fsm *state, enum connection_event event)
+int connection_fsm_assert(struct connection_fsm *state, enum connection_event event)
 {
 	if (state->cs == connection_fsm_error) {
 		return -1;
@@ -84,12 +86,12 @@ int connection_fsm_exec(struct connection_fsm *state, enum connection_event even
 
 	%% write exec;
 
-	return connection_fsm_invariant(state, event);
+	return connection_fsm_assert(state, event);
 }
 
 int connection_fsm_finish(struct connection_fsm *state)
 {
-	return connection_fsm_invariant(state, 0);
+	return connection_fsm_assert(state, 0);
 }
 
 int connection_fsm_done(struct connection_fsm *state)

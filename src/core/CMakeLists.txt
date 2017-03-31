@@ -1,13 +1,14 @@
 find_program("RAGEL" ragel)
 
-function(ragel_gen fsm)
+function(ragel_gen fsm deps)
   add_custom_command(OUTPUT ${fsm}.c
     COMMAND ${RAGEL} -o ${fsm}.c ${fsm}.rl -I ${CMAKE_CURRENT_SOURCE_DIR} ${ARGN}
-    DEPENDS ${fsm}.rl)
+    DEPENDS ${fsm}.rl ${deps})
 endfunction(ragel_gen)
 
 if(RAGEL)
-  ragel_gen(${CMAKE_CURRENT_SOURCE_DIR}/connection-state)
+  ragel_gen(${CMAKE_CURRENT_SOURCE_DIR}/connection-state
+    ${CMAKE_CURRENT_SOURCE_DIR}/connection-state-actions.rl)
 endif()
 
 set(LIBDSIO_SRCS

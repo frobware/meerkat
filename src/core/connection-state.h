@@ -4,8 +4,9 @@
  * must match the events defined in connection-state.rl or it will all
  * break. */
 enum connection_event { 
-	OPEN   = 'O',
-	CLOSED = 'C',
+	EVENT_OPEN   = 'O',
+	EVENT_CLOSED = 'C',
+	EVENT_MESSAGE = 'M',
 };
 
 enum connection_state {

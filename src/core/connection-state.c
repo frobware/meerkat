@@ -19,23 +19,24 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <dsio/log.h>
 #include "connection-state.h"
 #include "connection.h"
 
 /* Debugging Trace Transitions. */
 
 #if 1
-#define TT(A,S,N) printf("%d -> %d : %s, '%c'",S, N, "" # A, *p)
+#define TraceT(A,S,N) dsio_log(DSIO_LL_CONNECTION, "event='%c', %d -> %d : %s\n", *p, S, N, "" # A)
 #else
-#define TT(A,S,N)
+#define TraceT(A,S,N)
 #endif
 
 
-#line 52 "/home/aim/frobware/curly-garbanzo/src/core/connection-state.rl"
+#line 53 "/home/aim/frobware/curly-garbanzo/src/core/connection-state.rl"
 
 
 
-#line 39 "/home/aim/frobware/curly-garbanzo/src/core/connection-state.c"
+#line 40 "/home/aim/frobware/curly-garbanzo/src/core/connection-state.c"
 static const char _connection_fsm_actions[] = {
 	0, 1, 0, 1, 1
 };
@@ -79,25 +80,29 @@ static const int connection_fsm_error = 0;
 static const int connection_fsm_en_main = 1;
 
 
-#line 55 "/home/aim/frobware/curly-garbanzo/src/core/connection-state.rl"
+#line 56 "/home/aim/frobware/curly-garbanzo/src/core/connection-state.rl"
+
+
+#line 87 "/home/aim/frobware/curly-garbanzo/src/core/connection-state.c"
+
+#line 58 "/home/aim/frobware/curly-garbanzo/src/core/connection-state.rl"
 
 int connection_fsm_init(struct connection_fsm *state)
 {
 	assert(state->next == NULL && "attempt to init an active state");
-	state->cs = DSIO_CONNECTION_CLOSED;
 
 	
-#line 91 "/home/aim/frobware/curly-garbanzo/src/core/connection-state.c"
+#line 96 "/home/aim/frobware/curly-garbanzo/src/core/connection-state.c"
 	{
 	 state->cs = connection_fsm_start;
 	}
 
-#line 62 "/home/aim/frobware/curly-garbanzo/src/core/connection-state.rl"
+#line 64 "/home/aim/frobware/curly-garbanzo/src/core/connection-state.rl"
 
 	return 1;
 }
 
-int connection_fsm_invariant(struct connection_fsm *state, enum connection_event event)
+int connection_fsm_assert(struct connection_fsm *state, enum connection_event event)
 {
 	if (state->cs == connection_fsm_error) {
 		return -1;
@@ -117,7 +122,7 @@ int connection_fsm_exec(struct connection_fsm *state, enum connection_event even
 	const char *eof = NULL;
 
 	
-#line 121 "/home/aim/frobware/curly-garbanzo/src/core/connection-state.c"
+#line 126 "/home/aim/frobware/curly-garbanzo/src/core/connection-state.c"
 	{
 	int _klen, _ps;
 	unsigned int _trans;
@@ -194,17 +199,17 @@ _match:
 	case 0:
 #line 5 "/home/aim/frobware/curly-garbanzo/src/core/connection-state-actions.rl"
 	{ 
-	TT(begin, (_ps), ( state->cs));
+	TraceT(begin, (_ps), ( state->cs));
 	state->next = NULL;
 }
 	break;
 	case 1:
 #line 14 "/home/aim/frobware/curly-garbanzo/src/core/connection-state-actions.rl"
 	{
-	TT(error, (_ps), ( state->cs)); 
+	TraceT(error, (_ps), ( state->cs)); 
 }
 	break;
-#line 208 "/home/aim/frobware/curly-garbanzo/src/core/connection-state.c"
+#line 213 "/home/aim/frobware/curly-garbanzo/src/core/connection-state.c"
 		}
 	}
 
@@ -223,10 +228,10 @@ _again:
 	case 1:
 #line 14 "/home/aim/frobware/curly-garbanzo/src/core/connection-state-actions.rl"
 	{
-	TT(error, (_ps), ( state->cs)); 
+	TraceT(error, (_ps), ( state->cs)); 
 }
 	break;
-#line 230 "/home/aim/frobware/curly-garbanzo/src/core/connection-state.c"
+#line 235 "/home/aim/frobware/curly-garbanzo/src/core/connection-state.c"
 		}
 	}
 	}
@@ -234,14 +239,14 @@ _again:
 	_out: {}
 	}
 
-#line 86 "/home/aim/frobware/curly-garbanzo/src/core/connection-state.rl"
+#line 88 "/home/aim/frobware/curly-garbanzo/src/core/connection-state.rl"
 
-	return connection_fsm_invariant(state, event);
+	return connection_fsm_assert(state, event);
 }
 
 int connection_fsm_finish(struct connection_fsm *state)
 {
-	return connection_fsm_invariant(state, 0);
+	return connection_fsm_assert(state, 0);
 }
 
 int connection_fsm_done(struct connection_fsm *state)
