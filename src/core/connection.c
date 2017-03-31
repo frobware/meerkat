@@ -38,15 +38,14 @@ const char *const dsio_connection_state_names[] = {
 static int on_open(struct dsio_websocket *ws)
 {
 	dsio_log_notice("CONNECTION_ESTABLISHED\n");
-	connection_fsm_init(&ws->client->connection.state);
-	connection_fsm_exec(&ws->client->connection.state, EVENT_OPEN);
+	connection_fsm_exec(&ws->client->connection.state, "O", 1);
 	return 0;
 }
 
 static int on_close(struct dsio_websocket *ws)
 {
 	dsio_log_notice("CLOSED\n");
-	connection_fsm_exec(&ws->client->connection.state, EVENT_CLOSED);
+	connection_fsm_exec(&ws->client->connection.state, "C", 1);
 	return 0;
 }
 
@@ -54,8 +53,8 @@ static int on_message(struct dsio_websocket *ws, void *buf, size_t len)
 {
 	int rc;
 	struct dsio_msg msg;
-
-	connection_fsm_exec(&ws->client->connection.state, EVENT_MESSAGE);
+	char msgid[128];
+	size_t n;
 
 	dsio_log_notice("MESSAGE %zd, '%s'\n", len, (char *)buf);
 	rc = dsio_msg_parse(ws->client->cfg->allocator, buf, &msg);
@@ -63,8 +62,14 @@ static int on_message(struct dsio_websocket *ws, void *buf, size_t len)
 	if (rc != DSIO_OK) {
 		char errmsg[256];
 		snprintf(errmsg, 255, "unknown message: %s", (char *)buf);
+		return 0;
 		//return ws->client->on_error(&ws->client->connection, errmsg);
 	}
+
+	n = snprintf(msgid, sizeof(msgid)-1, "%s%c%s",
+		     msg.topic->ident, '_', msg.action->ident);
+		
+	connection_fsm_exec(&ws->client->connection.state, msgid, n);
 
 	return 0;
 }
@@ -72,6 +77,7 @@ static int on_message(struct dsio_websocket *ws, void *buf, size_t len)
 static int on_error(struct dsio_websocket *ws, const char *msg)
 {
 	dsio_log_notice("ERROR %s\n", msg);
+	connection_fsm_exec(&ws->client->connection.state, "E", 1);
 	return 0;
 }
 
@@ -84,5 +90,6 @@ int dsio_conn_init(struct dsio_connection *connection, struct dsio_client *clien
 	connection->endpoint.on_close = on_close;
 	connection->endpoint.on_message = on_message;
 	connection->endpoint.on_error = on_error;
+	connection_fsm_init(&client->connection.state);
 	return client->cfg->websocket_connect(client->cfg, &connection->endpoint);
 }

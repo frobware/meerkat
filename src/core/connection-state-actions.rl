@@ -2,9 +2,8 @@
 
 machine connection_fsm;
 
-action begin { 
+action begin {
 	TraceT(begin, fcurs, ftargs);
-	state->next = NULL;
 }
 
 action open {
@@ -12,8 +11,15 @@ action open {
 }
 
 action error {
-	TraceT(error, fcurs, ftargs); 
+	TraceT(error, fcurs, ftargs);
+}
+
+action ping {
+	TraceT(ping, fcurs, ftargs);
+}
+
+action challenge {
+	TraceT(challenge, fcurs, ftargs);
 }
 
 }%%
-

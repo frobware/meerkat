@@ -1,14 +1,5 @@
 #pragma once
 
-/* Synthetic events for the Ragel state machine. The settings here
- * must match the events defined in connection-state.rl or it will all
- * break. */
-enum connection_event { 
-	EVENT_OPEN   = 'O',
-	EVENT_CLOSED = 'C',
-	EVENT_MESSAGE = 'M',
-};
-
 enum connection_state {
 	DSIO_CONNECTION_CLOSED = 0,
 	DSIO_CONNECTION_AWAITING_CONNECTION,
@@ -27,8 +18,8 @@ struct connection_fsm {
 };
 
 extern int connection_fsm_init(struct connection_fsm *state);
-extern int connection_fsm_invariant(struct connection_fsm *state, enum connection_event event);
-extern int connection_fsm_exec(struct connection_fsm *state, enum connection_event event);
+extern int connection_fsm_assert(struct connection_fsm *state);
+extern int connection_fsm_exec(struct connection_fsm *state, const char *id, size_t len);
 extern int connection_fsm_finish(struct connection_fsm *state);
 extern int connection_fsm_done(struct connection_fsm *state);
 

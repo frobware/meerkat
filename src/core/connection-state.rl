@@ -24,7 +24,9 @@
 /* Debugging Trace Transitions. */
 
 #if 1
-#define TraceT(A,S,N) dsio_log(DSIO_LL_CONNECTION, "event='%c', %d -> %d : %s\n", *p, S, N, "" # A)
+#define TraceT(ACTION, CURR_STATE, NEXT_STATE) \
+	dsio_log(DSIO_LL_CONNECTION, "%d -> %d -> action(%s)\n", \
+		 CURR_STATE, NEXT_STATE, "" # ACTION)
 #else
 #define TraceT(A,S,N)
 #endif
@@ -37,16 +39,39 @@ include connection_fsm "connection-state-actions.rl";
 
 ### events
 
-open  = 'O';
-close = 'C';
+close	= "C";
+error	= "E";
+message = "M";
+open	= "O";
+
+C_CH  = "C_CH";
+C_CHR = "C_CHR";
+C_PI  = "C_PI";
 
 ### state chart
 
 Connection = (
-  start:     (open  -> Accepting),
-  Accepting: (close -> Closing),
-  Closing:   (close -> final)
+  start: (
+    open -> AwaitingConnection
+  ),
+
+  AwaitingConnection: (
+    (C_PI @ping |
+     C_CH @challenge -> ChallengingWait |
+     close -> Closing)
+  ),
+
+  ChallengingWait: (
+    (C_PI @ping |
+     close -> Closing )
+  ),
+
+  Idle: ('M' | close),
+
+  Closing: (close -> final)
+
 ) >begin $!error;
+
 
 main := Connection;
 
@@ -54,44 +79,51 @@ main := Connection;
 
 %% write data;
 
-%% write exports;
-
 int connection_fsm_init(struct connection_fsm *state)
 {
 	assert(state->next == NULL && "attempt to init an active state");
 
 	%% write init;
 
-	return 1;
+	return 1;		/* good */
 }
 
-int connection_fsm_assert(struct connection_fsm *state, enum connection_event event)
+int connection_fsm_assert(struct connection_fsm *state)
 {
 	if (state->cs == connection_fsm_error) {
+		dsio_log(DSIO_LL_CONNECTION, "return -1 from fsm_assert\n");
 		return -1;
 	}
 
 	if (state->cs >= connection_fsm_first_final) {
+		dsio_log(DSIO_LL_CONNECTION, "return 1 from fsm_assert\n");
 		return 1;
 	}
 
 	return 0;
 }
 
-int connection_fsm_exec(struct connection_fsm *state, enum connection_event event)
+/*
+ * Executes the single event against the state machine.
+ *
+ * Return 0 to accept more events, 1 for finished, -1 for failure.
+ */
+int connection_fsm_exec(struct connection_fsm *state, const char *event, size_t len)
 {
-	const char *p = (const char *)&event;
-	const char *pe = p + 1;
+	const char *p = event;
+	const char *pe = p + len;
 	const char *eof = NULL;
+
+	dsio_log(DSIO_LL_CONNECTION, "event='%s'\n", event);
 
 	%% write exec;
 
-	return connection_fsm_assert(state, event);
+	return connection_fsm_assert(state);
 }
 
 int connection_fsm_finish(struct connection_fsm *state)
 {
-	return connection_fsm_assert(state, 0);
+	return connection_fsm_assert(state);
 }
 
 int connection_fsm_done(struct connection_fsm *state)
