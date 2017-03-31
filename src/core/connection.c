@@ -73,7 +73,6 @@ int dsio_conn_init(struct dsio_connection *connection, struct dsio_client *clien
 {
 	memset(connection, 0, sizeof *connection);
 	connection->client = client;
-	connection->state = DSIO_CONNECTION_CLOSED;
 	connection->endpoint.client = client;
 	connection->endpoint.on_open = on_open;
 	connection->endpoint.on_close = on_close;

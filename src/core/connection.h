@@ -18,27 +18,17 @@
 
 #include <stdlib.h>
 #include <dsio/websocket.h>
-#include "client.h"
+#include "message.h"
+#include "connection-state.h"
 
-enum dsio_connection_state {
-	DSIO_CONNECTION_CLOSED = 0,
-	DSIO_CONNECTION_AWAITING_CONNECTION,
-	DSIO_CONNECTION_CHALLENGING,
-	DSIO_CONNECTION_AWAITING_AUTHENTICATION,
-	DSIO_CONNECTION_AUTHENTICATING,
-	DSIO_CONNECTION_OPEN,
-	DSIO_CONNECTION_ERROR,
-	DSIO_CONNECTION_RECONNECTING,
-	DSIO_CONNECTION_NR_STATES
-};
+struct dsio_client;
 
 struct dsio_connection {
 	struct dsio_client *client;
-	enum dsio_connection_state state;
+	struct connection_fsm sm;
 	struct dsio_websocket endpoint;
 	int (*on_error)(struct dsio_connection *conn, const char *errmsg);
 	int (*on_message)(struct dsio_connection *conn, struct dsio_msg *msg);
 };
 
 extern int dsio_conn_init(struct dsio_connection *conn, struct dsio_client *client);
-extern const char *const dsio_connection_state_names[DSIO_CONNECTION_NR_STATES];
