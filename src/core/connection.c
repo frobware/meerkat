@@ -19,6 +19,7 @@
 
 #include <dsio/dsio.h>
 #include <dsio/log.h>
+#include "message.h"
 #include "client.h"
 #include "connection.h"
 

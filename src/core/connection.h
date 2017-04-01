@@ -18,7 +18,6 @@
 
 #include <stdlib.h>
 #include <dsio/websocket.h>
-#include "message.h"
 
 struct dsio_client;
 
