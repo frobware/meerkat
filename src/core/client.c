@@ -36,7 +36,7 @@ int dsio_client_create(struct dsio_client **clientp, struct dsio_client_cfg *cfg
 	memset(client, 0, sizeof *client);
 	client->cfg = cfg;
 	client->connection.client = client;
-	rc = dsio_conn_init(&client->connection, client);
+	rc = connection_init(&client->connection, client);
 
 	if (rc != DSIO_OK) {
 		DSIO_FREE(cfg->allocator, client);

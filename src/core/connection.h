@@ -19,16 +19,32 @@
 #include <stdlib.h>
 #include <dsio/websocket.h>
 #include "message.h"
-#include "connection-state.h"
 
 struct dsio_client;
 
-struct dsio_connection {
-	struct dsio_client *client;
-	struct connection_fsm state;
-	struct dsio_websocket endpoint;
-	int (*on_error)(struct dsio_connection *conn, const char *errmsg);
-	int (*on_message)(struct dsio_connection *conn, struct dsio_msg *msg);
+enum dsio_connection_state {
+        DSIO_CONNECTION_CLOSED = 0,
+        DSIO_CONNECTION_AWAITING_CONNECTION,
+        DSIO_CONNECTION_CHALLENGING,
+        DSIO_CONNECTION_AWAITING_AUTHENTICATION,
+        DSIO_CONNECTION_AUTHENTICATING,
+        DSIO_CONNECTION_OPEN,
+        DSIO_CONNECTION_ERROR,
+        DSIO_CONNECTION_RECONNECTING,
+        DSIO_CONNECTION_NR_STATES
 };
 
-extern int dsio_conn_init(struct dsio_connection *conn, struct dsio_client *client);
+struct dsio_connection {
+        int cs;			/* current state -- for Ragel */
+        enum dsio_connection_state state;
+	struct dsio_client *client;
+	struct dsio_websocket endpoint;
+};
+
+extern int connection_init(struct dsio_connection *conn, struct dsio_client *client);
+extern int connection_state_init(struct dsio_connection *conn, struct dsio_client *client);
+extern int connection_state_assert(struct dsio_connection *conn, const char *event);
+extern int connection_state_exec(struct dsio_connection *conn, const char *event, size_t len);
+extern int connection_state_finish(struct dsio_connection *conn);
+extern int connection_state_done(struct dsio_connection *conn, const char *event);
+extern const char *const dsio_connection_state_names[DSIO_CONNECTION_NR_STATES];

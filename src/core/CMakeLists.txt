@@ -13,8 +13,8 @@ function(ragel_gen fsm deps)
 endfunction(ragel_gen)
 
 if(RAGEL)
-  ragel_gen(${CMAKE_CURRENT_SOURCE_DIR}/connection-state
-    ${CMAKE_CURRENT_SOURCE_DIR}/connection-state-actions.rl)
+  ragel_gen(${CMAKE_CURRENT_SOURCE_DIR}/state
+    ${CMAKE_CURRENT_SOURCE_DIR}/state-actions.rl)
 endif()
 
 set(LIBDSIO_SRCS
@@ -22,13 +22,13 @@ set(LIBDSIO_SRCS
   allocator.c
   client.c
   connection.c
-  connection-state.c
-  connection-state.dot
-  connection-state.xml
   error.c
   log.c
   message.c
   mprintf.c
+  state.c
+  state.dot
+  state.xml
   topics.c
 )
 

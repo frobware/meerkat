@@ -21,7 +21,6 @@
 #include <dsio/log.h>
 #include "client.h"
 #include "connection.h"
-#include "connection-state.h"
 
 const char *const dsio_connection_state_names[] = {
 	"CLOSED",
@@ -38,19 +37,19 @@ const char *const dsio_connection_state_names[] = {
 static int on_open(struct dsio_websocket *ws)
 {
 	dsio_log_notice("on_open\n");
-	return connection_fsm_exec(&ws->client->connection.state, "OPEN", 4);
+	return connection_state_exec(&ws->client->connection, "OPEN", 4);
 }
 
 static int on_close(struct dsio_websocket *ws)
 {
 	dsio_log_notice("on_close\n");
-	return connection_fsm_exec(&ws->client->connection.state, "CLOSE", 5);
+	return connection_state_exec(&ws->client->connection, "CLOSE", 5);
 }
 
 static int on_error(struct dsio_websocket *ws, const char *msg)
 {
 	dsio_log_notice("on_error\n");
-	return connection_fsm_exec(&ws->client->connection.state, "ERROR", 5);
+	return connection_state_exec(&ws->client->connection, "ERROR", 5);
 }
 
 static int on_message(struct dsio_websocket *ws, void *buf, size_t len)
@@ -69,19 +68,20 @@ static int on_message(struct dsio_websocket *ws, void *buf, size_t len)
 		return -1;
 	}
 
-	/* turn the message into a more human consumable message. */
+	/* Turn the message into something Ragel can eaily consume. */
+
 	n = snprintf(msgid, sizeof(msgid)-1, "%s%c%s",
 		     msg.topic->ident,
-		     '_', 
+		     '_',
 		     msg.action->ident);
 
 	dsio_log_notice("message: %.*s\n", (int)len, (char *)buf);
-	connection_fsm_exec(&ws->client->connection.state, msgid, n);
+	connection_state_exec(&ws->client->connection, msgid, n);
 
 	return 0;
 }
 
-int dsio_conn_init(struct dsio_connection *connection, struct dsio_client *client)
+int connection_init(struct dsio_connection *connection, struct dsio_client *client)
 {
 	memset(connection, 0, sizeof *connection);
 	connection->client = client;
@@ -90,6 +90,6 @@ int dsio_conn_init(struct dsio_connection *connection, struct dsio_client *clien
 	connection->endpoint.on_close = on_close;
 	connection->endpoint.on_message = on_message;
 	connection->endpoint.on_error = on_error;
-	connection_fsm_init(&client->connection.state, client);
+	connection_state_init(&client->connection, client);
 	return client->cfg->websocket_connect(client->cfg, &connection->endpoint);
 }

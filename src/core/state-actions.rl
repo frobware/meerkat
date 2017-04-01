@@ -1,9 +1,9 @@
 %%{
 
-machine connection_fsm;
+machine connection;
 
 action begin {
-	state->client->connection.state.state = DSIO_CONNECTION_AWAITING_CONNECTION;
+	TraceT(begin, fcurs, ftargs);
 }
 
 action open {
