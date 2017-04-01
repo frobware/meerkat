@@ -16,8 +16,13 @@
 
 #pragma once
 
-#include <dsio/allocator.h>
-#include <dsio/websocket.h>
-#include <dsio/client.h>
-#include <dsio/log.h>
-#include <dsio/error.h>
+/* Status codes. */
+
+enum {
+	DSIO_OK = 0,
+	DSIO_ERROR,
+	DSIO_NOMEM,
+	DSIO_NR_ERRORS
+};
+	
+extern const char* dsio_strerror(int status);

@@ -14,10 +14,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
-
-#include <dsio/allocator.h>
-#include <dsio/websocket.h>
-#include <dsio/client.h>
-#include <dsio/log.h>
 #include <dsio/error.h>
+
+static const char *const errors[] = {
+	"success",
+	"logic error",
+	"out of memory",
+};
+
+const char *dsio_strerror(int n)
+{
+	if (n < 0 || n >= DSIO_NR_ERRORS) {
+		return "unknown error";
+	}
+
+	return errors[n];
+}

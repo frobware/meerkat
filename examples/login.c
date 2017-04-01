@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
 	client_cfg.websocket_service = dsio_libwebsockets_service;
 
 	if ((rc = dsio_client_create(&client, &client_cfg)) != DSIO_OK) {
-		fprintf(stderr, "client create failed");
+		fprintf(stderr, "client create failed: %s\n", dsio_strerror(rc));
 		return EXIT_FAILURE;
 	}
 

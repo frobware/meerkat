@@ -17,6 +17,7 @@ set(LIBDSIO_SRCS
   client.c
   connection.c
   connection-state.c
+  error.c
   log.c
   message.c
   mprintf.c
