@@ -31,7 +31,7 @@
 		 CURR_STATE, NEXT_STATE, "" # ACTION)
 
 
-#line 71 "/home/aim/frobware/curly-garbanzo/src/core/connection-state.rl"
+#line 65 "/home/aim/frobware/curly-garbanzo/src/core/connection-state.rl"
 
 
 
@@ -43,20 +43,20 @@ static const char _connection_fsm_actions[] = {
 
 static const char _connection_fsm_key_offsets[] = {
 	0, 0, 1, 2, 3, 4, 5, 7, 
-	8, 9, 10, 12, 13, 14, 15, 16, 
+	8, 9, 10, 11, 12, 13, 15, 16, 
 	17
 };
 
 static const char _connection_fsm_trans_keys[] = {
 	79, 80, 69, 78, 67, 76, 95, 79, 
-	83, 69, 76, 95, 80, 73, 67, 67, 
-	72, 67, 0
+	83, 69, 67, 72, 67, 76, 95, 80, 
+	73, 0
 };
 
 static const char _connection_fsm_single_lengths[] = {
 	0, 1, 1, 1, 1, 1, 2, 1, 
-	1, 1, 2, 1, 1, 1, 1, 1, 
-	1
+	1, 1, 1, 1, 1, 2, 1, 1, 
+	0
 };
 
 static const char _connection_fsm_range_lengths[] = {
@@ -67,24 +67,24 @@ static const char _connection_fsm_range_lengths[] = {
 
 static const char _connection_fsm_index_offsets[] = {
 	0, 0, 2, 4, 6, 8, 10, 13, 
-	15, 17, 19, 22, 24, 26, 28, 30, 
+	15, 17, 19, 21, 23, 25, 28, 30, 
 	32
 };
 
 static const char _connection_fsm_trans_targs[] = {
 	2, 0, 3, 0, 4, 0, 5, 0, 
-	6, 0, 7, 14, 0, 8, 0, 9, 
-	0, 16, 0, 7, 11, 0, 12, 0, 
-	13, 0, 10, 0, 15, 0, 13, 0, 
-	10, 0, 0
+	6, 0, 7, 10, 0, 8, 0, 9, 
+	0, 16, 0, 11, 0, 12, 0, 13, 
+	0, 7, 14, 0, 15, 0, 12, 0, 
+	0, 0
 };
 
 static const char _connection_fsm_trans_actions[] = {
 	1, 5, 0, 5, 0, 5, 3, 5, 
 	0, 5, 0, 0, 5, 0, 5, 0, 
-	5, 11, 5, 0, 0, 5, 0, 5, 
-	7, 5, 0, 5, 0, 5, 9, 5, 
-	0, 5, 0
+	5, 11, 5, 0, 5, 9, 5, 0, 
+	5, 0, 0, 5, 0, 5, 7, 5, 
+	5, 0
 };
 
 static const char _connection_fsm_eof_actions[] = {
@@ -100,7 +100,7 @@ static const int connection_fsm_error = 0;
 static const int connection_fsm_en_main = 1;
 
 
-#line 74 "/home/aim/frobware/curly-garbanzo/src/core/connection-state.rl"
+#line 68 "/home/aim/frobware/curly-garbanzo/src/core/connection-state.rl"
 
 int connection_fsm_init(struct connection_fsm *state, struct dsio_client *client)
 {
@@ -111,7 +111,7 @@ int connection_fsm_init(struct connection_fsm *state, struct dsio_client *client
 	 state->cs = connection_fsm_start;
 	}
 
-#line 79 "/home/aim/frobware/curly-garbanzo/src/core/connection-state.rl"
+#line 73 "/home/aim/frobware/curly-garbanzo/src/core/connection-state.rl"
 	return 1;		/* good */
 }
 
@@ -147,16 +147,15 @@ int connection_fsm_exec(struct connection_fsm *state, const char *event, size_t 
 {
 	const char *p = event;
 	const char *pe = p + len;
-#if 1
 	const char *eof = NULL;
-#endif
+
 	dsio_log(DSIO_LL_CONNECTION, "%s event\n", event);
 
 	if (connection_fsm_done(state, event))
 		return -1;
 
 	
-#line 160 "/home/aim/frobware/curly-garbanzo/src/core/connection-state.c"
+#line 159 "/home/aim/frobware/curly-garbanzo/src/core/connection-state.c"
 	{
 	int _klen, _ps;
 	unsigned int _trans;
@@ -266,7 +265,7 @@ _match:
 	TraceT(close, (_ps), ( state->cs));
 }
 	break;
-#line 270 "/home/aim/frobware/curly-garbanzo/src/core/connection-state.c"
+#line 269 "/home/aim/frobware/curly-garbanzo/src/core/connection-state.c"
 		}
 	}
 
@@ -288,7 +287,7 @@ _again:
 	TraceT(error, (_ps), ( state->cs));
 }
 	break;
-#line 292 "/home/aim/frobware/curly-garbanzo/src/core/connection-state.c"
+#line 291 "/home/aim/frobware/curly-garbanzo/src/core/connection-state.c"
 		}
 	}
 	}
@@ -296,7 +295,7 @@ _again:
 	_out: {}
 	}
 
-#line 123 "/home/aim/frobware/curly-garbanzo/src/core/connection-state.rl"
+#line 116 "/home/aim/frobware/curly-garbanzo/src/core/connection-state.rl"
 
 	return connection_fsm_assert(state, event);
 }

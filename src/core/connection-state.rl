@@ -41,7 +41,6 @@ ERROR	= "ERROR";
 OPEN	= "OPEN";
 
 C_CH  = "C_CH";
-C_CHR = "C_CHR";
 C_PI  = "C_PI";
 
 ### state chart
@@ -53,19 +52,14 @@ main := (
 
   AwaitingConnection: (
 	  CLOSE @close -> final |
-	  C_CH @challenge_response
-  ) -> Challenging,
+	  C_CH @challenge_response -> Challenging
+  ),
 
   Challenging: (
 	  CLOSE @close -> final |
-	  C_PI @pong
-  ) -> Challenging,
+	  C_PI @pong -> Challenging
+  )
 
-  Idle: (
-	  CLOSE @close -> final |
-	  C_PI @pong
-  ) ->Idle
-	  
 ) >begin $!error;
 
 }%%
@@ -111,9 +105,8 @@ int connection_fsm_exec(struct connection_fsm *state, const char *event, size_t 
 {
 	const char *p = event;
 	const char *pe = p + len;
-#if 1
 	const char *eof = NULL;
-#endif
+
 	dsio_log(DSIO_LL_CONNECTION, "%s event\n", event);
 
 	if (connection_fsm_done(state, event))
