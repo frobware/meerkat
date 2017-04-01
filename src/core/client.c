@@ -17,7 +17,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <dsio/dsio.h>
-#include <dsio/log.h>
 
 #include "mprintf.h"
 #include "client.h"

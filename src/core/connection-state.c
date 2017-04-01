@@ -1,5 +1,5 @@
 
-#line 1 "/home/aim/frobware/curly-garbanzo/src/core/connection-state.rl"
+#line 1 "/home/aim/go/src/github.com/frobware/meerkat/src/core/connection-state.rl"
 /* Copyright (C) 2017 Andrew McDermott
  *
  * This program is free software: you can redistribute it and/or modify
@@ -34,11 +34,11 @@
 #endif
 
 
-#line 78 "/home/aim/frobware/curly-garbanzo/src/core/connection-state.rl"
+#line 78 "/home/aim/go/src/github.com/frobware/meerkat/src/core/connection-state.rl"
 
 
 
-#line 42 "/home/aim/frobware/curly-garbanzo/src/core/connection-state.c"
+#line 42 "/home/aim/go/src/github.com/frobware/meerkat/src/core/connection-state.c"
 static const char _connection_fsm_actions[] = {
 	0, 1, 0, 1, 1, 1, 2, 1, 
 	3
@@ -97,19 +97,19 @@ static const int connection_fsm_error = 0;
 static const int connection_fsm_en_main = 1;
 
 
-#line 81 "/home/aim/frobware/curly-garbanzo/src/core/connection-state.rl"
+#line 81 "/home/aim/go/src/github.com/frobware/meerkat/src/core/connection-state.rl"
 
 int connection_fsm_init(struct connection_fsm *state)
 {
 	assert(state->next == NULL && "attempt to init an active state");
 
 	
-#line 108 "/home/aim/frobware/curly-garbanzo/src/core/connection-state.c"
+#line 108 "/home/aim/go/src/github.com/frobware/meerkat/src/core/connection-state.c"
 	{
 	 state->cs = connection_fsm_start;
 	}
 
-#line 87 "/home/aim/frobware/curly-garbanzo/src/core/connection-state.rl"
+#line 87 "/home/aim/go/src/github.com/frobware/meerkat/src/core/connection-state.rl"
 
 	return 1;		/* good */
 }
@@ -143,7 +143,7 @@ int connection_fsm_exec(struct connection_fsm *state, const char *event, size_t 
 	dsio_log(DSIO_LL_CONNECTION, "event='%s'\n", event);
 
 	
-#line 147 "/home/aim/frobware/curly-garbanzo/src/core/connection-state.c"
+#line 147 "/home/aim/go/src/github.com/frobware/meerkat/src/core/connection-state.c"
 	{
 	int _klen, _ps;
 	unsigned int _trans;
@@ -219,30 +219,30 @@ _match:
 		switch ( *_acts++ )
 		{
 	case 0:
-#line 5 "/home/aim/frobware/curly-garbanzo/src/core/connection-state-actions.rl"
+#line 5 "/home/aim/go/src/github.com/frobware/meerkat/src/core/connection-state-actions.rl"
 	{
 	TraceT(begin, (_ps), ( state->cs));
 }
 	break;
 	case 1:
-#line 13 "/home/aim/frobware/curly-garbanzo/src/core/connection-state-actions.rl"
+#line 13 "/home/aim/go/src/github.com/frobware/meerkat/src/core/connection-state-actions.rl"
 	{
 	TraceT(error, (_ps), ( state->cs));
 }
 	break;
 	case 2:
-#line 17 "/home/aim/frobware/curly-garbanzo/src/core/connection-state-actions.rl"
+#line 17 "/home/aim/go/src/github.com/frobware/meerkat/src/core/connection-state-actions.rl"
 	{
 	TraceT(ping, (_ps), ( state->cs));
 }
 	break;
 	case 3:
-#line 21 "/home/aim/frobware/curly-garbanzo/src/core/connection-state-actions.rl"
+#line 21 "/home/aim/go/src/github.com/frobware/meerkat/src/core/connection-state-actions.rl"
 	{
 	TraceT(challenge, (_ps), ( state->cs));
 }
 	break;
-#line 246 "/home/aim/frobware/curly-garbanzo/src/core/connection-state.c"
+#line 246 "/home/aim/go/src/github.com/frobware/meerkat/src/core/connection-state.c"
 		}
 	}
 
@@ -259,12 +259,12 @@ _again:
 	while ( __nacts-- > 0 ) {
 		switch ( *__acts++ ) {
 	case 1:
-#line 13 "/home/aim/frobware/curly-garbanzo/src/core/connection-state-actions.rl"
+#line 13 "/home/aim/go/src/github.com/frobware/meerkat/src/core/connection-state-actions.rl"
 	{
 	TraceT(error, (_ps), ( state->cs));
 }
 	break;
-#line 268 "/home/aim/frobware/curly-garbanzo/src/core/connection-state.c"
+#line 268 "/home/aim/go/src/github.com/frobware/meerkat/src/core/connection-state.c"
 		}
 	}
 	}
@@ -272,7 +272,7 @@ _again:
 	_out: {}
 	}
 
-#line 120 "/home/aim/frobware/curly-garbanzo/src/core/connection-state.rl"
+#line 120 "/home/aim/go/src/github.com/frobware/meerkat/src/core/connection-state.rl"
 
 	return connection_fsm_assert(state);
 }

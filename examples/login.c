@@ -16,7 +16,6 @@
 
 #include <stdio.h>
 #include <dsio/dsio.h>
-#include <dsio/log.h>
 #include "../src/libwebsockets/dsio-libwebsockets-impl.h"
 
 #include <libwebsockets.h>

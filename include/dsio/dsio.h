@@ -18,6 +18,7 @@
 
 #include <dsio/allocator.h>
 #include <dsio/websocket.h>
+#include <dsio/client.h>
 #include <dsio/log.h>
 
 /* Status codes. */
@@ -25,20 +26,3 @@
 #define DSIO_OK		0
 #define DSIO_ERROR	1
 #define DSIO_NOMEM	2
-
-struct dsio_client_cfg {
-	const struct dsio_allocator *allocator;
-	const char *uri;
-	const char *username;
-	const char *password;
-	const char *ssl_cert_filepath;
-	const char *ssl_private_key_filepath;
-	int allow_self_signed_certs;
-	DSIO_WEBSOCKET_CONNECT websocket_connect;
-	DSIO_WEBSOCKET_DISCONNECT websocket_disconnect;
-	DSIO_WEBSOCKET_SERVICE websocket_service;
-};
-
-extern int dsio_client_create(struct dsio_client **result, struct dsio_client_cfg *cfg);
-extern void dsio_client_delete(struct dsio_client *client);
-extern int dsio_client_service(struct dsio_client *client);
