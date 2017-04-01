@@ -21,5 +21,5 @@
 struct dsio_client {
 	struct dsio_client_cfg *cfg;
 	struct dsio_connection connection;
-	void *userdata;
+ 	void *userdata;
 };

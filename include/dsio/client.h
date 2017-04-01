@@ -20,6 +20,20 @@
 #include <dsio/websocket.h>
 #include <dsio/client.h>
 
+enum dsio_connection_state {
+        DSIO_CONNECTION_CLOSED = 0,
+        DSIO_CONNECTION_AWAITING_CONNECTION,
+        DSIO_CONNECTION_CHALLENGING,
+        DSIO_CONNECTION_AWAITING_AUTHENTICATION,
+        DSIO_CONNECTION_AUTHENTICATING,
+        DSIO_CONNECTION_OPEN,
+        DSIO_CONNECTION_ERROR,
+        DSIO_CONNECTION_RECONNECTING,
+        DSIO_CONNECTION_NR_STATES
+};
+
+typedef void (*DSIO_CONNECTION_STATE_CHANGE)(struct dsio_client *client, enum dsio_connection_state newstate);
+
 struct dsio_client_cfg {
 	const struct dsio_allocator *allocator;
 	const char *uri;
@@ -31,8 +45,11 @@ struct dsio_client_cfg {
 	DSIO_WEBSOCKET_CONNECT websocket_connect;
 	DSIO_WEBSOCKET_DISCONNECT websocket_disconnect;
 	DSIO_WEBSOCKET_SERVICE websocket_service;
+	DSIO_CONNECTION_STATE_CHANGE connection_state_change;
 };
 
 extern int dsio_client_create(struct dsio_client **result, struct dsio_client_cfg *cfg);
 extern void dsio_client_delete(struct dsio_client *client);
 extern int dsio_client_service(struct dsio_client *client);
+
+extern const char *const dsio_connection_state_names[];

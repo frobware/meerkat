@@ -4,7 +4,7 @@ BUILD_FILE              = build.ninja
 
 CMAKE_GENERATOR		= "Unix Makefiles"
 CMAKE_BUILDER           = make
-CMAKE_BUILDER_ARGS      = -j -Oline
+CMAKE_BUILDER_ARGS      = -j -Oline --print-directory
 BUILD_FILE              = Makefile
 
 BUILD_DIR               := build

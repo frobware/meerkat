@@ -17,21 +17,10 @@
 #pragma once
 
 #include <stdlib.h>
+#include <dsio/client.h>
 #include <dsio/websocket.h>
 
 struct dsio_client;
-
-enum dsio_connection_state {
-        DSIO_CONNECTION_CLOSED = 0,
-        DSIO_CONNECTION_AWAITING_CONNECTION,
-        DSIO_CONNECTION_CHALLENGING,
-        DSIO_CONNECTION_AWAITING_AUTHENTICATION,
-        DSIO_CONNECTION_AUTHENTICATING,
-        DSIO_CONNECTION_OPEN,
-        DSIO_CONNECTION_ERROR,
-        DSIO_CONNECTION_RECONNECTING,
-        DSIO_CONNECTION_NR_STATES
-};
 
 struct dsio_connection {
         int cs;			/* current state -- for Ragel */
@@ -46,5 +35,4 @@ extern int connection_state_assert(struct dsio_connection *conn, const char *eve
 extern int connection_state_exec(struct dsio_connection *conn, const char *event, size_t len);
 extern int connection_state_finish(struct dsio_connection *conn);
 extern int connection_state_done(struct dsio_connection *conn, const char *event);
-extern const char *const dsio_connection_state_names[DSIO_CONNECTION_NR_STATES];
 extern int connection_send_challenge_response(struct dsio_connection *connection);

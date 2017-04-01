@@ -20,6 +20,12 @@
 
 #include <libwebsockets.h>
 
+static void connection_state_change(struct dsio_client *client,
+				    enum dsio_connection_state state)
+{
+	printf("CONN STATE -> %s\n", dsio_connection_state_names[state]);
+}
+
 int main(int argc, char *argv[])
 {
 	int rc;
@@ -39,6 +45,7 @@ int main(int argc, char *argv[])
 	client_cfg.websocket_connect = dsio_libwebsockets_connect;
 	client_cfg.websocket_disconnect = dsio_libwebsockets_disconnect;
 	client_cfg.websocket_service = dsio_libwebsockets_service;
+	client_cfg.connection_state_change = connection_state_change;
 
 	if ((rc = dsio_client_create(&client, &client_cfg)) != DSIO_OK) {
 		fprintf(stderr, "client create failed: %s\n", dsio_strerror(rc));
