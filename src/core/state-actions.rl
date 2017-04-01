@@ -4,20 +4,17 @@ machine connection;
 
 action begin {
 	TraceT(begin, fcurs, ftargs);
-	c->state = DSIO_CONNECTION_AWAITING_CONNECTION;
-	if (c->client->cfg->connection_state_change != NULL)
-		c->client->cfg->connection_state_change(c->client, c->state);
-
+	connection_state_update_client(conn, DSIO_CONNECTION_AWAITING_CONNECTION);
 }
 
 action open {
 	TraceT(open, fcurs, ftargs);
-	c->state = DSIO_CONNECTION_CHALLENGING;
+	connection_state_update_client(conn, DSIO_CONNECTION_CHALLENGING);
 }
 
 action error {
 	TraceT(error, fcurs, ftargs);
-	c->state = DSIO_CONNECTION_ERROR;
+	connection_state_update_client(conn, DSIO_CONNECTION_ERROR);
 }
 
 action pong {
@@ -26,7 +23,7 @@ action pong {
 
 action challenge_response {
 	TraceT(challenge_response, fcurs, ftargs);
-	connection_send_challenge_response(c);
+	connection_send_challenge_response(conn);
 }
 
 action close {

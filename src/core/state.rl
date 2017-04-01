@@ -30,7 +30,7 @@
 %%{
 
 machine connection;
-access c->;
+access conn->;
 include connection "state-actions.rl";
 
 ### events
@@ -65,9 +65,9 @@ main := (
 
 %% write data;
 
-int connection_state_init(struct dsio_connection *c, struct dsio_client *client)
+int connection_state_init(struct dsio_connection *conn, struct dsio_client *client)
 {
-	c->client = client;
+	conn->client = client;
 	%% write init;
 	return 1;		/* good */
 }
@@ -77,18 +77,18 @@ int connection_state_init(struct dsio_connection *c, struct dsio_client *client)
  *  -1 if we had a failure
  *   0 to continue accepting events
  */
-inline int connection_state_assert(struct dsio_connection *c, const char *event)
+inline int connection_state_assert(struct dsio_connection *conn, const char *event)
 {
-	if (c->cs == connection_error) {
+	if (conn->cs == connection_error) {
 		if (event != NULL) {
 			dsio_log(DSIO_LL_ERR, "event='%s'\n", event);
 		}
-		dsio_log(DSIO_LL_CONNECTION, "c->cs = connection_state_error\n");
+		dsio_log(DSIO_LL_CONNECTION, "conn->cs = connection_state_error\n");
 		return -1;
 	}
 
-	if (c->cs >= connection_first_final) {
-		dsio_log(DSIO_LL_CONNECTION, "c->cs = connection_state_first_final\n");
+	if (conn->cs >= connection_first_final) {
+		dsio_log(DSIO_LL_CONNECTION, "conn->cs = connection_state_first_final\n");
 		return 1;
 	}
 
@@ -100,7 +100,7 @@ inline int connection_state_assert(struct dsio_connection *c, const char *event)
  *
  * Return 0 to accept more events, 1 for finished, -1 for failure.
  */
-int connection_state_exec(struct dsio_connection *c, const char *event, size_t len)
+int connection_state_exec(struct dsio_connection *conn, const char *event, size_t len)
 {
 	const char *p = event;
 	const char *pe = p + len;
@@ -108,21 +108,21 @@ int connection_state_exec(struct dsio_connection *c, const char *event, size_t l
 
 	dsio_log(DSIO_LL_CONNECTION, "%s event\n", event);
 
-	if (connection_state_done(c, event))
+	if (connection_state_done(conn, event))
 		return -1;
 
 	%% write exec;
 
-	return connection_state_assert(c, event);
+	return connection_state_assert(conn, event);
 }
 
-int connection_state_finish(struct dsio_connection *c)
+int connection_state_finish(struct dsio_connection *conn)
 {
 	dsio_log(DSIO_LL_CONNECTION, "connection_state_finish()\n");
-	return connection_state_assert(c, NULL);
+	return connection_state_assert(conn, NULL);
 }
 
-int connection_state_done(struct dsio_connection *c, const char *event)
+int connection_state_done(struct dsio_connection *conn, const char *event)
 {
-	return c->cs == connection_error || c->cs == connection_first_final;
+	return conn->cs == connection_error || conn->cs == connection_first_final;
 }

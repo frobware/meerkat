@@ -95,15 +95,25 @@ int connection_send_challenge_response(struct dsio_connection *c)
 	return c->endpoint.send(&c->endpoint, m, strlen(m));
 }
 
-int connection_init(struct dsio_connection *connection, struct dsio_client *client)
+void connection_state_update_client(struct dsio_connection *conn,
+				    enum dsio_connection_state newstate)
 {
-	memset(connection, 0, sizeof *connection);
-	connection->client = client;
-	connection->endpoint.client = client;
-	connection->endpoint.on_open = on_open;
-	connection->endpoint.on_close = on_close;
-	connection->endpoint.on_message = on_message;
-	connection->endpoint.on_error = on_error;
+	conn->state = newstate;
+
+	if (conn->client->cfg->connection_state_change != NULL) {
+		conn->client->cfg->connection_state_change(conn->client, newstate);
+	}
+}
+
+int connection_init(struct dsio_connection *conn, struct dsio_client *client)
+{
+	memset(conn, 0, sizeof *conn);
+	conn->client = client;
+	conn->endpoint.client = client;
+	conn->endpoint.on_open = on_open;
+	conn->endpoint.on_close = on_close;
+	conn->endpoint.on_message = on_message;
+	conn->endpoint.on_error = on_error;
 	connection_state_init(&client->connection, client);
-	return client->cfg->websocket_connect(client->cfg, &connection->endpoint);
+	return client->cfg->websocket_connect(client->cfg, &conn->endpoint);
 }
