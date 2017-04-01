@@ -22,4 +22,9 @@ action challenge {
 	TraceT(challenge, fcurs, ftargs);
 }
 
+action close {
+	TraceT(close, fcurs, ftargs);
+	connection_fsm_finish(state);
+}
+
 }%%

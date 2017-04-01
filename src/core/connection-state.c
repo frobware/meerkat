@@ -1,5 +1,5 @@
 
-#line 1 "/home/aim/frobware/meerkat/src/core/connection-state.rl"
+#line 1 "/home/aim/frobware/curly-garbanzo/src/core/connection-state.rl"
 /* Copyright (C) 2017 Andrew McDermott
  *
  * This program is free software: you can redistribute it and/or modify
@@ -34,95 +34,90 @@
 #endif
 
 
-#line 78 "/home/aim/frobware/meerkat/src/core/connection-state.rl"
+#line 75 "/home/aim/frobware/curly-garbanzo/src/core/connection-state.rl"
 
 
 
-#line 42 "/home/aim/frobware/meerkat/src/core/connection-state.c"
+#line 42 "/home/aim/frobware/curly-garbanzo/src/core/connection-state.c"
 static const char _connection_fsm_actions[] = {
-	0, 1, 0, 1, 1, 1, 2, 1, 
-	3
+	0, 1, 0, 1, 1, 1, 2
 };
 
 static const char _connection_fsm_key_offsets[] = {
-	0, 0, 1, 2, 4, 6, 7, 8, 
-	10, 11, 12, 12
+	0, 0, 1, 2, 3, 4, 5, 6, 
+	7, 8, 9, 10, 11, 12
 };
 
 static const char _connection_fsm_trans_keys[] = {
-	79, 67, 67, 95, 67, 80, 72, 67, 
-	67, 95, 80, 73, 0
+	79, 80, 69, 78, 67, 95, 67, 72, 
+	67, 95, 67, 72, 82, 0
 };
 
 static const char _connection_fsm_single_lengths[] = {
-	0, 1, 1, 2, 2, 1, 1, 2, 
-	1, 1, 0, 0
+	0, 1, 1, 1, 1, 1, 1, 1, 
+	1, 1, 1, 1, 1, 1
 };
 
 static const char _connection_fsm_range_lengths[] = {
 	0, 0, 0, 0, 0, 0, 0, 0, 
-	0, 0, 0, 0
+	0, 0, 0, 0, 0, 0
 };
 
 static const char _connection_fsm_index_offsets[] = {
-	0, 0, 2, 4, 7, 10, 12, 14, 
-	17, 19, 21, 22
-};
-
-static const char _connection_fsm_indicies[] = {
-	1, 0, 2, 0, 3, 4, 0, 5, 
-	6, 0, 7, 0, 8, 0, 3, 9, 
-	0, 6, 0, 10, 0, 0, 0, 0
+	0, 0, 2, 4, 6, 8, 10, 12, 
+	14, 16, 18, 20, 22, 24
 };
 
 static const char _connection_fsm_trans_targs[] = {
-	0, 2, 3, 11, 4, 5, 9, 6, 
-	7, 8, 10
+	2, 0, 3, 0, 4, 0, 5, 0, 
+	6, 0, 7, 0, 8, 0, 9, 0, 
+	10, 0, 11, 0, 12, 0, 13, 0, 
+	9, 0, 0
 };
 
 static const char _connection_fsm_trans_actions[] = {
-	3, 1, 0, 0, 0, 0, 0, 7, 
-	0, 0, 5
+	1, 3, 0, 3, 0, 3, 0, 3, 
+	0, 3, 0, 3, 0, 3, 5, 3, 
+	0, 3, 0, 3, 0, 3, 0, 3, 
+	0, 3, 0
 };
 
 static const char _connection_fsm_eof_actions[] = {
 	0, 3, 3, 3, 3, 3, 3, 3, 
-	3, 3, 3, 0
+	3, 3, 3, 3, 3, 3
 };
 
 static const int connection_fsm_start = 1;
-static const int connection_fsm_first_final = 11;
+static const int connection_fsm_first_final = 14;
 static const int connection_fsm_error = 0;
 
 static const int connection_fsm_en_main = 1;
 
 
-#line 81 "/home/aim/frobware/meerkat/src/core/connection-state.rl"
+#line 78 "/home/aim/frobware/curly-garbanzo/src/core/connection-state.rl"
 
 int connection_fsm_init(struct connection_fsm *state)
 {
-	assert(state->next == NULL && "attempt to init an active state");
-
 	
-#line 108 "/home/aim/frobware/meerkat/src/core/connection-state.c"
+#line 103 "/home/aim/frobware/curly-garbanzo/src/core/connection-state.c"
 	{
 	 state->cs = connection_fsm_start;
 	}
 
-#line 87 "/home/aim/frobware/meerkat/src/core/connection-state.rl"
+#line 82 "/home/aim/frobware/curly-garbanzo/src/core/connection-state.rl"
 
 	return 1;		/* good */
 }
 
-int connection_fsm_assert(struct connection_fsm *state)
+inline int connection_fsm_assert(struct connection_fsm *state)
 {
 	if (state->cs == connection_fsm_error) {
-		dsio_log(DSIO_LL_CONNECTION, "return -1 from fsm_assert\n");
+		dsio_log(DSIO_LL_CONNECTION, "state->cs = connection_fsm_error\n");
 		return -1;
 	}
 
 	if (state->cs >= connection_fsm_first_final) {
-		dsio_log(DSIO_LL_CONNECTION, "return 1 from fsm_assert\n");
+		dsio_log(DSIO_LL_CONNECTION, "state->cs = connection_fsm_first_final\n");
 		return 1;
 	}
 
@@ -130,7 +125,7 @@ int connection_fsm_assert(struct connection_fsm *state)
 }
 
 /*
- * Executes the single event against the state machine.
+ * Inject the event against into the machine.
  *
  * Return 0 to accept more events, 1 for finished, -1 for failure.
  */
@@ -143,7 +138,7 @@ int connection_fsm_exec(struct connection_fsm *state, const char *event, size_t 
 	dsio_log(DSIO_LL_CONNECTION, "event='%s'\n", event);
 
 	
-#line 147 "/home/aim/frobware/meerkat/src/core/connection-state.c"
+#line 142 "/home/aim/frobware/curly-garbanzo/src/core/connection-state.c"
 	{
 	int _klen, _ps;
 	unsigned int _trans;
@@ -205,7 +200,6 @@ _resume:
 	}
 
 _match:
-	_trans = _connection_fsm_indicies[_trans];
 	_ps =  state->cs;
 	 state->cs = _connection_fsm_trans_targs[_trans];
 
@@ -219,30 +213,24 @@ _match:
 		switch ( *_acts++ )
 		{
 	case 0:
-#line 5 "/home/aim/frobware/meerkat/src/core/connection-state-actions.rl"
+#line 5 "/home/aim/frobware/curly-garbanzo/src/core/connection-state-actions.rl"
 	{
 	TraceT(begin, (_ps), ( state->cs));
 }
 	break;
 	case 1:
-#line 13 "/home/aim/frobware/meerkat/src/core/connection-state-actions.rl"
+#line 13 "/home/aim/frobware/curly-garbanzo/src/core/connection-state-actions.rl"
 	{
 	TraceT(error, (_ps), ( state->cs));
 }
 	break;
 	case 2:
-#line 17 "/home/aim/frobware/meerkat/src/core/connection-state-actions.rl"
-	{
-	TraceT(ping, (_ps), ( state->cs));
-}
-	break;
-	case 3:
-#line 21 "/home/aim/frobware/meerkat/src/core/connection-state-actions.rl"
+#line 21 "/home/aim/frobware/curly-garbanzo/src/core/connection-state-actions.rl"
 	{
 	TraceT(challenge, (_ps), ( state->cs));
 }
 	break;
-#line 246 "/home/aim/frobware/meerkat/src/core/connection-state.c"
+#line 234 "/home/aim/frobware/curly-garbanzo/src/core/connection-state.c"
 		}
 	}
 
@@ -259,12 +247,12 @@ _again:
 	while ( __nacts-- > 0 ) {
 		switch ( *__acts++ ) {
 	case 1:
-#line 13 "/home/aim/frobware/meerkat/src/core/connection-state-actions.rl"
+#line 13 "/home/aim/frobware/curly-garbanzo/src/core/connection-state-actions.rl"
 	{
 	TraceT(error, (_ps), ( state->cs));
 }
 	break;
-#line 268 "/home/aim/frobware/meerkat/src/core/connection-state.c"
+#line 256 "/home/aim/frobware/curly-garbanzo/src/core/connection-state.c"
 		}
 	}
 	}
@@ -272,17 +260,19 @@ _again:
 	_out: {}
 	}
 
-#line 120 "/home/aim/frobware/meerkat/src/core/connection-state.rl"
+#line 115 "/home/aim/frobware/curly-garbanzo/src/core/connection-state.rl"
 
 	return connection_fsm_assert(state);
 }
 
 int connection_fsm_finish(struct connection_fsm *state)
 {
+	dsio_log(DSIO_LL_CONNECTION, "connection_fsm_finish\n");
 	return connection_fsm_assert(state);
 }
 
 int connection_fsm_done(struct connection_fsm *state)
 {
+	dsio_log(DSIO_LL_CONNECTION, "connection_fsm_done\n");
 	return state->cs == connection_fsm_error || state->cs == connection_fsm_first_final;
 }

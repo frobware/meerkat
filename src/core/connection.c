@@ -37,16 +37,17 @@ const char *const dsio_connection_state_names[] = {
 
 static int on_open(struct dsio_websocket *ws)
 {
-	dsio_log_notice("CONNECTION_ESTABLISHED\n");
-	connection_fsm_exec(&ws->client->connection.state, "O", 1);
-	return 0;
+	return connection_fsm_exec(&ws->client->connection.state, "OPEN", 4);
 }
 
 static int on_close(struct dsio_websocket *ws)
 {
-	dsio_log_notice("CLOSED\n");
-	connection_fsm_exec(&ws->client->connection.state, "C", 1);
-	return 0;
+	return connection_fsm_exec(&ws->client->connection.state, "CLOSE", 5);
+}
+
+static int on_error(struct dsio_websocket *ws, const char *msg)
+{
+	return connection_fsm_exec(&ws->client->connection.state, "ERROR", 5);
 }
 
 static int on_message(struct dsio_websocket *ws, void *buf, size_t len)
@@ -56,28 +57,22 @@ static int on_message(struct dsio_websocket *ws, void *buf, size_t len)
 	char msgid[128];
 	size_t n;
 
-	dsio_log_notice("MESSAGE %zd, '%s'\n", len, (char *)buf);
 	rc = dsio_msg_parse(ws->client->cfg->allocator, buf, &msg);
 
 	if (rc != DSIO_OK) {
-		char errmsg[256];
-		snprintf(errmsg, 255, "unknown message: %s", (char *)buf);
-		return 0;
-		//return ws->client->on_error(&ws->client->connection, errmsg);
+		dsio_log_err("unknown message: %.*s\n", (int)len, (char *)buf);
+		return -1;
 	}
 
+	/* turn the message into a more human consumable message. */
 	n = snprintf(msgid, sizeof(msgid)-1, "%s%c%s",
-		     msg.topic->ident, '_', msg.action->ident);
-		
+		     msg.topic->ident,
+		     '_', 
+		     msg.action->ident);
+
+	dsio_log_notice("message: %.*s\n", (int)len, (char *)buf);
 	connection_fsm_exec(&ws->client->connection.state, msgid, n);
 
-	return 0;
-}
-
-static int on_error(struct dsio_websocket *ws, const char *msg)
-{
-	dsio_log_notice("ERROR %s\n", msg);
-	connection_fsm_exec(&ws->client->connection.state, "E", 1);
 	return 0;
 }
 

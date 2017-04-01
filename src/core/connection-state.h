@@ -14,12 +14,11 @@ enum connection_state {
 
 struct connection_fsm {
 	int cs;
-	struct connection_fsm_machine *next;
 };
 
 extern int connection_fsm_init(struct connection_fsm *state);
 extern int connection_fsm_assert(struct connection_fsm *state);
-extern int connection_fsm_exec(struct connection_fsm *state, const char *id, size_t len);
+extern int connection_fsm_exec(struct connection_fsm *state, const char *event, size_t len);
 extern int connection_fsm_finish(struct connection_fsm *state);
 extern int connection_fsm_done(struct connection_fsm *state);
 

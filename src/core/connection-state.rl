@@ -39,39 +39,36 @@ include connection_fsm "connection-state-actions.rl";
 
 ### events
 
-close	= "C";
-error	= "E";
-message = "M";
-open	= "O";
+CLOSE	= "CLOSE";
+ERROR	= "ERROR";
+OPEN	= "OPEN";
 
-C_CH  = "C_CH";
-C_CHR = "C_CHR";
-C_PI  = "C_PI";
+C_CH   = "C_CH";
+C_CHR  = "C_CHR";
+C_PING = "C_PI";
 
 ### state chart
 
 Connection = (
   start: (
-    open -> AwaitingConnection
+    OPEN -> AwaitingConnection
   ),
 
   AwaitingConnection: (
-    (C_PI @ping |
-     C_CH @challenge -> ChallengingWait |
-     close -> Closing)
+    C_CH @challenge -> ChallengingWait
   ),
 
+  Ping: (
+    C_PING @ping -> AwaitingConnection
+  ),
+  
   ChallengingWait: (
-    (C_PI @ping |
-     close -> Closing )
+    C_CHR -> ChallengingWait
   ),
 
-  Idle: ('M' | close),
-
-  Closing: (close -> final)
+  Closing: (CLOSE @close -> final)
 
 ) >begin $!error;
-
 
 main := Connection;
 
@@ -81,22 +78,20 @@ main := Connection;
 
 int connection_fsm_init(struct connection_fsm *state)
 {
-	assert(state->next == NULL && "attempt to init an active state");
-
 	%% write init;
 
 	return 1;		/* good */
 }
 
-int connection_fsm_assert(struct connection_fsm *state)
+inline int connection_fsm_assert(struct connection_fsm *state)
 {
 	if (state->cs == connection_fsm_error) {
-		dsio_log(DSIO_LL_CONNECTION, "return -1 from fsm_assert\n");
+		dsio_log(DSIO_LL_CONNECTION, "state->cs = connection_fsm_error\n");
 		return -1;
 	}
 
 	if (state->cs >= connection_fsm_first_final) {
-		dsio_log(DSIO_LL_CONNECTION, "return 1 from fsm_assert\n");
+		dsio_log(DSIO_LL_CONNECTION, "state->cs = connection_fsm_first_final\n");
 		return 1;
 	}
 
@@ -104,7 +99,7 @@ int connection_fsm_assert(struct connection_fsm *state)
 }
 
 /*
- * Executes the single event against the state machine.
+ * Inject the event against into the machine.
  *
  * Return 0 to accept more events, 1 for finished, -1 for failure.
  */
@@ -123,10 +118,12 @@ int connection_fsm_exec(struct connection_fsm *state, const char *event, size_t 
 
 int connection_fsm_finish(struct connection_fsm *state)
 {
+	dsio_log(DSIO_LL_CONNECTION, "connection_fsm_finish\n");
 	return connection_fsm_assert(state);
 }
 
 int connection_fsm_done(struct connection_fsm *state)
 {
+	dsio_log(DSIO_LL_CONNECTION, "connection_fsm_done\n");
 	return state->cs == connection_fsm_error || state->cs == connection_fsm_first_final;
 }
