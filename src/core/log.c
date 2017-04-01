@@ -19,8 +19,9 @@
 #include <sys/time.h>
 #include <dsio/log.h>
 
-typedef void (*LOG_EMITTER)(int level, const char *line);
+typedef void (*LOG_EMITTER)(int level, const char *line, void *userdata);
 
+static void *log_userdata;
 static int log_level = DSIO_LL_ERR | DSIO_LL_WARN | DSIO_LL_NOTICE | DSIO_LL_CONNECTION;
 
 static const char *const log_level_names[] = {
@@ -52,7 +53,7 @@ static unsigned int msbit(unsigned int value)
 	return r;
 }
 
-static void log_emit_stderr(int level, const char *line)
+static void log_emit_stderr(int level, const char *line, void *userdata)
 {
 	char buf[128];
 	unsigned long long now = time_in_microseconds() / 100;
@@ -76,7 +77,7 @@ void dsio_log_logv(int filter, const char *format, va_list ap)
 
 	vsnprintf(buf, sizeof(buf), format, ap);
 	buf[sizeof(buf) - 1] = '\0';
-	log_emit(filter, buf);
+	log_emit(filter, buf, log_userdata);
 }
 
 void dsio_log(int filter, const char *format, ...)
@@ -93,10 +94,11 @@ int dsio_log_level_get(void)
 	return log_level;
 }
 
-void dsio_log_level_set(int level, void (*func)(int level, const char *line))
+void dsio_log_level_set(int level, void (*func)(int level, const char *line, void *userdata), void *userdata)
 {
 	log_level = level;
-
+	log_userdata = userdata;
+	
 	if (func != NULL)
 		log_emit = func;
 }

@@ -75,7 +75,7 @@ int connection_state_init(struct dsio_connection *conn, struct dsio_client *clie
 /* Returns:
  *   1 if we're already in the final state
  *  -1 if we had a failure
- *   0 to continue accepting events
+ *   0 if OK to continue accepting events
  */
 inline int connection_state_assert(struct dsio_connection *conn, const char *event)
 {
