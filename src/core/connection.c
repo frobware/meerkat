@@ -20,6 +20,7 @@
 #include <dsio/dsio.h>
 #include <dsio/log.h>
 #include "message.h"
+#include "mprintf.h"
 #include "client.h"
 #include "connection.h"
 
@@ -80,6 +81,18 @@ static int on_message(struct dsio_websocket *ws, void *buf, size_t len)
 	connection_state_exec(&ws->client->connection, msgid, n);
 
 	return 0;
+}
+
+int connection_send_challenge_response(struct dsio_connection *c)
+{
+	char *m = dsio_mprintf(c->client->cfg->allocator,
+			       "C%cCHR%c%s%c",
+			       DSIO_MSG_PART_SEPARATOR,
+			       DSIO_MSG_PART_SEPARATOR,
+			       c->client->cfg->uri,
+			       DSIO_MSG_SEPARATOR);
+
+	return c->endpoint.send(&c->endpoint, m, strlen(m));
 }
 
 int connection_init(struct dsio_connection *connection, struct dsio_client *client)

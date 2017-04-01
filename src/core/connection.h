@@ -47,3 +47,4 @@ extern int connection_state_exec(struct dsio_connection *conn, const char *event
 extern int connection_state_finish(struct dsio_connection *conn);
 extern int connection_state_done(struct dsio_connection *conn, const char *event);
 extern const char *const dsio_connection_state_names[DSIO_CONNECTION_NR_STATES];
+extern int connection_send_challenge_response(struct dsio_connection *connection);

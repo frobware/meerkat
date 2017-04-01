@@ -25,54 +25,41 @@
 
 #include <assert.h>
 
+static char *M;
+static size_t MLEN;
+
 static int callback(struct lws *wsi,
 		    enum lws_callback_reasons reason,
 		    void *userdata, void *buf, size_t len)
 {
 	struct dsio_websocket *ws = userdata;
+	unsigned char wrbuf[LWS_PRE + 4096];
 
 	switch (reason) {
-	case LWS_CALLBACK_CLIENT_ESTABLISHED: {
-		int rc = ws->on_open(ws);
-		if (rc != 0) {
-			return rc;
-		}
-		lws_callback_on_writable(wsi);
-		return 0;
-	}
+	case LWS_CALLBACK_CLIENT_ESTABLISHED:
+		return ws->on_open(ws);
 	case LWS_CALLBACK_CLOSED:
 		return ws->on_close(ws);
 	case LWS_CALLBACK_CLIENT_RECEIVE:
 		((char *)buf)[len] = '\0';
 		return ws->on_message(ws, buf, len);
 	case LWS_CALLBACK_CLIENT_WRITEABLE:
-#if 0
-		if (!client_recv) {
-			lws_callback_on_writable(wsi);
+		if (M == NULL)
 			return 0;
-		}
-		memset(buf, 0, sizeof(buf));
 		lwsl_notice("LWS_CALLBACK_CLIENT_WRITEABLE\n");
-		l = sprintf((char *)&buf[LWS_PRE + l], "C%cCHR%c%s%c",
-			    DSIO_MSG_PART_SEPARATOR,
-			    DSIO_MSG_PART_SEPARATOR,
-			    "ws://deepstream:6020/deepstream",
-			    DSIO_MSG_SEPARATOR);
-		printf("l=%d\n", l);
-		printf("s=%s\n", &buf[LWS_PRE]);
-		n = lws_write(wsi, &buf[LWS_PRE], l, LWS_WRITE_TEXT);
-		if (n < 0) {
-			lwsl_err("write error LWS_CALLBACK_CLIENT_WRITEABLE\n");
-			return -1;
-		}
+		memset(wrbuf, 0, sizeof(wrbuf));
+		printf("sending: %s\n", M);
+		size_t l = sprintf((char *)&wrbuf[LWS_PRE], "%s", M);
+		printf("l=%zd\n", l);
+		printf("s=%s\n", &wrbuf[LWS_PRE]);
+		size_t n = lws_write(wsi, &wrbuf[LWS_PRE], l, LWS_WRITE_TEXT);
 		if (n < l) {
 			lwsl_err("Partial write LWS_CALLBACK_CLIENT_WRITEABLE\n");
 			return -1;
 		}
-		printf("n=%d\n", n);
-		/* get notified as soon as we can write again */
-		/* lws_callback_on_writable(wsi); */
-#endif
+		printf("n=%zd\n", n);
+		M = NULL;
+		lws_callback_on_writable(wsi);
 		break;
 	case LWS_CALLBACK_CLIENT_CONNECTION_ERROR:
 		return ws->on_error(ws, "connection error");
@@ -87,7 +74,7 @@ static struct lws_protocols protocols[2] = {
 		"dsio_libwebsockets",
 		callback,
 		0,		/* TODO */
-		128,		/* TODO */
+		1280,		/* TODO */
 		0,
 		NULL
 	},
@@ -106,6 +93,14 @@ static int is_ssl_protocol(const char *proto)
 	return strcmp(proto, "https://") == 0 || strcmp(proto, "wss://") == 0;
 }
 
+static size_t dsio_libwebsockets_send(struct dsio_websocket *ws, void *p, size_t len)
+{
+	const struct lws_context *context = ws->userdata;
+	M = p;
+	MLEN = len;
+	return lws_callback_on_writable_all_protocol(context, protocols);
+}
+
 int dsio_libwebsockets_connect(struct dsio_client_cfg *cfg, struct dsio_websocket *ws)
 {
 	struct lws *wsi;
@@ -116,6 +111,7 @@ int dsio_libwebsockets_connect(struct dsio_client_cfg *cfg, struct dsio_websocke
 	char *uri_cp;
 	char path[1024];	/* FIXME */
 
+	ws->send = dsio_libwebsockets_send;
 	ws->cfg = cfg;
 
 	uri_cp = dsio_mprintf(ws->cfg->allocator, "%s", ws->cfg->uri);

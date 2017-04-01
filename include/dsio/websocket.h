@@ -39,8 +39,8 @@ struct dsio_websocket {
 	struct dsio_client_cfg *cfg;
 	enum dsio_websocket_readystate state;
 	void *userdata;
-	int (*close)();
-	int (*send)(void *buffer, size_t length);
+	int (*close)(struct dsio_websocket *ws);
+	size_t (*send)(struct dsio_websocket *ws, void *buffer, size_t length);
 	int (*on_open)(struct dsio_websocket *ws);
 	int (*on_close)(struct dsio_websocket *ws);
 	int (*on_error)(struct dsio_websocket *ws, const char *msg);

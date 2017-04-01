@@ -20,6 +20,7 @@ action pong {
 
 action challenge_response {
 	TraceT(challenge_response, fcurs, ftargs);
+	connection_send_challenge_response(c);
 }
 
 action close {
