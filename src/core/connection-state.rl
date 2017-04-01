@@ -18,18 +18,15 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <dsio/log.h>
+#include "client.h"
 #include "connection-state.h"
 #include "connection.h"
 
 /* Debugging Trace Transitions. */
 
-#if 1
 #define TraceT(ACTION, CURR_STATE, NEXT_STATE) \
 	dsio_log(DSIO_LL_CONNECTION, "%d -> %d -> action(%s)\n", \
 		 CURR_STATE, NEXT_STATE, "" # ACTION)
-#else
-#define TraceT(A,S,N)
-#endif
 
 %%{
 
@@ -43,49 +40,56 @@ CLOSE	= "CLOSE";
 ERROR	= "ERROR";
 OPEN	= "OPEN";
 
-C_CH   = "C_CH";
-C_CHR  = "C_CHR";
-C_PING = "C_PI";
+C_CH  = "C_CH";
+C_CHR = "C_CHR";
+C_PI  = "C_PI";
 
 ### state chart
 
-Connection = (
+main := (
   start: (
-    OPEN -> AwaitingConnection
+	  OPEN @open -> AwaitingConnection
   ),
 
   AwaitingConnection: (
-    C_CH @challenge -> ChallengingWait
-  ),
+	  CLOSE @close -> final |
+	  C_CH @challenge_response
+  ) -> Challenging,
 
-  Ping: (
-    C_PING @ping -> AwaitingConnection
-  ),
-  
-  ChallengingWait: (
-    C_CHR -> ChallengingWait
-  ),
+  Challenging: (
+	  CLOSE @close -> final |
+	  C_PI @pong
+  ) -> Challenging,
 
-  Closing: (CLOSE @close -> final)
-
+  Idle: (
+	  CLOSE @close -> final |
+	  C_PI @pong
+  ) ->Idle
+	  
 ) >begin $!error;
-
-main := Connection;
 
 }%%
 
 %% write data;
 
-int connection_fsm_init(struct connection_fsm *state)
+int connection_fsm_init(struct connection_fsm *state, struct dsio_client *client)
 {
+	state->client = client;
 	%% write init;
-
 	return 1;		/* good */
 }
 
-inline int connection_fsm_assert(struct connection_fsm *state)
+/* Returns:
+ *   1 if we're already in the final state
+ *  -1 if we had a failure
+ *   0 to continue accepting events
+ */
+inline int connection_fsm_assert(struct connection_fsm *state, const char *event)
 {
 	if (state->cs == connection_fsm_error) {
+		if (event != NULL) {
+			dsio_log(DSIO_LL_ERR, "event='%s'\n", event);
+		}
 		dsio_log(DSIO_LL_CONNECTION, "state->cs = connection_fsm_error\n");
 		return -1;
 	}
@@ -99,7 +103,7 @@ inline int connection_fsm_assert(struct connection_fsm *state)
 }
 
 /*
- * Inject the event against into the machine.
+ * Inject an event into the machine.
  *
  * Return 0 to accept more events, 1 for finished, -1 for failure.
  */
@@ -107,23 +111,26 @@ int connection_fsm_exec(struct connection_fsm *state, const char *event, size_t 
 {
 	const char *p = event;
 	const char *pe = p + len;
+#if 1
 	const char *eof = NULL;
+#endif
+	dsio_log(DSIO_LL_CONNECTION, "%s event\n", event);
 
-	dsio_log(DSIO_LL_CONNECTION, "event='%s'\n", event);
+	if (connection_fsm_done(state, event))
+		return -1;
 
 	%% write exec;
 
-	return connection_fsm_assert(state);
+	return connection_fsm_assert(state, event);
 }
 
 int connection_fsm_finish(struct connection_fsm *state)
 {
-	dsio_log(DSIO_LL_CONNECTION, "connection_fsm_finish\n");
-	return connection_fsm_assert(state);
+	dsio_log(DSIO_LL_CONNECTION, "connection_fsm_finish()\n");
+	return connection_fsm_assert(state, NULL);
 }
 
-int connection_fsm_done(struct connection_fsm *state)
+int connection_fsm_done(struct connection_fsm *state, const char *event)
 {
-	dsio_log(DSIO_LL_CONNECTION, "connection_fsm_done\n");
 	return state->cs == connection_fsm_error || state->cs == connection_fsm_first_final;
 }

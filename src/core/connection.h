@@ -21,15 +21,6 @@
 #include "message.h"
 #include "connection-state.h"
 
-/* Synthetic events for the Ragel state machine. The settings here
- * must match the events defined in connection-state.rl or it will all
- * break. */
-
-#define EVENT_CLOSE "C"
-#define EVENT_ERROR "E"
-#define EVENT_MESSAGE "M"
-#define EVENT_OPEN "O"
-
 struct dsio_client;
 
 struct dsio_connection {

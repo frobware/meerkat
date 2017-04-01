@@ -37,16 +37,19 @@ const char *const dsio_connection_state_names[] = {
 
 static int on_open(struct dsio_websocket *ws)
 {
+	dsio_log_notice("on_open\n");
 	return connection_fsm_exec(&ws->client->connection.state, "OPEN", 4);
 }
 
 static int on_close(struct dsio_websocket *ws)
 {
+	dsio_log_notice("on_close\n");
 	return connection_fsm_exec(&ws->client->connection.state, "CLOSE", 5);
 }
 
 static int on_error(struct dsio_websocket *ws, const char *msg)
 {
+	dsio_log_notice("on_error\n");
 	return connection_fsm_exec(&ws->client->connection.state, "ERROR", 5);
 }
 
@@ -56,6 +59,8 @@ static int on_message(struct dsio_websocket *ws, void *buf, size_t len)
 	struct dsio_msg msg;
 	char msgid[128];
 	size_t n;
+
+	dsio_log_notice("on_message\n");
 
 	rc = dsio_msg_parse(ws->client->cfg->allocator, buf, &msg);
 
@@ -85,6 +90,6 @@ int dsio_conn_init(struct dsio_connection *connection, struct dsio_client *clien
 	connection->endpoint.on_close = on_close;
 	connection->endpoint.on_message = on_message;
 	connection->endpoint.on_error = on_error;
-	connection_fsm_init(&client->connection.state);
+	connection_fsm_init(&client->connection.state, client);
 	return client->cfg->websocket_connect(client->cfg, &connection->endpoint);
 }

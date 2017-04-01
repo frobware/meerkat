@@ -3,7 +3,7 @@
 machine connection_fsm;
 
 action begin {
-	TraceT(begin, fcurs, ftargs);
+	state->client->connection.state.state = DSIO_CONNECTION_AWAITING_CONNECTION;
 }
 
 action open {
@@ -14,17 +14,16 @@ action error {
 	TraceT(error, fcurs, ftargs);
 }
 
-action ping {
-	TraceT(ping, fcurs, ftargs);
+action pong {
+	TraceT(pong, fcurs, ftargs);
 }
 
-action challenge {
-	TraceT(challenge, fcurs, ftargs);
+action challenge_response {
+	TraceT(challenge_response, fcurs, ftargs);
 }
 
 action close {
 	TraceT(close, fcurs, ftargs);
-	connection_fsm_finish(state);
 }
 
 }%%
