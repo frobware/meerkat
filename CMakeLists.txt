@@ -16,6 +16,7 @@ include(use-ccache)
 include(use-gold-linker)
 include(CheckCCompilerFlag)
 include(FindLibWebSockets)
+include(ragel-gen)
 
 option(ENABLE_COVERAGE "Build with code coverage" ON)
 
@@ -44,18 +45,6 @@ endif()
 include_directories(${CMAKE_SOURCE_DIR}/include)
 
 find_program("RAGEL" ragel)
-
-function(ragel_gen fsm deps)
-  add_custom_command(OUTPUT ${fsm}.c
-    COMMAND ${RAGEL} -p -o ${fsm}.c ${fsm}.rl -I ${CMAKE_CURRENT_SOURCE_DIR} ${ARGN}
-    DEPENDS ${fsm}.rl ${deps})
-  add_custom_command(OUTPUT ${fsm}.dot
-    COMMAND ${RAGEL} -p -V -o ${fsm}.dot ${fsm}.rl -I ${CMAKE_CURRENT_SOURCE_DIR} ${ARGN}
-    DEPENDS ${fsm}.rl ${deps})
-  add_custom_command(OUTPUT ${fsm}.xml
-    COMMAND ${RAGEL} -x -o ${fsm}.xml ${fsm}.rl -I ${CMAKE_CURRENT_SOURCE_DIR} ${ARGN}
-    DEPENDS ${fsm}.rl ${deps})
-endfunction(ragel_gen)
 
 if(RAGEL)
   ragel_gen(${CMAKE_SOURCE_DIR}/src/core/state
