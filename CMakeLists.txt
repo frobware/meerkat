@@ -58,8 +58,8 @@ function(ragel_gen fsm deps)
 endfunction(ragel_gen)
 
 if(RAGEL)
-  ragel_gen(${CMAKE_CURRENT_SOURCE_DIR}/state
-    ${CMAKE_CURRENT_SOURCE_DIR}/state-actions.rl)
+  ragel_gen(${CMAKE_SOURCE_DIR}/src/core/state
+    ${CMAKE_SOURCE_DIR}/src/core/state-actions.rl)
 endif()
 
 set(LIBDSIO_SRCS
