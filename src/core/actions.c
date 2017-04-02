@@ -18,6 +18,8 @@
 #include <string.h>
 #include "actions.h"
 
+/* The first column must remain sorted. */
+
 struct dsio_action_type dsio_actions[] = {
 	{"A",	1,	"ACK",				DSIO_ACTION_ACK},
 	{"C",	1,	"CREATE",			DSIO_ACTION_CREATE},
@@ -61,7 +63,7 @@ static int bsearch_comparator(const void *a, const void *b)
 
 struct dsio_action_type *dsio_action_lookup(const char *s, size_t len)
 {
-	const struct dsio_action_type key = { .ident = s, .ident_len = len };
+	struct dsio_action_type key = { .ident = s, .ident_len = len };
 
 	return bsearch(&key, dsio_actions,
 		       DSIO_ACTION_NR_ACTIONS,

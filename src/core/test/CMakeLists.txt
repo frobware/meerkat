@@ -2,6 +2,7 @@ set(SRC_CORE_TESTS
   test-allocator
   test-message
   test-mprintf
+  test-actions
 )
 
 foreach(test ${SRC_CORE_TESTS})

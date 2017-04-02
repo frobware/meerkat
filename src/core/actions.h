@@ -49,9 +49,9 @@ enum dsio_action_tag {
 };
 
 struct dsio_action_type {
-	const char *const ident; /* sort key; must be first */
+	const char *ident;
 	size_t ident_len;
-	const char *const descr;
+	const char *descr;
 	enum dsio_action_tag type;
 };
 
