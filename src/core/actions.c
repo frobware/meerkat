@@ -61,9 +61,12 @@ static int bsearch_comparator(const void *a, const void *b)
 	return strncmp(x->ident, y->ident, DSIO_MAX(x->ident_len, y->ident_len));
 }
 
-struct dsio_action_type *dsio_action_lookup(const char *s, size_t len)
+struct dsio_action_type *dsio_action_lookup(const char *ident, size_t len)
 {
-	struct dsio_action_type key = { .ident = s, .ident_len = len };
+	struct dsio_action_type key;
+
+	key.ident = ident;
+	key.ident_len = len;
 
 	return bsearch(&key, dsio_actions,
 		       DSIO_ACTION_NR_ACTIONS,
