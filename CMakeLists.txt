@@ -43,7 +43,55 @@ endif()
 
 include_directories(${CMAKE_SOURCE_DIR}/include)
 
-add_subdirectory(src/core)
+find_program("RAGEL" ragel)
+
+function(ragel_gen fsm deps)
+  add_custom_command(OUTPUT ${fsm}.c
+    COMMAND ${RAGEL} -p -o ${fsm}.c ${fsm}.rl -I ${CMAKE_CURRENT_SOURCE_DIR} ${ARGN}
+    DEPENDS ${fsm}.rl ${deps})
+  add_custom_command(OUTPUT ${fsm}.dot
+    COMMAND ${RAGEL} -p -V -o ${fsm}.dot ${fsm}.rl -I ${CMAKE_CURRENT_SOURCE_DIR} ${ARGN}
+    DEPENDS ${fsm}.rl ${deps})
+  add_custom_command(OUTPUT ${fsm}.xml
+    COMMAND ${RAGEL} -x -o ${fsm}.xml ${fsm}.rl -I ${CMAKE_CURRENT_SOURCE_DIR} ${ARGN}
+    DEPENDS ${fsm}.rl ${deps})
+endfunction(ragel_gen)
+
+if(RAGEL)
+  ragel_gen(${CMAKE_CURRENT_SOURCE_DIR}/state
+    ${CMAKE_CURRENT_SOURCE_DIR}/state-actions.rl)
+endif()
+
+set(LIBDSIO_SRCS
+  src/core/actions.c
+  src/core/allocator.c
+  src/core/client.c
+  src/core/connection.c
+  src/core/error.c
+  src/core/log.c
+  src/core/message.c
+  src/core/mprintf.c
+  src/core/state.c
+  src/core/state.dot
+  src/core/state.xml
+  src/core/topics.c
+)
+
+add_library(libdsio_core SHARED ${LIBDSIO_SRCS})
+set_target_properties(libdsio_core PROPERTIES OUTPUT_NAME dsio-core)
+
+set(SRC_CORE_TESTS
+  test-allocator
+  test-message
+  test-mprintf
+  test-actions
+)
+
+foreach(test ${SRC_CORE_TESTS})
+  add_executable(${test} src/core/test/${test}.c)
+  target_link_libraries(${test} libdsio_core)
+  add_test(${test} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${test})
+endforeach()
 
 if(LIBWEBSOCKETS_FOUND)
   add_subdirectory(src/libwebsockets)
