@@ -39,10 +39,8 @@ $(BUILD_DIR)/$(BUILD_FILE): | $(BUILD_DIR)
 $(BUILD_DIR):
 	@mkdir -p $@
 
-$(BUILD_DIR)/$(BUILD_FILE): Makefile		\
+$(BUILD_DIR)/$(BUILD_FILE): GNUmakefile		\
 	CMakeLists.txt				\
-	src/libwebsockets/CMakeLists.txt	\
-	examples/CMakeLists.txt			\
 	| $(BUILD_DIR)
 
 rclean:
