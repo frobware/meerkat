@@ -40,3 +40,9 @@ struct dsio_msg {
 
 extern int dsio_msg_parse(const struct dsio_allocator *a, const char *const input, struct dsio_msg *msg);
 extern int dsio_msg_release(struct dsio_msg *msg);
+
+extern char *dsio_msg_create(
+	const struct dsio_allocator *allocator,
+	enum dsio_topic_tag topic,
+	enum dsio_action_tag action,
+	const char *payload);

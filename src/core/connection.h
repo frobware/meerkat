@@ -36,4 +36,5 @@ extern int connection_state_exec(struct dsio_connection *conn, const char *event
 extern int connection_state_finish(struct dsio_connection *conn);
 extern int connection_state_done(struct dsio_connection *conn, const char *event);
 extern int connection_send_challenge_response(struct dsio_connection *connection);
+extern int connection_send_auth_response(struct dsio_connection *c);
 extern void connection_state_update_client(struct dsio_connection *connection, enum dsio_connection_state newstate);

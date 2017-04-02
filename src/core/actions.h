@@ -16,11 +16,11 @@
 
 #pragma once
 
-typedef enum {
+enum dsio_action_tag {
 	DSIO_ACTION_ACK = 0,
+	DSIO_ACTION_CREATE,
 	DSIO_ACTION_CHALLENGE,
 	DSIO_ACTION_CHALLENGE_RESPONSE,
-	DSIO_ACTION_CREATE,
 	DSIO_ACTION_CREATEORREAD,
 	DSIO_ACTION_DELETE,
 	DSIO_ACTION_ERROR,
@@ -39,20 +39,20 @@ typedef enum {
 	DSIO_ACTION_REJECTION,
 	DSIO_ACTION_REQUEST,
 	DSIO_ACTION_RESPONSE,
-	DSIO_ACTION_SNAPSHOT,
 	DSIO_ACTION_SUBSCRIBE,
 	DSIO_ACTION_SUBSCRIPTION_HAS_PROVIDER,
+	DSIO_ACTION_SNAPSHOT,
+	DSIO_ACTION_UPDATE,
 	DSIO_ACTION_UNLISTEN,
 	DSIO_ACTION_UNSUBSCRIBE,
-	DSIO_ACTION_UPDATE,
-	DSIO_ACTION_NR_ACTIONS,
-} dsio_action_tag;
+	DSIO_ACTION_NR_ACTIONS
+};
 
 struct dsio_action_type {
-	const char *const ident;
+	const char *const ident; /* sort key; must be first */
 	size_t ident_len;
 	const char *const descr;
-	const dsio_action_tag type;
+	enum dsio_action_tag type;
 };
 
 extern struct dsio_action_type dsio_actions[];

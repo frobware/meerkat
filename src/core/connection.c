@@ -85,8 +85,26 @@ static int on_message(struct dsio_websocket *ws, void *buf, size_t len)
 
 int connection_send_challenge_response(struct dsio_connection *c)
 {
+#if 0
 	char *m = dsio_mprintf(c->client->cfg->allocator,
 			       "C%cCHR%c%s%c",
+			       DSIO_MSG_PART_SEPARATOR,
+			       DSIO_MSG_PART_SEPARATOR,
+			       c->client->cfg->uri,
+			       DSIO_MSG_SEPARATOR);
+#endif
+	char *m = dsio_msg_create(c->client->cfg->allocator,
+				  DSIO_TOPIC_CONNECTION,
+				  DSIO_ACTION_CHALLENGE_RESPONSE,
+				  c->client->cfg->uri);
+	printf("<<<<<<<<<<<<<<<<%s>>>>>>>>>>>>>>>>>>>>\n", m);
+	return c->endpoint.send(&c->endpoint, m, strlen(m));
+}
+
+int connection_send_auth_response(struct dsio_connection *c)
+{
+	char *m = dsio_mprintf(c->client->cfg->allocator,
+			       "A%cCHR%c%s%c",
 			       DSIO_MSG_PART_SEPARATOR,
 			       DSIO_MSG_PART_SEPARATOR,
 			       c->client->cfg->uri,

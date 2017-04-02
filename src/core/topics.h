@@ -16,21 +16,21 @@
 
 #pragma once
 
-typedef enum {
-	DSIO_TOPIC_AUTH = 0,
-	DSIO_TOPIC_CONNECTION,
-	DSIO_TOPIC_EVENT,
+enum dsio_topic_tag {
+	DSIO_TOPIC_EVENT = 0,
 	DSIO_TOPIC_RPC,
 	DSIO_TOPIC_RECORD,
+	DSIO_TOPIC_AUTH,
+	DSIO_TOPIC_CONNECTION,
 	DSIO_TOPIC_ERROR,
 	DSIO_TOPIC_NR_TOPICS,
-} dsio_topic_tag;
+};
 
 struct dsio_topic_type {
-	const char *const ident;
+	const char *const ident; /* sort key; must be first */
 	size_t ident_len;
 	const char *const descr;
-	const dsio_topic_tag type;
+	enum dsio_topic_tag type;
 };
 
 extern struct dsio_topic_type dsio_topics[];

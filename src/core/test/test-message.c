@@ -144,7 +144,7 @@ static int test_topic_and_action_and_one_data(void)
 	int rc;
 	struct dsio_msg msg;
 	char input[] = {
-		'E',
+		'C',
 		DSIO_MSG_PART_SEPARATOR,
 		'C',
 		'H',

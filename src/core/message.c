@@ -23,6 +23,7 @@
 #include "message.h"
 #include "topics.h"
 #include "actions.h"
+#include "mprintf.h"
 
 /*
  * Message Structure Overview
@@ -143,3 +144,28 @@ int dsio_msg_parse(const struct dsio_allocator *a, const char *input, struct dsi
 
 	return s.parse_complete ? DSIO_OK : DSIO_ERROR;
 }
+
+char *dsio_msg_create(const struct dsio_allocator *allocator,
+		      enum dsio_topic_tag topic,
+		      enum dsio_action_tag action,
+		      const char *payload)
+{
+	if (payload == NULL || *payload == '\0') {
+		return dsio_mprintf(allocator,
+				    "%s%c%s%c",
+				    dsio_topics[topic].ident,
+				    DSIO_MSG_PART_SEPARATOR,
+				    dsio_actions[action].ident,
+				    DSIO_MSG_SEPARATOR);
+	}
+	
+	return dsio_mprintf(allocator,
+			    "%s%c%s%c%s%c",
+			    dsio_topics[topic].ident,
+			    DSIO_MSG_PART_SEPARATOR,
+			    dsio_actions[action].ident,
+			    DSIO_MSG_PART_SEPARATOR,
+			    payload,
+			    DSIO_MSG_SEPARATOR);
+}
+

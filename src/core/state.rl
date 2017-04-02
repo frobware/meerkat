@@ -35,30 +35,39 @@ include connection "state-actions.rl";
 
 ### events
 
-CLOSE	= "CLOSE";
-ERROR	= "ERROR";
-OPEN	= "OPEN";
+WS_CLOSE    = "CLOSE";
+WS_ERROR    = "ERROR";
+WS_OPEN	    = "OPEN";
 
-C_CH  = "C_CH";
-C_PI  = "C_PI";
+A_ACK	    = "A_ACK";
+
+C_CHALLENGE = "C_CH";
+C_PING	    = "C_PI";
+C_REJECT    = "C_REJ";
+C_AUTHENTICATE    = "C_REJ";
 
 ### state chart
 
 main := (
   start: (
-	  OPEN @open -> AwaitingConnection
+	  WS_OPEN @open -> AwaitingConnection
   ),
-
   AwaitingConnection: (
-	  CLOSE @close -> final |
-	  C_CH @challenge_response -> Challenging
+	  WS_CLOSE @close -> final |
+	  C_CHALLENGE @challenge_response -> ChallengingWait
   ),
-
-  Challenging: (
-	  CLOSE @close -> final |
-	  C_PI @pong -> Challenging
+  ChallengingWait: (
+	  WS_CLOSE @close -> final |
+	  C_REJECT @close -> final |
+	  C_PING @pong -> ChallengingWait |
+	  C_AUTHENTICATE @authenticate -> AwaitingAuthentication
+  ),
+  AwaitingAuthentication: (
+	  A_ACK -> Open
+  ),
+  Open: (
+	  C_PING @pong -> Open
   )
-
 ) >begin $!error;
 
 }%%

@@ -23,7 +23,7 @@
 static void connection_state_change(struct dsio_client *client,
 				    enum dsio_connection_state state)
 {
-	printf("CONN STATE -> %s\n", dsio_connection_state_names[state]);
+	dsio_log_notice("**** client state -> %s\n", dsio_connection_state_names[state]);
 }
 
 int main(int argc, char *argv[])
