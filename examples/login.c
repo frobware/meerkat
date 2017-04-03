@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
 	memset(&client_cfg, 0, sizeof client_cfg);
 	client_cfg.allocator = dsio_stdlib_allocator;
 	client_cfg.uri = argv[1];
-	client_cfg.username = NULL;
+	client_cfg.username = getenv("USER");
 	client_cfg.password = NULL;
 	client_cfg.websocket_connect = dsio_libwebsockets_connect;
 	client_cfg.websocket_disconnect = dsio_libwebsockets_disconnect;

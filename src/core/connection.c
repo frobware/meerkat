@@ -96,10 +96,20 @@ int connection_send_challenge_response(struct dsio_connection *c)
 
 int connection_send_auth_response(struct dsio_connection *c)
 {
+	/* char *auth = "{}"; */
+
+	/* char *username; */
+	/* char *password; */
+
+	/* if (c->client->cfg->username != NULL) { */
+	/* 	username = dsio_mprintf("\"username\":%s", */
+	/* 				c-client->cfg->username); */
+	/* } */
+	    
 	char *m = dsio_msg_create(c->client->cfg->allocator,
 				  DSIO_TOPIC_AUTH,
 				  DSIO_ACTION_REQUEST,
-				  "{}");
+				  "{\"username\":\"bob\", \"password\":\"bob\"}");
 	return c->endpoint.send(&c->endpoint, m, strlen(m));
 }
 
@@ -115,9 +125,10 @@ int connection_send_pong_response(struct dsio_connection *c)
 void connection_state_change(struct dsio_connection *conn,
 				    enum dsio_connection_state next)
 {
-	if (conn->client->cfg->connection_state_change != NULL) {
-		conn->client->cfg->connection_state_change(
-			conn->client, conn->state, next);
+	DSIO_CONNECTION_STATE_CHANGE cb = conn->client->cfg->connection_state_change;
+	
+	if (cb != NULL) {
+		cb(conn->client, conn->state, next);
 	}
 
 	conn->state = next;
