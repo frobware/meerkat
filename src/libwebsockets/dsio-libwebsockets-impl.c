@@ -19,8 +19,6 @@
 #include <libwebsockets.h>
 
 #include <dsio/dsio.h>
-#include <dsio/allocator.h>
-#include <dsio/websocket.h>
 #include "../src/core/mprintf.h"
 
 #include <assert.h>
@@ -46,9 +44,8 @@ static int callback(struct lws *wsi,
 	case LWS_CALLBACK_CLIENT_WRITEABLE:
 		if (M == NULL)
 			return 0;
-		lwsl_notice("LWS_CALLBACK_CLIENT_WRITEABLE\n");
 		memset(wrbuf, 0, sizeof(wrbuf));
-		printf("SEND: %s\n", M);
+		dsio_log(DSIO_LL_CONNECTION, "SEND: %s\n", M);
 		size_t l = sprintf((char *)&wrbuf[LWS_PRE], "%s", M);
 		size_t n = lws_write(wsi, &wrbuf[LWS_PRE], l, LWS_WRITE_TEXT);
 		if (n < l) {
