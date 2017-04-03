@@ -22,7 +22,8 @@
 typedef void (*LOG_EMITTER)(int level, const char *line, void *userdata);
 
 static void *log_userdata;
-static int log_level = DSIO_LL_ERR | DSIO_LL_WARN | DSIO_LL_NOTICE | DSIO_LL_CONNECTION;
+//static int log_level = DSIO_LL_ERR | DSIO_LL_WARN | DSIO_LL_NOTICE | DSIO_LL_CONNECTION;
+static int log_level = DSIO_LL_ERR | DSIO_LL_WARN | DSIO_LL_NOTICE;
 
 static const char *const log_level_names[] = {
 	"ERROR",

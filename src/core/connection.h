@@ -23,8 +23,8 @@
 struct dsio_client;
 
 struct dsio_connection {
-        int cs;			/* current state -- for Ragel */
-        enum dsio_connection_state state;
+	int cs;			/* current state -- for Ragel */
+	enum dsio_connection_state state;
 	struct dsio_client *client;
 	struct dsio_websocket endpoint;
 };
@@ -35,6 +35,7 @@ extern int connection_state_assert(struct dsio_connection *conn, const char *eve
 extern int connection_state_exec(struct dsio_connection *conn, const char *event, size_t len);
 extern int connection_state_finish(struct dsio_connection *conn);
 extern int connection_state_done(struct dsio_connection *conn, const char *event);
+extern void connection_state_change(struct dsio_connection *connection, enum dsio_connection_state newstate);
 extern int connection_send_challenge_response(struct dsio_connection *connection);
 extern int connection_send_auth_response(struct dsio_connection *c);
-extern void connection_state_update_client(struct dsio_connection *connection, enum dsio_connection_state newstate);
+extern int connection_send_pong_response(struct dsio_connection *c);

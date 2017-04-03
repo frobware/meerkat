@@ -21,9 +21,12 @@
 #include <libwebsockets.h>
 
 static void connection_state_change(struct dsio_client *client,
-				    enum dsio_connection_state state)
+				    enum dsio_connection_state curr,
+				    enum dsio_connection_state next)
 {
-	dsio_log_notice("**** client state -> %s\n", dsio_connection_state_names[state]);
+	dsio_log_notice("**** client state change: %s -> %s\n",
+			dsio_connection_state_names[curr],
+			dsio_connection_state_names[next]);
 }
 
 int main(int argc, char *argv[])

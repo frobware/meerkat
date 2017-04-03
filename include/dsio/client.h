@@ -21,18 +21,21 @@
 #include <dsio/client.h>
 
 enum dsio_connection_state {
-        DSIO_CONNECTION_CLOSED = 0,
-        DSIO_CONNECTION_AWAITING_CONNECTION,
-        DSIO_CONNECTION_CHALLENGING,
-        DSIO_CONNECTION_AWAITING_AUTHENTICATION,
-        DSIO_CONNECTION_AUTHENTICATING,
-        DSIO_CONNECTION_OPEN,
-        DSIO_CONNECTION_ERROR,
-        DSIO_CONNECTION_RECONNECTING,
-        DSIO_CONNECTION_NR_STATES
+	DSIO_CONNECTION_CLOSED = 0,
+	DSIO_CONNECTION_AWAITING_CONNECTION,
+	DSIO_CONNECTION_CHALLENGING,
+	DSIO_CONNECTION_AWAITING_AUTHENTICATION,
+	DSIO_CONNECTION_AUTHENTICATING,
+	DSIO_CONNECTION_OPEN,
+	DSIO_CONNECTION_ERROR,
+	DSIO_CONNECTION_RECONNECTING,
+	DSIO_CONNECTION_NR_STATES
 };
 
-typedef void (*DSIO_CONNECTION_STATE_CHANGE)(struct dsio_client *client, enum dsio_connection_state newstate);
+typedef void (*DSIO_CONNECTION_STATE_CHANGE)(
+	struct dsio_client *client,
+	enum dsio_connection_state curr,
+	enum dsio_connection_state next);
 
 struct dsio_client_cfg {
 	const struct dsio_allocator *allocator;

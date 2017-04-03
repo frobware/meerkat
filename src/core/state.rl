@@ -35,39 +35,43 @@ include connection "state-actions.rl";
 
 ### events
 
-WS_CLOSE    = "CLOSE";
-WS_ERROR    = "ERROR";
-WS_OPEN	    = "OPEN";
+WS_CLOSE    = "WS_CLOSE";
+WS_ERROR    = "WS_ERROR";
+WS_OPEN	    = "WS_OPEN";
 
-A_ACK	    = "A_ACK";
+A_ACK	    = "A_A";
+A_ERR	    = "A_E";
 
-C_CHALLENGE = "C_CH";
-C_PING	    = "C_PI";
-C_REJECT    = "C_REJ";
-C_AUTHENTICATE    = "C_REJ";
+C_A   = "C_A";
+C_CH  = "C_CH";
+C_PI  = "C_PI";
+C_REJ = "C_REJ";
 
 ### state chart
 
 main := (
   start: (
-	  WS_OPEN @open -> AwaitingConnection
+	  WS_OPEN @reconnecting -> AwaitingConnection
   ),
   AwaitingConnection: (
 	  WS_CLOSE @close -> final |
-	  C_CHALLENGE @challenge_response -> ChallengingWait
+	  C_CH @challenge_response -> ChallengingWait
   ),
   ChallengingWait: (
 	  WS_CLOSE @close -> final |
-	  C_REJECT @close -> final |
-	  C_PING @pong -> ChallengingWait |
-	  C_AUTHENTICATE @authenticate -> AwaitingAuthentication
+	  C_REJ @close -> final |
+	  C_PI @pong -> ChallengingWait |
+	  C_A @authenticate -> AwaitingAuthentication
   ),
   AwaitingAuthentication: (
-	  A_ACK -> Open
+	  WS_CLOSE @close -> final |
+	  A_ERR @error -> final |
+	  A_ACK @open -> Open
   ),
   Open: (
-	  C_PING @pong -> Open
-  )
+	  WS_CLOSE @close -> final |
+	  C_PI @pong -> Open
+  ) -> Open
 ) >begin $!error;
 
 }%%
@@ -115,10 +119,12 @@ int connection_state_exec(struct dsio_connection *conn, const char *event, size_
 	const char *pe = p + len;
 	const char *eof = NULL;
 
-	dsio_log(DSIO_LL_CONNECTION, "%s event\n", event);
+	dsio_log(DSIO_LL_CONNECTION, "inject '%s'\n", event);
 
-	if (connection_state_done(conn, event))
+	if (connection_state_done(conn, event)) {
+		dsio_log(DSIO_LL_ERR, "something bad happened; %s event\n", event);
 		return -1;
+	}
 
 	%% write exec;
 

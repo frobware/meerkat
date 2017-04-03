@@ -190,6 +190,7 @@ int dsio_libwebsockets_service(struct dsio_websocket *ws)
 
 	do {
 		rc = lws_service(ws->userdata, -1);
+		printf("lws_service: rc=%d\n", rc);
 	} while (rc == 0);
 
 	return rc;
