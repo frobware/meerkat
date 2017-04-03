@@ -68,12 +68,13 @@ static int on_message(struct dsio_websocket *ws, void *data, size_t len)
 		return -1;
 	}
 
-	dsio_log(DSIO_LL_NOTICE, "RECV: %s_%s (%s_%s)\n",
-		 msg.topic->ident,
-		 msg.action->ident,
-		 msg.topic->descr,
-		 msg.action->descr);
-
+#if 0
+	dsio_log_notice("RECV: %s_%s (%s.ACTION_%s)\n",
+			msg.topic->ident,
+			msg.action->ident,
+			msg.topic->descr,
+			msg.action->descr);
+#endif
 	/* Turn data into something we want to visualize in Ragel. */
 
 	n = snprintf(msgid, sizeof(msgid)-1, "%s%c%s",

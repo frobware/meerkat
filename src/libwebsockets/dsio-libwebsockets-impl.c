@@ -45,7 +45,7 @@ static int callback(struct lws *wsi,
 		if (M == NULL)
 			return 0;
 		memset(wrbuf, 0, sizeof(wrbuf));
-		dsio_log(DSIO_LL_CONNECTION, "SEND: %s\n", M);
+		dsio_log_notice("SEND: %s\n", M);
 		size_t l = sprintf((char *)&wrbuf[LWS_PRE], "%s", M);
 		size_t n = lws_write(wsi, &wrbuf[LWS_PRE], l, LWS_WRITE_TEXT);
 		if (n < l) {
