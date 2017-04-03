@@ -48,16 +48,13 @@ static int callback(struct lws *wsi,
 			return 0;
 		lwsl_notice("LWS_CALLBACK_CLIENT_WRITEABLE\n");
 		memset(wrbuf, 0, sizeof(wrbuf));
-		printf("sending: %s\n", M);
+		printf("SEND: %s\n", M);
 		size_t l = sprintf((char *)&wrbuf[LWS_PRE], "%s", M);
-		printf("l=%zd\n", l);
-		printf("s=%s\n", &wrbuf[LWS_PRE]);
 		size_t n = lws_write(wsi, &wrbuf[LWS_PRE], l, LWS_WRITE_TEXT);
 		if (n < l) {
 			lwsl_err("Partial write LWS_CALLBACK_CLIENT_WRITEABLE\n");
 			return -1;
 		}
-		printf("n=%zd\n", n);
 		M = NULL;
 		lws_callback_on_writable(wsi);
 		break;
@@ -190,7 +187,6 @@ int dsio_libwebsockets_service(struct dsio_websocket *ws)
 
 	do {
 		rc = lws_service(ws->userdata, -1);
-		printf("lws_service: rc=%d\n", rc);
 	} while (rc == 0);
 
 	return rc;

@@ -65,6 +65,7 @@ main := (
   ),
   AwaitingAuthentication: (
 	  WS_CLOSE @close -> final |
+	  C_PI @pong -> AwaitingAuthentication |
 	  A_ERR @error -> final |
 	  A_ACK @open -> Open
   ),
