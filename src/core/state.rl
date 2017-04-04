@@ -140,5 +140,9 @@ int connection_state_finish(struct dsio_connection *conn)
 
 int connection_state_done(struct dsio_connection *conn, const char *event)
 {
-	return conn->cs == connection_error || conn->cs == connection_first_final;
+	int done = conn->cs == connection_error || conn->cs == connection_first_final;
+	if (done) {
+		connection_state_init(conn, conn->client);
+	}
+	return done;
 }

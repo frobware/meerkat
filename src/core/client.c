@@ -51,3 +51,8 @@ int dsio_client_service(struct dsio_client *client)
 {
 	return client->cfg->websocket_service(&client->connection.endpoint);
 }
+
+enum dsio_connection_state dsio_client_state(struct dsio_client *client)
+{
+	return client->connection.state;
+}

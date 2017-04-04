@@ -37,8 +37,8 @@ extern void dsio_logv(int level, const char *format, va_list ap)
 extern int dsio_log_level_get(void);
 extern void dsio_log_level_set(int level, void (*func)(int level, const char *line, void *userdata), void *userdata);
 
-#define dsio_log_err(...) dsio_log(DSIO_LL_ERR, __VA_ARGS__)
-#define dsio_log_warn(...) dsio_log(DSIO_LL_WARN, __VA_ARGS__)
-#define dsio_log_notice(...) dsio_log(DSIO_LL_NOTICE, __VA_ARGS__)
-#define dsio_log_info(...) dsio_log(DSIO_LL_INFO, __VA_ARGS__)
-#define dsio_log_debug(...) dsio_log(DSIO_LL_DEBUG, __VA_ARGS__)
+#define DSIO_LOG_ERR(...) dsio_log(DSIO_LL_ERR, __VA_ARGS__)
+#define DSIO_LOG_WARN(...) dsio_log(DSIO_LL_WARN, __VA_ARGS__)
+#define DSIO_LOG_NOTICE(...) dsio_log(DSIO_LL_NOTICE, __VA_ARGS__)
+#define DSIO_LOG_INFO(...) dsio_log(DSIO_LL_INFO, __VA_ARGS__)
+#define DSIO_LOG_DEBUG(...) dsio_log(DSIO_LL_DEBUG, __VA_ARGS__)

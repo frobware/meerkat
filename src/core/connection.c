@@ -38,19 +38,19 @@ const char *const dsio_connection_state_names[] = {
 
 static int on_open(struct dsio_websocket *ws)
 {
-	dsio_log_notice("on_open\n");
+	DSIO_LOG_NOTICE("on_open\n");
 	return connection_state_exec(&ws->client->connection, "WS_OPEN", 7);
 }
 
 static int on_close(struct dsio_websocket *ws)
 {
-	dsio_log_notice("on_close\n");
+	DSIO_LOG_NOTICE("on_close\n");
 	return connection_state_exec(&ws->client->connection, "WS_CLOSE", 8);
 }
 
 static int on_error(struct dsio_websocket *ws, const char *msg)
 {
-	dsio_log_notice("on_error\n");
+	DSIO_LOG_NOTICE("on_error\n");
 	return connection_state_exec(&ws->client->connection, "WS_ERROR", 8);
 }
 
@@ -64,7 +64,7 @@ static int on_message(struct dsio_websocket *ws, void *data, size_t len)
 	rc = dsio_msg_parse(ws->client->cfg->allocator, data, &msg);
 
 	if (rc != DSIO_OK) {
-		dsio_log_err("unknown message: %.*s\n", (int)len, (char *)data);
+		DSIO_LOG_ERR("unknown message: %.*s\n", (int)len, (char *)data);
 		return -1;
 	}
 

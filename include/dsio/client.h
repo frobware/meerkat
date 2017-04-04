@@ -54,5 +54,5 @@ struct dsio_client_cfg {
 extern int dsio_client_create(struct dsio_client **result, struct dsio_client_cfg *cfg);
 extern void dsio_client_delete(struct dsio_client *client);
 extern int dsio_client_service(struct dsio_client *client);
-
+extern enum dsio_connection_state dsio_client_state(struct dsio_client *client);
 extern const char *const dsio_connection_state_names[];
