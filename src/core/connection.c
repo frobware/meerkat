@@ -39,6 +39,7 @@ const char *const dsio_connection_state_names[] = {
 static int on_open(struct dsio_websocket *ws)
 {
 	DSIO_LOG_NOTICE("on_open\n");
+	connection_state_init(&ws->client->connection, ws->client);
 	return connection_state_exec(&ws->client->connection, "WS_OPEN", 7);
 }
 
@@ -145,6 +146,6 @@ int connection_init(struct dsio_connection *conn, struct dsio_client *client)
 	conn->endpoint.on_close = on_close;
 	conn->endpoint.on_message = on_message;
 	conn->endpoint.on_error = on_error;
-	connection_state_init(&client->connection, client);
+	/* connection_state_init(&client->connection, client); */
 	return client->cfg->websocket_connect(client->cfg, &conn->endpoint);
 }
