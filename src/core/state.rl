@@ -1,4 +1,4 @@
-/* Copyright (C) 2017 Andrew McDermott
+/* Copyright (C) 2017 Andrew McDermott -*-c-*-
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -120,7 +120,7 @@ int connection_state_exec(struct dsio_connection *conn, const char *event, size_
 	const char *pe = p + len;
 	const char *eof = NULL;
 
-	dsio_log_notice("RECV '%s'\n", event);
+	dsio_log(DSIO_LL_NOTICE, "RECV '%s'\n", event);
 
 	if (connection_state_done(conn, event)) {
 		dsio_log(DSIO_LL_ERR, "something bad happened; %s event\n", event);
