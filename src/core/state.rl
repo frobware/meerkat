@@ -21,65 +21,113 @@
 #include "client.h"
 #include "connection.h"
 
-/* Debugging Trace Transitions. */
+/* Debug: Trace Transitions. */
 
 #define TraceT(ACTION, CURR_STATE, NEXT_STATE) \
-	dsio_log(DSIO_LL_CONNECTION, "%d -> %d -> action(%s)\n", \
+	dsio_log(DSIO_LL_NOTICE, "%d -> %d -> action(%s)\n", \
 		 CURR_STATE, NEXT_STATE, "" # ACTION)
 
 %%{
 
 machine connection;
 access conn->;
-include connection "state-actions.rl";
 
-### events
+action begin {
+	TraceT(begin, fcurs, ftargs);
+	sm_state_set(conn, DSIO_CONNECTION_CLOSED);
+}
+
+action start {
+	TraceT(start, fcurs, ftargs);
+	sm_state_set(conn, DSIO_CONNECTION_AWAITING_CONNECTION);
+}
+
+action challenge {
+	TraceT(challenge, fcurs, ftargs);
+	sm_state_set(conn, DSIO_CONNECTION_CHALLENGING);
+	connection_send_challenge_response(conn);
+}
+
+action authenticate {
+	TraceT(challenge_response, fcurs, ftargs);
+	sm_state_set(conn, DSIO_CONNECTION_AWAITING_AUTHENTICATION);
+	connection_send_auth_response(conn);
+}
+
+action open {
+	TraceT(open, fcurs, ftargs);
+	sm_state_set(conn, DSIO_CONNECTION_OPEN);
+}
+
+action close {
+	TraceT(close, fcurs, ftargs);
+	sm_state_set(conn, DSIO_CONNECTION_CLOSED);
+}
+
+action error {
+	TraceT(error, fcurs, ftargs);
+	sm_state_set(conn, DSIO_CONNECTION_ERROR);
+}
+
+action pong {
+	TraceT(pong, fcurs, ftargs);
+	connection_send_pong_response(conn);
+}
+
+### websocket events
 
 WS_CLOSE    = "WS_CLOSE";
 WS_ERROR    = "WS_ERROR";
 WS_OPEN	    = "WS_OPEN";
 
+### auth events
+
 A_ACK	    = "A_A";
 A_ERR	    = "A_E";
 
-C_A   = "C_A";
-C_CH  = "C_CH";
-C_PI  = "C_PI";
-C_REJ = "C_REJ";
+### connection events
+
+C_ACTION_ACK	   = "C_A";
+C_ACTION_CHALLENGE = "C_CH";
+C_ACTION_ERROR	   = "C_E";
+C_ACTION_PING	   = "C_PI";
+C_ACTION_REDIRECT  = "C_RED";
+C_ACTION_REJECT    = "C_REJ";
 
 ### state chart
 
 main := (
   start: (
-	  WS_OPEN @reconnecting -> AwaitingConnection
+	  WS_OPEN @start -> AwaitingConnection
   ),
   AwaitingConnection: (
 	  WS_CLOSE @close -> final |
-	  C_CH @challenge_response -> ChallengingWait
+	  C_ACTION_CHALLENGE @challenge -> ChallengingWait
   ),
   ChallengingWait: (
 	  WS_CLOSE @close -> final |
-	  C_REJ @close -> final |
-	  C_PI @pong -> ChallengingWait |
-	  C_A @authenticate -> AwaitingAuthentication
+	  C_ACTION_REJECT @close -> final |
+	  C_ACTION_REDIRECT @close -> final |
+	  C_ACTION_PING @pong -> ChallengingWait |
+	  C_ACTION_ACK @authenticate -> AwaitingAuthentication
   ),
   AwaitingAuthentication: (
 	  WS_CLOSE @close -> final |
-	  C_PI @pong -> AwaitingAuthentication |
+	  C_ACTION_PING @pong -> AwaitingAuthentication |
 	  A_ERR @error -> final |
 	  A_ACK @open -> Open
   ),
   Open: (
 	  WS_CLOSE @close -> final |
-	  C_PI @pong -> Open
-  ) -> Open
-) >begin $!error;
+	  C_ACTION_PING @pong -> Open
+  )
+) $!error;
 
 }%%
 
 %% write data;
 
-int connection_state_init(struct dsio_connection *conn, struct dsio_client *client)
+int sm_init(struct dsio_connection *conn, struct dsio_client *client)
 {
 	conn->client = client;
 	%% write init;
@@ -91,18 +139,18 @@ int connection_state_init(struct dsio_connection *conn, struct dsio_client *clie
  *  -1 if we had a failure
  *   0 if OK to continue accepting events
  */
-inline int connection_state_assert(struct dsio_connection *conn, const char *event)
+int sm_assert(struct dsio_connection *conn, const char *event)
 {
 	if (conn->cs == connection_error) {
 		if (event != NULL) {
 			dsio_log(DSIO_LL_ERR, "event='%s'\n", event);
 		}
-		dsio_log(DSIO_LL_CONNECTION, "conn->cs = connection_state_error\n");
+		dsio_log(DSIO_LL_CONNECTION, "conn->cs = connection_error\n");
 		return -1;
 	}
 
 	if (conn->cs >= connection_first_final) {
-		dsio_log(DSIO_LL_CONNECTION, "conn->cs = connection_state_first_final\n");
+		dsio_log(DSIO_LL_CONNECTION, "conn->cs = connection_first_final\n");
 		return 1;
 	}
 
@@ -110,11 +158,11 @@ inline int connection_state_assert(struct dsio_connection *conn, const char *eve
 }
 
 /*
- * Inject an event into the machine.
+ * Execuate an event against the state machine.
  *
- * Return 0 to accept more events, 1 for finished, -1 for failure.
+ * Returns 0 to accept more events, 1 for finished, -1 for failure.
  */
-int connection_state_exec(struct dsio_connection *conn, const char *event, size_t len)
+int sm_exec(struct dsio_connection *conn, const char *event, size_t len)
 {
 	const char *p = event;
 	const char *pe = p + len;
@@ -122,23 +170,23 @@ int connection_state_exec(struct dsio_connection *conn, const char *event, size_
 
 	dsio_log(DSIO_LL_NOTICE, "RECV '%s'\n", event);
 
-	if (connection_state_done(conn, event)) {
+	if (sm_done(conn, event)) {
 		dsio_log(DSIO_LL_ERR, "something bad happened; %s event\n", event);
 		return -1;
 	}
 
 	%% write exec;
 
-	return connection_state_assert(conn, event);
+	return sm_assert(conn, event);
 }
 
-int connection_state_finish(struct dsio_connection *conn)
+int sm_finish(struct dsio_connection *conn)
 {
-	dsio_log(DSIO_LL_CONNECTION, "connection_state_finish()\n");
-	return connection_state_assert(conn, NULL);
+	dsio_log(DSIO_LL_CONNECTION, "sm_finish()\n");
+	return sm_assert(conn, NULL);
 }
 
-int connection_state_done(struct dsio_connection *conn, const char *event)
+int sm_done(struct dsio_connection *conn, const char *event)
 {
 	return conn->cs == connection_error || conn->cs == connection_first_final;
 }

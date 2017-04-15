@@ -39,20 +39,20 @@ const char *const dsio_connection_state_names[] = {
 static int on_open(struct dsio_websocket *ws)
 {
 	DSIO_LOG_NOTICE("on_open\n");
-	connection_state_init(&ws->client->connection, ws->client);
-	return connection_state_exec(&ws->client->connection, "WS_OPEN", 7);
+	sm_init(&ws->client->connection, ws->client);
+	return sm_exec(&ws->client->connection, "WS_OPEN", 7);
 }
 
 static int on_close(struct dsio_websocket *ws)
 {
 	DSIO_LOG_NOTICE("on_close\n");
-	return connection_state_exec(&ws->client->connection, "WS_CLOSE", 8);
+	return sm_exec(&ws->client->connection, "WS_CLOSE", 8);
 }
 
 static int on_error(struct dsio_websocket *ws, const char *msg)
 {
 	DSIO_LOG_NOTICE("on_error\n");
-	return connection_state_exec(&ws->client->connection, "WS_ERROR", 8);
+	return sm_exec(&ws->client->connection, "WS_ERROR", 8);
 }
 
 static int on_message(struct dsio_websocket *ws, void *data, size_t len)
@@ -83,7 +83,7 @@ static int on_message(struct dsio_websocket *ws, void *data, size_t len)
 		     '_',
 		     msg.action->ident);
 
-	connection_state_exec(&ws->client->connection, msgid, n);
+	sm_exec(&ws->client->connection, msgid, n);
 
 	return 0;
 }
@@ -105,10 +105,10 @@ int connection_send_auth_response(struct dsio_connection *c)
 	/* char *password; */
 
 	/* if (c->client->cfg->username != NULL) { */
-	/* 	username = dsio_mprintf("\"username\":%s", */
-	/* 				c-client->cfg->username); */
+	/*	username = dsio_mprintf("\"username\":%s", */
+	/*				c-client->cfg->username); */
 	/* } */
-	    
+
 	char *m = dsio_msg_create(c->client->cfg->allocator,
 				  DSIO_TOPIC_AUTH,
 				  DSIO_ACTION_REQUEST,
@@ -125,11 +125,11 @@ int connection_send_pong_response(struct dsio_connection *c)
 	return c->endpoint.send(&c->endpoint, m, strlen(m));
 }
 
-void connection_state_change(struct dsio_connection *conn,
-				    enum dsio_connection_state next)
+void sm_state_set(struct dsio_connection *conn,
+		  enum dsio_connection_state next)
 {
 	DSIO_CONNECTION_STATE_CHANGE cb = conn->client->cfg->connection_state_change;
-	
+
 	if (cb != NULL) {
 		cb(conn->client, conn->state, next);
 	}
@@ -146,6 +146,5 @@ int connection_init(struct dsio_connection *conn, struct dsio_client *client)
 	conn->endpoint.on_close = on_close;
 	conn->endpoint.on_message = on_message;
 	conn->endpoint.on_error = on_error;
-	/* connection_state_init(&client->connection, client); */
 	return client->cfg->websocket_connect(client->cfg, &conn->endpoint);
 }

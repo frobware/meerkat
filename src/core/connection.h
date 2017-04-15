@@ -30,12 +30,14 @@ struct dsio_connection {
 };
 
 extern int connection_init(struct dsio_connection *conn, struct dsio_client *client);
-extern int connection_state_init(struct dsio_connection *conn, struct dsio_client *client);
-extern int connection_state_assert(struct dsio_connection *conn, const char *event);
-extern int connection_state_exec(struct dsio_connection *conn, const char *event, size_t len);
-extern int connection_state_finish(struct dsio_connection *conn);
-extern int connection_state_done(struct dsio_connection *conn, const char *event);
-extern void connection_state_change(struct dsio_connection *connection, enum dsio_connection_state newstate);
 extern int connection_send_challenge_response(struct dsio_connection *connection);
 extern int connection_send_auth_response(struct dsio_connection *c);
 extern int connection_send_pong_response(struct dsio_connection *c);
+
+/* state machine */
+extern int sm_init(struct dsio_connection *conn, struct dsio_client *client);
+extern int sm_assert(struct dsio_connection *conn, const char *event);
+extern int sm_exec(struct dsio_connection *conn, const char *event, size_t len);
+extern int sm_finish(struct dsio_connection *conn);
+extern int sm_done(struct dsio_connection *conn, const char *event);
+extern void sm_state_set(struct dsio_connection *connection, enum dsio_connection_state newstate);
