@@ -80,19 +80,24 @@ WS_CLOSE    = "WS_CLOSE";
 WS_ERROR    = "WS_ERROR";
 WS_OPEN	    = "WS_OPEN";
 
+# deepstream message and message part separator
+
+MS  = 0x1e;
+MPS = 0x1f;
+
 ### auth events
 
-A_ACK	    = "A_A";
-A_ERR	    = "A_E";
+AUTH_ACK = "A" MPS "A" MS;
+AUTH_ERR = "A" MPS "E" MS;
 
 ### connection events
 
-C_ACTION_ACK	   = "C_A";
-C_ACTION_CHALLENGE = "C_CH";
-C_ACTION_ERROR	   = "C_E";
-C_ACTION_PING	   = "C_PI";
-C_ACTION_REDIRECT  = "C_RED";
-C_ACTION_REJECT    = "C_REJ";
+CONN_ACK       = "C" MPS "A" MS;
+CONN_CHALLENGE = "C" MPS "CH" MS;
+CONN_ERROR     = "C" MPS "E" MS;
+CONN_PING      = "C" MPS "PI" MS;
+CONN_REDIRECT  = "C" MPS "RED" MS;
+CONN_REJECT    = "C" MPS "REJ" MS;
 
 ### state chart
 
@@ -102,24 +107,24 @@ main := (
   ),
   AwaitingConnection: (
 	  WS_CLOSE @close -> final |
-	  C_ACTION_CHALLENGE @challenge -> ChallengingWait
+	  CONN_CHALLENGE @challenge -> ChallengingWait
   ),
   ChallengingWait: (
 	  WS_CLOSE @close -> final |
-	  C_ACTION_REJECT @close -> final |
-	  C_ACTION_REDIRECT @close -> final |
-	  C_ACTION_PING @pong -> ChallengingWait |
-	  C_ACTION_ACK @authenticate -> AwaitingAuthentication
+	  CONN_REJECT @close -> final |
+	  CONN_REDIRECT @close -> final |
+	  CONN_PING @pong -> ChallengingWait |
+	  CONN_ACK @authenticate -> AwaitingAuthentication
   ),
   AwaitingAuthentication: (
 	  WS_CLOSE @close -> final |
-	  C_ACTION_PING @pong -> AwaitingAuthentication |
-	  A_ERR @error -> final |
-	  A_ACK @open -> Open
+	  CONN_PING @pong -> AwaitingAuthentication |
+	  AUTH_ERR @error -> final |
+	  AUTH_ACK @open -> Open
   ),
   Open: (
 	  WS_CLOSE @close -> final |
-	  C_ACTION_PING @pong -> Open
+	  CONN_PING @pong -> Open
   )
 ) $!error;
 

@@ -57,35 +57,7 @@ static int on_error(struct dsio_websocket *ws, const char *msg)
 
 static int on_message(struct dsio_websocket *ws, void *data, size_t len)
 {
-	int rc;
-	struct dsio_msg msg;
-	char msgid[128];
-	size_t n;
-
-	rc = dsio_msg_parse(ws->client->cfg->allocator, data, &msg);
-
-	if (rc != DSIO_OK) {
-		DSIO_LOG_ERR("unknown message: %.*s\n", (int)len, (char *)data);
-		return -1;
-	}
-
-#if 0
-	dsio_log_notice("RECV: %s_%s (%s.ACTION_%s)\n",
-			msg.topic->ident,
-			msg.action->ident,
-			msg.topic->descr,
-			msg.action->descr);
-#endif
-	/* Turn data into something we want to visualize in Ragel. */
-
-	n = snprintf(msgid, sizeof(msgid)-1, "%s%c%s",
-		     msg.topic->ident,
-		     '_',
-		     msg.action->ident);
-
-	sm_exec(&ws->client->connection, msgid, n);
-
-	return 0;
+	return sm_exec(&ws->client->connection, data, len);
 }
 
 int connection_send_challenge_response(struct dsio_connection *c)
@@ -99,16 +71,6 @@ int connection_send_challenge_response(struct dsio_connection *c)
 
 int connection_send_auth_response(struct dsio_connection *c)
 {
-	/* char *auth = "{}"; */
-
-	/* char *username; */
-	/* char *password; */
-
-	/* if (c->client->cfg->username != NULL) { */
-	/*	username = dsio_mprintf("\"username\":%s", */
-	/*				c-client->cfg->username); */
-	/* } */
-
 	char *m = dsio_msg_create(c->client->cfg->allocator,
 				  DSIO_TOPIC_AUTH,
 				  DSIO_ACTION_REQUEST,
