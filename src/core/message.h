@@ -22,7 +22,7 @@
 
 enum {
 	DSIO_MSG_SEPARATOR = 0x1e,
-	DSIO_MSG_PART_SEPARATOR = 0x1f,
+	DSIO_MSG_PART_SEPARATOR = 0x1f
 };
 
 struct dsio_msg_data {

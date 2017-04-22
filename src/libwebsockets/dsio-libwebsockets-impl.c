@@ -83,7 +83,7 @@ static int callback_dsio(struct lws *wsi,
 	return 0;
 }
 
-static struct lws_protocols protocols[2] = {
+static struct lws_protocols protocols[] = {
 	{
 		"",		/* name */
 		callback_dsio,	/* callback */

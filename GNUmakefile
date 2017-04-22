@@ -20,7 +20,7 @@ all: $(BUILD_DIR)/$(BUILD_FILE)
 
 # Argument 1 is the build directory.
 #
-# Argument 2 is specific arguments to pass to the cmake invocation.
+# Argument 2 are specific arguments to pass to cmake.
 #
 # Argument 3 is the directory containing the CMakeLists.txt.
 #
