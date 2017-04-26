@@ -241,7 +241,7 @@ int dsio_libwebsockets_service(struct dsio_websocket *ws)
 
 		state = dsio_client_state(ws->client);
 
-		if (!session->wsi && ratelimit_connects(&rl_dumb, 1u)) {
+		if (!session->wsi && ratelimit_connects(&rl_dumb, 3u)) {
 			printf("client state: %s\n",
 			       dsio_connection_state_names[state]);
 			fprintf(stderr, "**** RECONNECTING ****\n");
