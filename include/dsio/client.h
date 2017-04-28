@@ -45,7 +45,7 @@ struct dsio_client_cfg {
 	const char *ssl_cert_filepath;
 	const char *ssl_private_key_filepath;
 	int allow_self_signed_certs;
-	DSIO_WEBSOCKET_CONNECT websocket_connect;
+	dsio_websocket_connect websocket_connect;
 	DSIO_WEBSOCKET_DISCONNECT websocket_disconnect;
 	DSIO_WEBSOCKET_SERVICE websocket_service;
 	DSIO_CONNECTION_STATE_CHANGE connection_state_change;

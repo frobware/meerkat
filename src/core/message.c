@@ -25,6 +25,9 @@
 #include "actions.h"
 #include "mprintf.h"
 
+static const char MSG_SEP[] = { DSIO_MSG_SEPARATOR, '\0' };
+static const char MSG_PART_SEP[] = { DSIO_MSG_PART_SEPARATOR, '\0' };
+
 /*
  * Message Structure Overview
  * ==========================
@@ -143,6 +146,35 @@ int dsio_msg_parse(const struct dsio_allocator *a, const char *input, struct dsi
 	}
 
 	return s.parse_complete ? DSIO_OK : DSIO_ERROR;
+}
+
+int parse_parts(const struct dsio_allocator *allocator, struct dsio_msg_list *msg_list, char *input)
+{
+	char *p, *q;
+
+	for (p = input; /* true */; p = NULL) {
+		char *token = strtok_r(p, MSG_PART_SEP, &q);
+		if (token == NULL)
+			break;
+		printf("part: %s\n", token);
+	}
+
+	return 0;
+}
+
+int dsio_msg_parse2(const struct dsio_allocator *allocator, struct dsio_msg_list *msg_list, char *input)
+{
+	char *p, *q;
+
+	for (p = input; /* true */; p = NULL) {
+		char *token = strtok_r(p, MSG_SEP, &q);
+		if (token == NULL)
+			break;
+		printf("token: %s\n", token);
+		parse_parts(allocator, msg_list, token);
+	}
+
+	return 0;
 }
 
 char *dsio_msg_create(const struct dsio_allocator *allocator,

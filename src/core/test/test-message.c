@@ -315,6 +315,31 @@ static int test_all_topics_and_actions_without_alloc_failure(void)
 	return test_all_topics_and_actions(0);
 }
 
+static int test_multiple_messages(void)
+{
+	int rc;
+	struct dsio_msg_list msg_list;
+
+	char input[] = {
+		'C',
+		DSIO_MSG_PART_SEPARATOR,
+		'C',
+		'H',
+		DSIO_MSG_SEPARATOR,
+
+		'A',
+		DSIO_MSG_PART_SEPARATOR,
+		'A',
+		DSIO_MSG_SEPARATOR,
+
+		'\0',
+	};
+	test_allocator_reset();
+	rc = dsio_msg_parse2(test_allocator, &msg_list, input);
+	CUT_ASSERT_EQUAL(DSIO_OK, rc);
+	return 0;
+}
+
 CUT_BEGIN_TEST_HARNESS(message_suite)
 CUT_RUN_TEST(test_topic_null_ident);
 CUT_RUN_TEST(test_topic_empty_ident);
@@ -331,4 +356,5 @@ CUT_RUN_TEST(test_payload_data_alloc_fails);
 CUT_RUN_TEST(test_topic_and_action_without_record_separator);
 CUT_RUN_TEST(test_all_topics_and_actions_with_alloc_failure);
 CUT_RUN_TEST(test_all_topics_and_actions_without_alloc_failure);
+CUT_RUN_TEST(test_multiple_messages);
 CUT_END_TEST_HARNESS

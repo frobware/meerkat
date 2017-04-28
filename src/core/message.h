@@ -19,6 +19,7 @@
 #include <dsio/allocator.h>
 #include "topics.h"
 #include "actions.h"
+#include "array.h"
 
 enum {
 	DSIO_MSG_SEPARATOR = 0x1e,
@@ -34,11 +35,18 @@ struct dsio_msg {
 	const char *raw;
 	const struct dsio_topic_type *topic;
 	const struct dsio_action_type *action;
+	struct dsio_array part;
 	struct dsio_msg_data *data;
 	size_t ndata;
 };
 
+struct dsio_msg_list {
+	const char *raw;
+	struct dsio_array messages;
+};
+
 extern int dsio_msg_parse(const struct dsio_allocator *a, const char *const input, struct dsio_msg *msg);
+extern int dsio_msg_parse2(const struct dsio_allocator *a, struct dsio_msg_list *msg_list, char *input);
 extern int dsio_msg_release(struct dsio_msg *msg);
 
 extern char *dsio_msg_create(

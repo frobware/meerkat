@@ -47,6 +47,6 @@ struct dsio_websocket {
 	int (*on_message)(struct dsio_websocket *ws, void *buffer, size_t len);
 };
 
-typedef int (*DSIO_WEBSOCKET_CONNECT)(struct dsio_client_cfg *cfg, struct dsio_websocket *ws);
+typedef int (*dsio_websocket_connect)(struct dsio_client_cfg *cfg, struct dsio_websocket *ws);
 typedef void (*DSIO_WEBSOCKET_DISCONNECT)(struct dsio_websocket *ws);
 typedef int (*DSIO_WEBSOCKET_SERVICE)(struct dsio_websocket *ws);

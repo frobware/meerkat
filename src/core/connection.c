@@ -88,15 +88,15 @@ int connection_send_pong_response(struct dsio_connection *c)
 }
 
 void sm_state_set(struct dsio_connection *conn,
-		  enum dsio_connection_state next)
+		  enum dsio_connection_state newstate)
 {
 	DSIO_CONNECTION_STATE_CHANGE cb = conn->client->cfg->connection_state_change;
 
 	if (cb != NULL) {
-		cb(conn->client, conn->state, next);
+		cb(conn->client, conn->state, newstate);
 	}
 
-	conn->state = next;
+	conn->state = newstate;
 }
 
 int connection_init(struct dsio_connection *conn, struct dsio_client *client)
