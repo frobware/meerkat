@@ -54,7 +54,6 @@ endif()
 set(LIBDSIO_SRCS
   src/core/actions.c
   src/core/allocator.c
-  src/core/array.c
   src/core/bb.c
   src/core/client.c
   src/core/connection.c

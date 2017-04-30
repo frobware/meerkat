@@ -35,7 +35,7 @@ static int test_actions_are_sorted(void)
 		t[i].ident = strdup(dsio_actions[i].ident);
 		t[i].ident_len = dsio_actions[i].ident_len;
 		t[i].descr = strdup(dsio_actions[i].descr);
-		t[i].type = dsio_actions[i].type;
+		t[i].action = dsio_actions[i].action;
 		CUT_ASSERT_NOT_NULL(t[i].ident);
 		CUT_ASSERT_EQUAL(t[i].ident_len, strlen(dsio_actions[i].ident));
 	}
@@ -46,7 +46,7 @@ static int test_actions_are_sorted(void)
 		CUT_ASSERT_EQUAL(strcmp(t[i].ident, dsio_actions[i].ident), 0);
 		CUT_ASSERT_EQUAL(dsio_actions[i].ident_len, t[i].ident_len);
 		CUT_ASSERT_EQUAL(strcmp(t[i].descr, dsio_actions[i].descr), 0);
-		CUT_ASSERT_EQUAL(dsio_actions[i].type, t[i].type);
+		CUT_ASSERT_EQUAL(dsio_actions[i].action, t[i].action);
 		free((void *)t[i].ident);
 		free((void *)t[i].descr);
 	}

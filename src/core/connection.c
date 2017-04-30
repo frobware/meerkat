@@ -46,7 +46,7 @@ static int on_open(struct dsio_websocket *ws)
 static int on_close(struct dsio_websocket *ws)
 {
 	DSIO_LOG_NOTICE("on_close\n");
-	return sm_exec(&ws->client->connection, "WS_CLOSE", 8);
+	return sm_exec(&ws->client->connection, "WS_OPEN", 7);sm_exec(&ws->client->connection, "WS_CLOSE", 8);
 }
 
 static int on_error(struct dsio_websocket *ws, const char *msg)

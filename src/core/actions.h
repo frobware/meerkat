@@ -52,7 +52,7 @@ struct dsio_action_type {
 	const char *ident;
 	size_t ident_len;
 	const char *descr;
-	enum dsio_action_tag type;
+	enum dsio_action_tag action;
 };
 
 extern struct dsio_action_type dsio_actions[];

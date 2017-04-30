@@ -148,6 +148,7 @@ int dsio_msg_parse(const struct dsio_allocator *a, const char *input, struct dsi
 	return s.parse_complete ? DSIO_OK : DSIO_ERROR;
 }
 
+#if 0
 int parse_parts(const struct dsio_allocator *allocator, struct dsio_msg_list *msg_list, char *input)
 {
 	char *p, *q;
@@ -176,7 +177,7 @@ int dsio_msg_parse2(const struct dsio_allocator *allocator, struct dsio_msg_list
 
 	return 0;
 }
-
+#endif
 char *dsio_msg_create(const struct dsio_allocator *allocator,
 		      enum dsio_topic_tag topic,
 		      enum dsio_action_tag action,

@@ -29,7 +29,7 @@ define regenerate_cmake_rules
 	@cd $(1) ;					\
 	cmake -G$(CMAKE_GENERATOR)			\
 		-DCMAKE_BUILD_TYPE=$(CMAKE_BUILD_TYPE)	\
-		-DCMAKE_C_COMPILER=$(CMAKE_C_COMPILER)	\
+                -DCMAKE_EXPORT_COMPILE_COMMANDS=1	\
 		$(2) $(3)
 endef
 
