@@ -293,7 +293,7 @@ static int test_all_topics_and_actions(int alloc_failure)
 			rc = dsio_msg_parse(test_allocator, input, &msg);
 			CUT_ASSERT_EQUAL(DSIO_OK, rc);
 			CUT_ASSERT_EQUAL(dsio_topics[i].type, msg.topic->type);
-			CUT_ASSERT_EQUAL(dsio_actions[j].type, msg.action->type);
+			CUT_ASSERT_EQUAL(dsio_actions[j].action, msg.action->action);
 			CUT_ASSERT_EQUAL(strcmp(t->ident, msg.topic->ident), 0);
 			CUT_ASSERT_EQUAL(strcmp(a->ident, msg.action->ident), 0);
 			CUT_ASSERT_NULL(msg.data);
