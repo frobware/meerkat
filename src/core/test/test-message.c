@@ -18,20 +18,28 @@
 #include <string.h>
 #include <dsio/dsio.h>
 #include "../message.h"
-#include "../mprintf.h"
+#include "../builder.h"
 #include "allocator.c"
 #include "CUnitTest.h"
 
-static char *make_msg(const char *topic, const char *action)
+static int test_parse_msg(void)
 {
-	return dsio_mprintf(test_allocator,
-			    "%s%c%s%c",
-			    topic,
-			    DSIO_MSG_PART_SEPARATOR,
-			    action,
-			    DSIO_MSG_SEPARATOR);
+	int rc;
+	char *msg1;
+
+	struct dsio_msg_list msg_list;
+
+	test_allocator_reset();
+
+	msg1 = dsio_msg_build(test_allocator, DSIO_TOPIC_AUTH, DSIO_ACTION_ACK, "hello", "world", NULL);
+	dsio_msg_list_init(test_allocator, &msg_list);
+	rc = dsio_msg_parse(msg1, &msg_list);
+	CUT_ASSERT_EQUAL(DSIO_OK, rc);
+
+	return 0;
 }
 
+#if 0
 static int test_topic_null_ident(void)
 {
 	int rc;
@@ -342,6 +350,7 @@ static int test_multiple_messages(void)
 }
 #endif
 
+
 CUT_BEGIN_TEST_HARNESS(message_suite)
 CUT_RUN_TEST(test_topic_null_ident);
 CUT_RUN_TEST(test_topic_empty_ident);
@@ -358,5 +367,9 @@ CUT_RUN_TEST(test_payload_data_alloc_fails);
 CUT_RUN_TEST(test_topic_and_action_without_record_separator);
 CUT_RUN_TEST(test_all_topics_and_actions_with_alloc_failure);
 CUT_RUN_TEST(test_all_topics_and_actions_without_alloc_failure);
+#endif
+
+CUT_BEGIN_TEST_HARNESS(message_suite)
+CUT_RUN_TEST(test_parse_msg);
 /* CUT_RUN_TEST(test_multiple_messages); */
 CUT_END_TEST_HARNESS

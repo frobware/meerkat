@@ -1,0 +1,3 @@
+[submodule "seatest"]
+	path = seatest
+	url = https://github.com/keithn/seatest.git

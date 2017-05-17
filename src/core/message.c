@@ -28,177 +28,127 @@
 static const char MSG_SEP[] = { DSIO_MSG_SEPARATOR, '\0' };
 static const char MSG_PART_SEP[] = { DSIO_MSG_PART_SEPARATOR, '\0' };
 
-/*
- * Message Structure Overview
- * ==========================
- *
- * deepstream messages are transmitted using a proprietary, minimal,
- * string-based protocol. Every message follows the same structure:
- *
- * <topic>|<action>|<data[0]>|...|<data[n]>+
- *
- * | and + are used above as placeholders, but messages are actually
- * separated by ASCII control characters ("unit separator" 31) and
- * "record separator" 30).
- *
- * Every message has a topic (e.g., RECORD, EVENT, AUTH) and an action
- * (e.g., CREATE, DELETE, SUBSCRIBE).
- *
- * Messages always start with TOPIC, then ACTION, but can contain zero
- * or more data fields.
- */
-
-struct scanner {
-	const char *input;
-	const char *curr;
-	struct dsio_msg *msg;
-	const struct dsio_allocator *allocator;
-	int parse_complete;
-};
-
-static int parse_topic(struct scanner *s)
+static int part_list_grow(const struct dsio_allocator *a, struct dsio_msg_part_list *l)
 {
-	const char *token = s->curr;
+	if (l->len == l->cap) {
+		size_t new_cap = l->cap;
+		void *new_partv;
 
-	for (; *s->curr != '\0'; s->curr++) {
-		switch (*s->curr) {
-		case DSIO_MSG_PART_SEPARATOR:
-			s->msg->topic = dsio_topic_lookup(token, s->curr - token);
-			s->curr++;
-			return s->msg->topic ? DSIO_OK : DSIO_ERROR;
+		if (l->len == 0) {
+			new_cap = 1;
+		} else {
+			new_cap *= 2;
 		}
-	}
 
-	return DSIO_ERROR;
-}
+		new_partv = DSIO_REALLOC(a, l->partv, new_cap * sizeof *l->partv);
 
-static int parse_action(struct scanner *s)
-{
-	const char *token = s->curr;
-
-	for (; *s->curr != '\0'; s->curr++) {
-		int c = *s->curr;
-		switch (c) {
-		case DSIO_MSG_SEPARATOR:
-			s->parse_complete = 1;
-			/* fallthrough */
-		case DSIO_MSG_PART_SEPARATOR:
-			s->msg->action = dsio_action_lookup(token, s->curr - token);
-			s->curr++;
-			return s->msg->action ? DSIO_OK : DSIO_ERROR;
+		if (new_partv == NULL) {
+			return DSIO_NOMEM;
 		}
-	}
 
-	return DSIO_ERROR;
-}
-
-static int parse_payload(struct scanner *s)
-{
-	const char *token = s->curr;
-
-	for (; *s->curr != '\0'; s->curr++) {
-		switch (*s->curr) {
-		case DSIO_MSG_SEPARATOR:
-			s->parse_complete = 1;
-			return DSIO_OK;
-		case DSIO_MSG_PART_SEPARATOR:
-			s->msg->data = DSIO_REALLOC(s->allocator,
-						    s->msg->data,
-						    (1 + s->msg->ndata) * sizeof(*s->msg->data));
-			if (s->msg->data == NULL) {
-				return DSIO_NOMEM;
-			}
-			s->msg->data[s->msg->ndata].start = token;
-			s->msg->data[s->msg->ndata++].len = s->curr - token;
-			token = s->curr + 1;
-			break;
-		}
+		l->cap = new_cap;
+		l->partv = new_partv;
 	}
 
 	return DSIO_OK;
 }
 
-int dsio_msg_parse(const struct dsio_allocator *a, const char *input, struct dsio_msg *msg)
+static int msg_list_grow(const struct dsio_allocator *a, struct dsio_msg_list *l)
+{
+	if (l->len == l->cap) {
+		size_t nbytes;
+		size_t new_cap = l->cap;
+		size_t element_size = sizeof *l->msgv;
+		void *new_msgv;
+
+		if (l->len == 0) {
+			new_cap = 1;
+		} else {
+			new_cap *= 2;
+		}
+
+		new_msgv = DSIO_REALLOC(a, l->msgv, new_cap * element_size);
+
+		if (new_msgv == NULL) {
+			return DSIO_NOMEM;
+		}
+
+		nbytes = (new_cap - l->cap) * element_size;
+		memset((char *)new_msgv + (l->cap * element_size), 0, nbytes);
+
+		l->cap = new_cap;
+		l->msgv = new_msgv;
+	}
+
+	return DSIO_OK;
+}
+
+static void msg_list_reset(struct dsio_msg_list *l)
+{
+	size_t i, j;
+
+	for (i = 0; i < l->cap; i++) {
+		for (j = 0; j < l->msgv[i].part_list.cap; j++) {
+			l->msgv[i].part_list.partv[j].len = 0;
+		}
+		l->len = 0;
+	}
+}
+
+void dsio_msg_list_init(const struct dsio_allocator *a, struct dsio_msg_list *l)
+{
+	memset(l, 0, sizeof *l);
+	l->allocator = a;
+}
+
+static int parse_parts(char *input, const struct dsio_allocator *a, struct dsio_msg_part_list *l)
 {
 	int rc;
-	struct scanner s;
+	char *token, *q;
 
-	if (input == NULL || *input == '\0')
-		return DSIO_ERROR;
+	token = strtok_r(input, MSG_PART_SEP, &q);
 
-	memset(msg, 0, sizeof *msg);
-	s.input = input;
-	s.curr = input;
-	s.parse_complete = 0;
-	s.msg = msg;
-	s.msg->raw = input;
-	s.allocator = a;
-
-	if ((rc = parse_topic(&s)) != DSIO_OK)
-		return rc;
-
-	if ((rc = parse_action(&s)) != DSIO_OK)
-		return rc;
-
-	if (!s.parse_complete) {
-		if ((rc = parse_payload(&s)) != DSIO_OK)
-			return rc;
-	}
-
-	return s.parse_complete ? DSIO_OK : DSIO_ERROR;
-}
-
-#if 0
-int parse_parts(const struct dsio_allocator *allocator, struct dsio_msg_list *msg_list, char *input)
-{
-	char *p, *q;
-
-	for (p = input; /* true */; p = NULL) {
-		char *token = strtok_r(p, MSG_PART_SEP, &q);
-		if (token == NULL)
-			break;
+	while (token != NULL) {
+		printf("part->len = %zd\n", l->len);
+		printf("part->cap = %zd\n", l->cap);
 		printf("part: %s\n", token);
+		if ((rc = part_list_grow(a, l)) != DSIO_OK)
+			return rc;
+		l->len++;
+		token = strtok_r(NULL, MSG_PART_SEP, &q);
 	}
 
-	return 0;
+	return DSIO_OK;
 }
 
-int dsio_msg_parse2(const struct dsio_allocator *allocator, struct dsio_msg_list *msg_list, char *input)
+static int parse_messages(char *input, struct dsio_msg_list *l)
 {
-	char *p, *q;
+	int rc;
+	char *token, *q;
 
-	for (p = input; /* true */; p = NULL) {
-		char *token = strtok_r(p, MSG_SEP, &q);
-		if (token == NULL)
-			break;
-		printf("token: %s\n", token);
-		parse_parts(allocator, msg_list, token);
+	msg_list_reset(l);
+	token = strtok_r(input, MSG_SEP, &q);
+
+	while (token != NULL) {
+		rc = msg_list_grow(l->allocator, l);
+
+		if (rc != DSIO_OK)
+			return rc;
+
+		rc = parse_parts(token, l->allocator, &l->msgv[l->len].part_list);
+
+		if (rc != DSIO_OK)
+			return rc;
+
+		l->len++;
+		token = strtok_r(NULL, MSG_SEP, &q);
 	}
 
-	return 0;
+	return DSIO_OK;
 }
-#endif
-char *dsio_msg_create(const struct dsio_allocator *allocator,
-		      enum dsio_topic_tag topic,
-		      enum dsio_action_tag action,
-		      const char *payload)
+
+int dsio_msg_parse(char *input, struct dsio_msg_list *msg_list)
 {
-	if (payload == NULL || *payload == '\0') {
-		return dsio_mprintf(allocator,
-				    "%s%c%s%c",
-				    dsio_topics[topic].ident,
-				    DSIO_MSG_PART_SEPARATOR,
-				    dsio_actions[action].ident,
-				    DSIO_MSG_SEPARATOR);
-	}
-	
-	return dsio_mprintf(allocator,
-			    "%s%c%s%c%s%c",
-			    dsio_topics[topic].ident,
-			    DSIO_MSG_PART_SEPARATOR,
-			    dsio_actions[action].ident,
-			    DSIO_MSG_PART_SEPARATOR,
-			    payload,
-			    DSIO_MSG_SEPARATOR);
+	printf("N=%s\n", input);
+	return parse_messages(input, msg_list);
 }
-

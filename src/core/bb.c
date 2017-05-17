@@ -13,22 +13,15 @@
  * which may be too aggressive in some circumstances.
  */
 
-static char dsio_bb_fugacious[1] = { '\0' };
-
-struct dsio_bb {
-	char *data;
-	size_t len;
-	size_t capacity;
-	const struct dsio_allocator *allocator;
-};
+static char dsio_bb_ephemeral[] = { '\0' };
 
 static void dsio_bb_init(struct dsio_bb *bb, const struct dsio_allocator *allocator)
 {
 	bb->allocator = allocator;
 	bb->len = 0;
 	bb->capacity = 0;
-	bb->data = dsio_bb_fugacious;
-	assert(dsio_bb_fugacious[0] == '\0');
+	bb->data = dsio_bb_ephemeral;
+	assert(dsio_bb_ephemeral[0] == '\0');
 }
 
 static int dsio_bb_capacity_set(struct dsio_bb *bb, size_t new_capacity)
@@ -55,14 +48,14 @@ static int dsio_bb_capacity_set(struct dsio_bb *bb, size_t new_capacity)
 	return DSIO_OK;
 }
 
-static int dsio_bb_write(struct dsio_bb *bb, int byte)
+static int dsio_bb_write(struct dsio_bb *bb, unsigned char byte)
 {
 	int rc = dsio_bb_capacity_set(bb, bb->len + 1);
 
 	if (rc != DSIO_OK)
 		return rc;
 
-	bb->data[bb->len++] = (char) byte;
+	bb->data[bb->len++] = byte;
 
 	return DSIO_OK;
 }
@@ -103,7 +96,7 @@ void dsio_strbuf_reset(struct dsio_bb *bb)
 {
 	bb->len = 0;
 
-	if (bb->data != dsio_bb_fugacious) {
+	if (bb->data != dsio_bb_ephemeral) {
 		bb->data[0] = '\0';
 	}
 }
@@ -134,7 +127,7 @@ int dsio_strbuf_vfmt(struct dsio_bb *bb, const char *fmt, va_list ap)
 	if (size == 0)
 		return DSIO_OK;
 
-	if (bb->data == dsio_bb_fugacious)
+	if (bb->data == dsio_bb_ephemeral)
 		bb->data = NULL;
 
 	rc = dsio_bb_reserve(bb, size + 1, &next);
@@ -149,7 +142,7 @@ int dsio_strbuf_vfmt(struct dsio_bb *bb, const char *fmt, va_list ap)
 	if (n < size)
 		return DSIO_ERROR;
 
-	bb->len--;
+	bb->len--;		/* why? */
 
 	return DSIO_OK;
 }
@@ -158,7 +151,7 @@ int dsio_strbuf_addc(struct dsio_bb *bb, int c)
 {
 	int rc;
 
-	if (bb->data == dsio_bb_fugacious)
+	if (bb->data == dsio_bb_ephemeral)
 		bb->data = NULL;
 
 	rc = dsio_bb_write(bb, c);
@@ -187,6 +180,6 @@ int dsio_bb_append(struct dsio_bb *bb, const char *new_data, size_t new_data_len
 
 void dsio_bb_terminate(struct dsio_bb *bb)
 {
-	if (bb->data != dsio_bb_fugacious)
+	if (bb->data != dsio_bb_ephemeral)
 		DSIO_FREE(bb->allocator, bb->data);
 }

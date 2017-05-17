@@ -20,6 +20,8 @@
 #include <dsio/client.h>
 #include <dsio/websocket.h>
 
+#include "message.h"
+
 struct dsio_client;
 
 struct dsio_connection {
@@ -27,6 +29,7 @@ struct dsio_connection {
 	enum dsio_connection_state state;
 	struct dsio_client *client;
 	struct dsio_websocket endpoint;
+	struct dsio_msg_list messages;
 };
 
 extern int connection_init(struct dsio_connection *conn, struct dsio_client *client);

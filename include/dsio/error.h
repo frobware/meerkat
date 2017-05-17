@@ -25,4 +25,4 @@ enum {
 	DSIO_NR_ERRORS
 };
 	
-extern const char* dsio_strerror(int status);
+extern const char *dsio_strerror(int status);

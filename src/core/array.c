@@ -2,7 +2,7 @@
 #include <dsio/dsio.h>
 #include "array.h"
 
-static char *element_ptr(struct dsio_array *a, size_t idx)
+static inline char *element_ptr(struct dsio_array *a, size_t idx)
 {
 	return (char *)a->data + (idx * a->element_size);
 }
@@ -21,7 +21,8 @@ void dsio_array_init(const struct dsio_allocator *allocator,
 int dsio_array_capacity_set(struct dsio_array *array, size_t new_size)
 {
 	void *new_data;
-	size_t nbytes, curr_cap = array->cap;
+	size_t nbytes;
+	size_t curr_cap = array->cap;
 
 	if (new_size < curr_cap)
 		return DSIO_OK;

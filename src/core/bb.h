@@ -3,7 +3,13 @@
 #include <stdarg.h>
 
 struct dsio_allocator;
-struct dsio_bb;
+
+struct dsio_bb {
+	char *data;
+	size_t len;
+	size_t capacity;
+	const struct dsio_allocator *allocator;
+};
 
 extern void dsio_strbuf_init(struct dsio_bb *bb, const struct dsio_allocator *allocator);
 extern char *dsio_strbuf_purloin(struct dsio_bb *bb);

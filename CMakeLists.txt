@@ -55,6 +55,7 @@ set(LIBDSIO_SRCS
   src/core/actions.c
   src/core/allocator.c
   src/core/bb.c
+  src/core/builder.c
   src/core/client.c
   src/core/connection.c
   src/core/error.c
@@ -71,10 +72,10 @@ add_library(libdsio_core SHARED ${LIBDSIO_SRCS})
 set_target_properties(libdsio_core PROPERTIES OUTPUT_NAME dsio-core)
 
 set(SRC_CORE_TESTS
+  test-actions
   test-allocator
   test-message
   test-mprintf
-  test-actions
 )
 
 foreach(test ${SRC_CORE_TESTS})

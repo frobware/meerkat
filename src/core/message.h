@@ -25,29 +25,30 @@ enum {
 	DSIO_MSG_PART_SEPARATOR = 0x1f
 };
 
-struct dsio_msg_data {
-	const char *start;
+struct dsio_msg_part {
+	void *data;
 	size_t len;
 };
 
+struct dsio_msg_part_list {
+	struct dsio_msg_part *partv;
+	size_t len;
+	size_t cap;
+};
+
 struct dsio_msg {
-	const char *raw;
 	const struct dsio_topic_type *topic;
 	const struct dsio_action_type *action;
-	struct dsio_msg_data *data;
-	size_t ndata;
+	struct dsio_msg_part_list part_list;
 };
 
 struct dsio_msg_list {
-	const char *raw;
+	struct dsio_msg *msgv;
+	size_t len;
+	size_t cap;
+	const struct dsio_allocator *allocator;
 };
 
-extern int dsio_msg_parse(const struct dsio_allocator *a, const char *const input, struct dsio_msg *msg);
-extern int dsio_msg_parse2(const struct dsio_allocator *a, struct dsio_msg_list *msg_list, char *input);
-extern int dsio_msg_release(struct dsio_msg *msg);
-
-extern char *dsio_msg_create(
-	const struct dsio_allocator *allocator,
-	enum dsio_topic_tag topic,
-	enum dsio_action_tag action,
-	const char *payload);
+extern void dsio_msg_list_init(const struct dsio_allocator *allocator, struct dsio_msg_list *list);
+extern int dsio_msg_parse(char *input, struct dsio_msg_list *messages);
+extern int dsio_msg_release(struct dsio_msg_list *messages);
