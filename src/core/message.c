@@ -149,6 +149,10 @@ static int parse_messages(char *input, struct dsio_msg_list *l)
 
 int dsio_msg_parse(char *input, struct dsio_msg_list *msg_list)
 {
+	if (input == NULL || *input == '\0') {
+		return DSIO_BAD_MESSAGE
+	}
+
 	printf("N=%s\n", input);
 	return parse_messages(input, msg_list);
 }

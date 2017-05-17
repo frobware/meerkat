@@ -20,6 +20,9 @@ static const char *const errors[] = {
 	"success",
 	"logic error",
 	"out of memory",
+	"invalid message",
+	"unknown topic",
+	"unknown action",
 };
 
 const char *dsio_strerror(int n)

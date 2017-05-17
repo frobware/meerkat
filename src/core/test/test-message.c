@@ -22,6 +22,10 @@
 #include "allocator.c"
 #include "CUnitTest.h"
 
+static int test_empty_message(void)
+{
+}
+
 static int test_parse_msg(void)
 {
 	int rc;
